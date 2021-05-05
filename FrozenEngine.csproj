@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>FrozenEngine</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="ECS\Components\Camera2d.cs" />
+    <Compile Remove="ECS\Components\ShapeRenderer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="DefaultContent\Arial.xnb" />
+    <None Remove="ECS\Components\Camera.cs~RF1a4e0ee2.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="DefaultContent\Arial.xnb" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.0.1641" />
+    <PackageReference Include="Monogame.ImGui.Standard" Version="1.0.0" />
+    <PackageReference Include="System.Memory" Version="4.5.4" />
+  </ItemGroup>
+</Project>
