@@ -9,22 +9,24 @@ using System.Linq;
 
 namespace FrozenEngine.Drawing
 {
-	internal abstract class Drawable<T> where T : struct, IVertexType
+	internal abstract class Drawable
 	{
-		protected ExpandingArray<T> vertices;
+		protected ExpandingArray<VertexPositionColorTexture> vertices;
 		protected ExpandingArray<int> indices;
+
+		public abstract Material Material { get; protected set; }
 		protected abstract Func<int, bool> ValidateVertices { get; }
 		protected abstract int VerticesPerPrimitive { get; }
 
 		public int PrimitivesCount => this.indices.Count / this.VerticesPerPrimitive;
 		public PrimitiveType PrimitiveType { get; private set; }
-		public T[] Vertices => this.vertices.Data;
+		public VertexPositionColorTexture[] Vertices => this.vertices.Data;
 		public int[] Indices => this.indices.Data;
 
 		protected Drawable(PrimitiveType pType)
 		{
 			this.PrimitiveType = pType;
-			this.vertices = new ExpandingArray<T>();
+			this.vertices = new ExpandingArray<VertexPositionColorTexture>();
 			this.indices = new ExpandingArray<int>();
 		}
 
@@ -34,7 +36,7 @@ namespace FrozenEngine.Drawing
 			this.indices.Clear();
 		}
 
-		public void AppendVertices(T[] vertices, int[] indices)
+		public void AppendVertices(VertexPositionColorTexture[] vertices, int[] indices)
 		{
 			if(!this.ValidateVertices(indices.Length))
 				throw new ArgumentException("Not enough vertices");
@@ -45,16 +47,14 @@ namespace FrozenEngine.Drawing
 		}
 	}
 
-	internal class TexturedTris : Drawable<VertexPositionColorTexture>
+	internal class TriangleList : Drawable
 	{
-		public Material Material { get; private set; }
+		public override Material Material { get; protected set; }
 		protected override Func<int, bool> ValidateVertices => CoreMath.IsMultipleOf3;
 		protected override int VerticesPerPrimitive => 3;
 
-		public TexturedTris(Material material) : base(PrimitiveType.TriangleList)
-		{
-			this.Material = material;
-		}
+		public TriangleList() : base(PrimitiveType.TriangleList)
+		{ }
 
 		public void Reset(Material material)
 		{
@@ -63,12 +63,13 @@ namespace FrozenEngine.Drawing
 		}
 	}
 
-	internal class ColoredLines : Drawable<VertexPositionColor>
+	internal class LinesList : Drawable
 	{
+		public override Material Material { get; protected set; } = Material.FlatColor;
 		protected override Func<int, bool> ValidateVertices => CoreMath.IsMultipleOf2;
 		protected override int VerticesPerPrimitive => 2;
 
-		public ColoredLines() : base(PrimitiveType.LineList)
+		public LinesList() : base(PrimitiveType.LineList)
 		{ }
 	}
 }

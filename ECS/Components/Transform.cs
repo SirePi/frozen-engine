@@ -10,7 +10,7 @@ namespace FrozenEngine.ECS.Components
 		private Vector3 position;
 		private float rotation;
 		private float scale = 1;
-		private Matrix transformMatrix;
+		private Matrix transformMatrix = Matrix.Identity;
 
 		public new bool IsActive => true;
 

@@ -7,13 +7,13 @@ namespace FrozenEngine.Drawing
 {
 	public class DrawTechnique
 	{
-		internal Effect Effect { get; private set; }
-		internal bool IsCompiled { get; private set; }
+		public static DrawTechnique FlatColor { get; private set; } = new DrawTechnique(new BasicEffect(Core.Game.GraphicsDevice) { TextureEnabled = false, VertexColorEnabled = true });
 
-		internal void Compile(GraphicsDevice device)
+		internal Effect Effect { get; private set; }
+
+		public DrawTechnique(Effect baseEffect)
 		{
-			this.Effect = new BasicEffect(device) { Alpha = .5f };
-			this.IsCompiled = true;
+			this.Effect = baseEffect;
 		}
 	}
 }

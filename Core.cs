@@ -32,21 +32,23 @@ namespace FrozenEngine
 
 			Type[] components = AppDomain.CurrentDomain.GetAssemblies()
 				.SelectMany(
-					asm => asm.GetTypes().Where(t => t.IsSubclassOf(typeof(Component)))
+					asm => asm.GetTypes().Where(t => t.IsSubclassOf(typeof(Component)) && !t.IsAbstract)
 				).ToArray();
 
 			// Building component cache
 			RequiredComponentsCache = components.ToDictionary(
 				k => k,
 				v => v.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-						.Where(f => f.GetCustomAttribute<RequiredComponentAttribute>() != null)
-						.ToArray()
+					.Where(f => f.GetCustomAttribute<RequiredComponentAttribute>() != null)
+					.ToArray()
 			);
 
 			// Building update order
 			ComponentsUpdateOrder = components.ToDictionary(
 				k => k,
-				v => GetRequiredComponentsFor(v).Distinct().Count()
+				v => GetRequiredComponentsFor(v)
+					.Distinct()
+					.Count()
 			);
 
 			Keyboard = new KeyboardManager();

@@ -7,28 +7,37 @@ namespace FrozenEngine.Drawing
 {
 	public class Material
 	{
-		public static Material White { get; private set; } = new Material(null, new DrawTechnique());
+		public static Material FlatColor { get; private set; } = new Material(DefaultGraphics.FlatColor);
 
-		public SpriteSheet SpriteSheet { get; private set; }
-		public DrawTechnique Technique { get; private set; }
-		internal AlphaTestEffect Effect { get; private set; }
-		internal bool IsCompiled { get; private set; }
+#pragma warning disable IDE0022 // Use block body for methods - suppressed for clarity
+		public static Material AlphaBlendedSprite(SpriteSheet spriteSheet) => new Material(DefaultGraphics.AlphaTestTexture, spriteSheet);
+		public static Material FromSprite(SpriteSheet spriteSheet) => new Material(DefaultGraphics.DefaultTexture, spriteSheet);
+#pragma warning restore IDE0022 // Use block body for methods
 
-		internal void Compile(GraphicsDevice device)
+		private SpriteSheet spriteSheet;
+		public SpriteSheet SpriteSheet
 		{
-			this.Effect = new AlphaTestEffect(device)
+			get => this.spriteSheet;
+			set
 			{
-				Texture = this.SpriteSheet.Texture,
-				VertexColorEnabled = true
-			};
-
-			this.IsCompiled = true;
+				if (this.spriteSheet != value)
+				{
+					this.spriteSheet = value;
+					switch (this.Effect)
+					{
+						case AlphaTestEffect a: a.Texture = this.spriteSheet.Texture; break;
+						case BasicEffect b: b.Texture = this.spriteSheet.Texture; break;
+					}
+				}
+			}
 		}
 
-		public Material(SpriteSheet spriteSheet, DrawTechnique technique)
+		public Effect Effect { get; private set; }
+
+		public Material(Effect effect, SpriteSheet spriteSheet = null)
 		{
+			this.Effect = effect.Clone();
 			this.SpriteSheet = spriteSheet;
-			this.Technique = technique;
 		}
 
 		public long DefaultSortingHash(float z)

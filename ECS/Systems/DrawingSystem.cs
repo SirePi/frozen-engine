@@ -12,14 +12,11 @@ namespace FrozenEngine.ECS.Systems
 {
 	public class DrawingSystem
 	{
-		private readonly List<TexturedTris> texturedTris = new List<TexturedTris>();
-		private readonly ColoredLines coloredLines = new ColoredLines();
-		private int trisCount;
-		private int trisUsed;
+		private readonly List<Drawable> drawables = new List<Drawable>();
+		private int drawablesUsed;
 
 		private readonly SpriteBatch batch;
 		private readonly GraphicsDevice device;
-		private readonly BasicEffect lineEffect;
 
 		internal DrawingSystem(GraphicsDevice device)
 		{
@@ -28,15 +25,11 @@ namespace FrozenEngine.ECS.Systems
 			this.device.RasterizerState = new RasterizerState { CullMode = CullMode.CullCounterClockwiseFace, FillMode = FillMode.Solid };
 
 			this.batch = new SpriteBatch(device);
-
-			this.lineEffect = new BasicEffect(device);
-			this.lineEffect.TextureEnabled = false;
-			this.lineEffect.VertexColorEnabled = true;
 		}
 
 		internal void DrawScene(Scene scene, GameTime gameTime)
 		{
-			this.Clear();
+			this.ClearDrawables();
 
 			foreach (Renderer renderer in scene.GetSortedRenderers())
 				renderer.Draw(this);
@@ -49,37 +42,23 @@ namespace FrozenEngine.ECS.Systems
 				this.device.SamplerStates[0] = SamplerState.AnisotropicClamp;
 				this.device.RasterizerState = new RasterizerState { CullMode = CullMode.CullCounterClockwiseFace, FillMode = FillMode.Solid };
 
-				for (int i = 0; i < this.trisUsed; i++)
+				for (int i = 0; i < this.drawablesUsed; i++)
 				{
-					TexturedTris tt = this.texturedTris[i];
-					if (tt.PrimitivesCount > 0)
+					Drawable d = this.drawables[i];
+					if (d.PrimitivesCount > 0)
 					{
-						if (!tt.Material.IsCompiled)
-							tt.Material.Compile(this.device);
+						if (d.Material.Effect is IEffectMatrices iem)
+						{
+							iem.Projection = camera.Projection;
+							iem.View = camera.View;
+							iem.World = Matrix.Identity;
+						}
 
-						tt.Material.Effect.Projection = camera.Projection;
-						tt.Material.Effect.View = camera.View;
-						tt.Material.Effect.World = Matrix.Identity;
-
-						foreach (EffectPass pass in tt.Material.Effect.CurrentTechnique.Passes)
+						foreach (EffectPass pass in d.Material.Effect.CurrentTechnique.Passes)
 						{
 							pass.Apply();
-							// this.device.DrawUserPrimitives(PrimitiveType.TriangleList, tt.Vertices, 0, tt.PrimitivesCount);
-							this.device.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, tt.Vertices, 0, tt.Vertices.Length, tt.Indices, 0, tt.PrimitivesCount);
+							this.device.DrawUserIndexedPrimitives(d.PrimitiveType, d.Vertices, 0, d.Vertices.Length, d.Indices, 0, d.PrimitivesCount);
 						}
-					}
-				}
-
-				if (this.coloredLines.PrimitivesCount > 0)
-				{
-					this.lineEffect.Projection = camera.Projection;
-					this.lineEffect.View = camera.View;
-					this.lineEffect.World = Matrix.Identity;
-
-					foreach (EffectPass pass in this.lineEffect.CurrentTechnique.Passes)
-					{
-						pass.Apply();
-						this.device.DrawUserIndexedPrimitives(PrimitiveType.LineList, this.coloredLines.Vertices, 0, this.coloredLines.Vertices.Length, this.coloredLines.Indices, 0, this.coloredLines.PrimitivesCount);
 					}
 				}
 			}
@@ -109,42 +88,54 @@ namespace FrozenEngine.ECS.Systems
 				ui.Draw(gameTime);
 		}
 
-		private void Clear()
+		private void ClearDrawables()
 		{
-			this.coloredLines.Clean();
+			for (int i = 0; i < this.drawables.Count; i++)
+				this.drawables[i].Clean();
 
-			for (int i = 0; i < this.trisCount; i++)
-				this.texturedTris[i].Clean();
-
-			this.trisUsed = 0;
+			this.drawablesUsed = 0;
 		}
 
 		public void DrawTexturedTriangles(Material material, VertexPositionColorTexture[] vertices, int[] indices)
 		{
-			if (this.trisUsed > 0 && this.texturedTris[this.trisUsed - 1].Material == material)
+			if (this.drawablesUsed > 0 && this.drawables[this.drawablesUsed - 1] is TriangleList && this.drawables[this.drawablesUsed - 1].Material == material)
 			{
-				this.texturedTris[this.trisUsed - 1].AppendVertices(vertices, indices);
+				this.drawables[this.drawablesUsed - 1].AppendVertices(vertices, indices);
 			}
 			else
 			{
-				TexturedTris tris;
-				if (this.trisUsed < this.trisCount)
-				{
-					tris = this.texturedTris[this.trisUsed];
-					tris.Reset(material);
-				}
-				else
-				{
-					tris = new TexturedTris(material);
-					this.texturedTris.Add(tris);
-					this.trisCount++;
-				}
+				TriangleList tList = this.GetFreeDrawable<TriangleList>();
+				tList.Reset(material);
+				tList.AppendVertices(vertices, indices);
 
-				tris.AppendVertices(vertices, indices);
-
-				this.trisUsed++;
+				this.drawablesUsed++;
 			}
 		}
+
+		private T GetFreeDrawable<T>() where T : Drawable, new()
+		{
+			for (int i = this.drawablesUsed; i < this.drawables.Count; i++)
+			{
+				if (this.drawables[i] is T t)
+				{
+					if (i != this.drawablesUsed)
+					{
+						// Swap
+						Drawable tmp = this.drawables[this.drawablesUsed];
+						this.drawables[this.drawablesUsed] = t;
+						this.drawables[i] = tmp;
+					}
+
+					return t;
+				}
+			}
+
+			T result = new T();
+			this.drawables.Add(result);
+
+			return result;
+		}
+
 
 		/// <summary>
 		/// Adds indexed triangles to be rendered as flat colored texture. The TextureCoordinates information in the <paramref name="vertices"/> array is discarded.
@@ -156,25 +147,36 @@ namespace FrozenEngine.ECS.Systems
 			for (int i = 0; i < vertices.Length; i++)
 				vertices[i].TextureCoordinate = Vector2.Zero;
 
-			this.DrawTexturedTriangles(Material.White, vertices, indices);
+			this.DrawTexturedTriangles(Material.FlatColor, vertices, indices);
 		}
 
-		public void DrawLines(VertexPositionColor[] vertices, int[] indices)
+		public void DrawLines(VertexPositionColorTexture[] vertices, int[] indices)
 		{
-			this.coloredLines.AppendVertices(vertices, indices);
+			if (this.drawablesUsed > 0 && this.drawables[this.drawablesUsed - 1] is LinesList)
+			{
+				this.drawables[this.drawablesUsed - 1].AppendVertices(vertices, indices);
+			}
+			else
+			{
+				LinesList lList = this.GetFreeDrawable<LinesList>();
+				lList.AppendVertices(vertices, indices);
+
+				this.drawablesUsed++;
+			}
+
 		}
 
 		public void DrawAxisAlignedRectangle(Vector3 position, Vector2 size, Color color)
 		{
-			VertexPositionColor[] vertices = new VertexPositionColor[]
+			VertexPositionColorTexture[] vertices = new VertexPositionColorTexture[]
 			{
-				new VertexPositionColor{ Color = color, Position = position },
-				new VertexPositionColor{ Color = color, Position = position + new Vector3(size.X, 0, 0) },
-				new VertexPositionColor{ Color = color, Position = position + new Vector3(size.X, size.Y, 0) },
-				new VertexPositionColor{ Color = color, Position = position + new Vector3(0, size.Y, 0) }
+				new VertexPositionColorTexture{ Color = color, Position = position },
+				new VertexPositionColorTexture{ Color = color, Position = position + new Vector3(size.X, 0, 0) },
+				new VertexPositionColorTexture{ Color = color, Position = position + new Vector3(size.X, size.Y, 0) },
+				new VertexPositionColorTexture{ Color = color, Position = position + new Vector3(0, size.Y, 0) }
 			};
 
-			this.coloredLines.AppendVertices(vertices, new int[] { 0, 1, 1, 2, 2, 3, 3, 0 });
+			this.DrawLines(vertices, new int[] { 0, 1, 1, 2, 2, 3, 3, 0 });
 		}
 	}
 }

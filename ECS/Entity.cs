@@ -12,6 +12,8 @@ namespace FrozenEngine.ECS
 		private static readonly Component[] NoComponents = new Component[0];
 		private readonly Dictionary<Type, Component> components = new Dictionary<Type, Component>();
 		private readonly HashSet<Entity> children = new HashSet<Entity>();
+
+		private Component[] updateOrderedComponents;
 		private bool disposedValue;
 
 		private Scene scene;
@@ -165,7 +167,7 @@ namespace FrozenEngine.ECS
 		{
 			if (this.IsActive || force)
 			{
-				foreach (Component component in this.components.Values)
+				foreach (Component component in this.updateOrderedComponents)
 					component.Update(gameTime, force);
 
 				foreach (Entity child in this.children)
@@ -177,6 +179,11 @@ namespace FrozenEngine.ECS
 		{
 			foreach (Component component in this.components.Values)
 				component.UpdateRequirements();
+
+			this.updateOrderedComponents = this.components
+				.OrderBy(kvp => Core.ComponentsUpdateOrder[kvp.Key])
+				.Select(kvp => kvp.Value)
+				.ToArray();
 		}
 
 		public IEnumerator<Component> GetEnumerator()

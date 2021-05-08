@@ -8,23 +8,45 @@ namespace FrozenEngine.Drawing
 {
 	public class SpriteAtlas
 	{
-		private readonly List<Rectangle> sprites = new List<Rectangle>();
-		private readonly Dictionary<string, Rectangle> atlas = new Dictionary<string, Rectangle>();
+		public static SpriteAtlas SingleSprite()
+		{
+			SpriteAtlas result = new SpriteAtlas();
+			result.sprites.Add(UVRect.One);
+			return result;
+		}
+
+		public static SpriteAtlas FromGrid(int rows, int columns)
+		{
+			float x = 1f / columns;
+			float y = 1f / rows;
+
+			SpriteAtlas result = new SpriteAtlas();
+
+			for (int r = 0; r < rows; r++)
+				for (int c = 0; c < columns; c++)
+					result.sprites.Add(new UVRect(x * c, y * r, x, y));
+			
+			return result;
+		}
+
+		private readonly List<UVRect> sprites = new List<UVRect>();
+		private readonly Dictionary<string, UVRect> atlas = new Dictionary<string, UVRect>();
 		private readonly Dictionary<string, Frame[]> animations = new Dictionary<string, Frame[]>();
 
-		public Rectangle this[int spriteIndex]
-		{
-			get { return this.sprites[spriteIndex]; }
-		}
+		private SpriteAtlas() { }
 
-		public Rectangle this[string spriteName]
-		{
-			get { return this.atlas[spriteName]; }
-		}
+		public UVRect this[int spriteIndex] => this.sprites[spriteIndex];
+
+		public UVRect this[string spriteName] => this.atlas[spriteName];
 
 		public int SpriteIndexOf(string name)
 		{
 			return this.sprites.IndexOf(this[name]);
+		}
+
+		public Frame[] GetAnimationChain(string animation)
+		{
+			return this.animations[animation];
 		}
 
 		public void AddAnimationChain(string name, int[] spriteIndexes, float[] durations)
@@ -52,11 +74,6 @@ namespace FrozenEngine.Drawing
 				throw new ArgumentException($"An animationChain with the name {name} already exists.");
 
 			this.animations[name] = frames;
-		}
-
-		public Frame[] GetAnimationChain(string animation)
-		{
-			return this.animations[animation];
 		}
 	}
 }
