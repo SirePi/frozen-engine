@@ -5,5 +5,5 @@ using System.Text;
 namespace FrozenEngine.ECS
 {
 	[System.AttributeUsage(System.AttributeTargets.Property, Inherited = false, AllowMultiple = false)]
-	sealed class RequiredComponentAttribute : Attribute { }
+	public sealed class RequiredComponentAttribute : Attribute { }
 }

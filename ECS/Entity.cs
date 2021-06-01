@@ -163,6 +163,16 @@ namespace FrozenEngine.ECS
 			return null;
 		}
 
+		public IEnumerable<T> GetAll<T>() where T: Component
+		{
+			Type componentType = typeof(T);
+			foreach (KeyValuePair<Type, Component> kvp in this.components)
+			{
+				if (kvp.Key == componentType || kvp.Key.IsSubclassOf(componentType))
+					yield return kvp.Value as T;
+			}
+		}
+
 		public void Update(GameTime gameTime, bool force = false)
 		{
 			if (this.IsActive || force)

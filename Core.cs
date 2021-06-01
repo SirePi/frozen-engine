@@ -11,17 +11,14 @@ using FrozenEngine.ECS.Systems;
 
 namespace FrozenEngine
 {
-	public static class Core
+	internal static class Core
 	{
 		internal static Dictionary<Type, PropertyInfo[]> RequiredComponentsCache { get; private set; }
 		internal static Dictionary<Type, int> ComponentsUpdateOrder { get; private set; }
 		internal static Game Game { get; private set; }
 		internal static DrawingSystem Drawing { get; private set; }
 		internal static DefaultContent DefaultContent { get; private set; }
-
-		public static Rectangle Viewport { get; private set; }
-		public static KeyboardManager Keyboard { get; private set; }
-		public static IReadOnlyDictionary<PlayerIndex, GamePadManager> GamePad { get; private set; }
+		internal static AudioSystem Audio { get; private set; }
 
 		public static void Initialize(Game game)
 		{
@@ -29,10 +26,11 @@ namespace FrozenEngine
 			DefaultContent = new DefaultContent(game.Content);
 
 			Drawing = new DrawingSystem(game.GraphicsDevice);
+			Audio = new AudioSystem();
 
 			Type[] components = AppDomain.CurrentDomain.GetAssemblies()
 				.SelectMany(
-					asm => asm.GetTypes().Where(t => t.IsSubclassOf(typeof(Component)) && !t.IsAbstract)
+					asm => asm.GetTypes().Where(t => t.IsSubclassOf(typeof(Component)))
 				).ToArray();
 
 			// Building component cache
@@ -50,9 +48,6 @@ namespace FrozenEngine
 					.Distinct()
 					.Count()
 			);
-
-			Keyboard = new KeyboardManager();
-			GamePad = Enum.GetValues(typeof(PlayerIndex)).Cast<PlayerIndex>().ToDictionary(k => k, v => new GamePadManager(v));
 		}
 
 		private static IEnumerable<Type> GetRequiredComponentsFor(Type componentType)

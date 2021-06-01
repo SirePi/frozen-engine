@@ -24,14 +24,19 @@ namespace FrozenEngine.Input
 			this.currentFrameState = Keyboard.GetState();
 		}
 
-		public InputState this[Keys key]
+		public bool IsUp(Keys key)
 		{
-			get
-			{
-				if (this.currentFrameState[key] == KeyState.Up) return InputState.Up;
-				else if (this.lastFrameState[key] == KeyState.Up) return InputState.Hit;
-				else return InputState.Held;
-			}
+			return this.currentFrameState[key] == KeyState.Up;
+		}
+
+		public bool IsDown(Keys key)
+		{
+			return this.currentFrameState[key] == KeyState.Down;
+		}
+
+		public bool IsHit(Keys key)
+		{
+			return this.currentFrameState[key] == KeyState.Down && this.lastFrameState[key] == KeyState.Up;
 		}
 	}
 }

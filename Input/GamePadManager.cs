@@ -27,24 +27,34 @@ namespace FrozenEngine.Input
 			this.currentFrameState = GamePad.GetState(this.player, GamePadDeadZone.Circular);
 		}
 
-		public InputState this[GamePadButton key]
+		public bool IsButtonUp(GamePadButton key)
 		{
-			get
-			{
-				if (key.GetButtonState(this.currentFrameState) == ButtonState.Released) return InputState.Up;
-				else if (key.GetButtonState(this.lastFrameState) == ButtonState.Released) return InputState.Hit;
-				else return InputState.Held;
-			}
+			return key.GetButtonState(this.currentFrameState) == ButtonState.Released;
 		}
 
-		public InputState this[DPad dpad]
+		public bool IsButtonDown(GamePadButton key)
 		{
-			get
-			{
-				if (dpad.GetDPadState(this.currentFrameState) == ButtonState.Released) return InputState.Up;
-				else if (dpad.GetDPadState(this.lastFrameState) == ButtonState.Released) return InputState.Hit;
-				else return InputState.Held;
-			}
+			return key.GetButtonState(this.currentFrameState) == ButtonState.Pressed;
+		}
+
+		public bool IsButtonHit(GamePadButton key)
+		{
+			return key.GetButtonState(this.currentFrameState) == ButtonState.Pressed && key.GetButtonState(this.lastFrameState) == ButtonState.Released;
+		}
+
+		public bool IsDPadUp(DPad key)
+		{
+			return key.GetDPadState(this.currentFrameState) == ButtonState.Released;
+		}
+
+		public bool IsDPadDown(DPad key)
+		{
+			return key.GetDPadState(this.currentFrameState) == ButtonState.Pressed;
+		}
+
+		public bool IsDPadHit(DPad key)
+		{
+			return key.GetDPadState(this.currentFrameState) == ButtonState.Pressed && key.GetDPadState(this.lastFrameState) == ButtonState.Released;
 		}
 	}
 }

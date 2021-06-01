@@ -42,7 +42,14 @@ namespace FrozenEngine.ECS
 		internal void UpdateRequirements()
 		{
 			foreach (PropertyInfo pi in Core.RequiredComponentsCache[this.GetType()])
-				pi.SetValue(this, this.Entity.Get(pi.PropertyType));
+			{
+				object component = this.Entity.Get(pi.PropertyType);
+
+				if (component == null)
+					throw new RequiredComponentNotFoundException(this.Entity.Name, pi.PropertyType.Name);
+
+				pi.SetValue(this, component);
+			}
 		}
 	}
 }

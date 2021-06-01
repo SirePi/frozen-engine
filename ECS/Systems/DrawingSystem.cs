@@ -38,7 +38,7 @@ namespace FrozenEngine.ECS.Systems
 			{
 				this.device.SetRenderTarget(camera.RenderTarget);
 				this.device.BlendState = BlendState.AlphaBlend;
-				this.device.DepthStencilState = DepthStencilState.None;
+				this.device.DepthStencilState = DepthStencilState.Default;
 				this.device.SamplerStates[0] = SamplerState.AnisotropicClamp;
 				this.device.RasterizerState = new RasterizerState { CullMode = CullMode.CullCounterClockwiseFace, FillMode = FillMode.Solid };
 

@@ -7,6 +7,7 @@ namespace FrozenEngine.ECS.Components
 {
 	public sealed class Transform : Component
 	{
+		private Vector3 lastPosition;
 		private Vector3 position;
 		private float rotation;
 		private float scale = 1;
@@ -80,6 +81,19 @@ namespace FrozenEngine.ECS.Components
 
 				return result;
 			}
+		}
+
+		public Vector3 WorldPosition
+		{
+			get => Vector3.Transform(Vector3.Zero, this.FullTransformMatrix);
+		}
+
+		public Vector3 Velocity { get; private set; }
+
+		protected override void OnUpdate(GameTime gameTime)
+		{
+			this.Velocity = (this.position - this.lastPosition) / (float)gameTime.ElapsedGameTime.TotalSeconds;
+			this.lastPosition = this.position;
 		}
 	}
 }

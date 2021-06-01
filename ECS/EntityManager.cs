@@ -84,12 +84,12 @@ namespace FrozenEngine.ECS
 
 		internal IEnumerable<T> GetComponents<T>() where T : Component
 		{
-			return this.entities.Select(e => e.Get<T>()).Where(c => c != null);
+			return this.entities.SelectMany(e => e.GetAll<T>());
 		}
 
 		internal IEnumerable<T> GetActiveComponents<T>() where T : Component
 		{
-			return this.GetActiveEntities().Select(e => e.Get<T>()).Where(c => c != null);
+			return this.GetActiveEntities().SelectMany(e => e.GetAll<T>());
 		}
 
 		internal IEnumerable<Entity> GetActiveEntities()

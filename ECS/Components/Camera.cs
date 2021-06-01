@@ -84,7 +84,7 @@ namespace FrozenEngine.ECS.Components
 				width = device.Viewport.Width * this.size.Size.X;
 				height = device.Viewport.Height * this.size.Size.Y;
 			}
-			this.RenderTarget = new RenderTarget2D(Core.Game.GraphicsDevice, (int)width, (int)height, true, SurfaceFormat.Color, DepthFormat.Depth24Stencil8);
+			this.RenderTarget = new RenderTarget2D(Core.Game.GraphicsDevice, (int)width, (int)height, true, SurfaceFormat.Color, DepthFormat.Depth24Stencil8, 0, RenderTargetUsage.DiscardContents);
 		}
 
 		protected override void OnUpdate(GameTime gameTime)

@@ -1,4 +1,5 @@
-﻿using FrozenEngine.ECS.Components;
+﻿using FrozenEngine.Coroutines;
+using FrozenEngine.ECS.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -18,6 +19,7 @@ namespace FrozenEngine.ECS
 		}
 
 		private readonly EntityManager entityManager = new EntityManager();
+		private readonly CoroutineManager coroutineManager = new CoroutineManager();
 		private readonly HashSet<Renderer> renderers = new HashSet<Renderer>();
 		private readonly HashSet<UI> uis = new HashSet<UI>();
 
@@ -31,14 +33,6 @@ namespace FrozenEngine.ECS
 			this.entityManager.OnComponentRemoved += this.OnEntityComponentRemoved;
 
 			/*
-            Entity e = new Entity($"Camera_")
-                {
-                    new Transform { RelativePosition = new Vector3(0, 0, -1000) },
-                    Camera.CreateFullScreen<TwoPointFiveDCamera>()
-                };
-            this.AddEntity(e);
-            */
-
 			int i = 0;
 			foreach (Camera c in Camera.CreateSplitScreen<TwoPointFiveDCamera>(SplitScreen.FourWays))
 			{
@@ -49,11 +43,13 @@ namespace FrozenEngine.ECS
 				};
 				this.AddEntity(e);
 			}
+			*/
 		}
 
 		public void Update(GameTime gameTime)
 		{
 			this.entityManager.Update(gameTime);
+			this.coroutineManager.Update(gameTime);
 		}
 
 		public void AddEntity(Entity entity)
@@ -162,6 +158,11 @@ namespace FrozenEngine.ECS
 				case Renderer r: this.renderers.Remove(r); break;
 				case UI ui: this.uis.Remove(ui); break;
 			}
+		}
+
+		public Coroutine StartCoroutine(IEnumerable<WaitUntil> coroutine)
+		{
+			return this.coroutineManager.StartNew(coroutine);
 		}
 	}
 }
