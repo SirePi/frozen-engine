@@ -43,24 +43,7 @@ namespace FrozenEngine.ECS.Systems
 				this.device.RasterizerState = new RasterizerState { CullMode = CullMode.CullCounterClockwiseFace, FillMode = FillMode.Solid };
 
 				for (int i = 0; i < this.drawablesUsed; i++)
-				{
-					Drawable d = this.drawables[i];
-					if (d.PrimitivesCount > 0)
-					{
-						if (d.Material.Effect is IEffectMatrices iem)
-						{
-							iem.Projection = camera.Projection;
-							iem.View = camera.View;
-							iem.World = Matrix.Identity;
-						}
-
-						foreach (EffectPass pass in d.Material.Effect.CurrentTechnique.Passes)
-						{
-							pass.Apply();
-							this.device.DrawUserIndexedPrimitives(d.PrimitiveType, d.Vertices, 0, d.Vertices.Length, d.Indices, 0, d.PrimitivesCount);
-						}
-					}
-				}
+					this.drawables[i].Draw(this.device, camera);
 			}
 
 			this.device.SetRenderTarget(null);
@@ -98,9 +81,9 @@ namespace FrozenEngine.ECS.Systems
 
 		public void DrawTexturedTriangles(Material material, VertexPositionColorTexture[] vertices, int[] indices)
 		{
-			if (this.drawablesUsed > 0 && this.drawables[this.drawablesUsed - 1] is TriangleList && this.drawables[this.drawablesUsed - 1].Material == material)
+			if (this.drawablesUsed > 0 && this.drawables[this.drawablesUsed - 1] is TriangleList tl && tl.Material == material)
 			{
-				this.drawables[this.drawablesUsed - 1].AppendVertices(vertices, indices);
+				tl.AppendVertices(vertices, indices);
 			}
 			else
 			{
@@ -150,11 +133,19 @@ namespace FrozenEngine.ECS.Systems
 			this.DrawTexturedTriangles(Material.FlatColor, vertices, indices);
 		}
 
+		public void DrawCameraBoundPrimitives(Func<Camera, IEnumerable<PrimitiveDrawable>> drawingFunc)
+		{
+			CameraBoundDrawable draw = this.GetFreeDrawable<CameraBoundDrawable>();
+			draw.Reset(drawingFunc);
+
+			this.drawablesUsed++;
+		}
+
 		public void DrawLines(VertexPositionColorTexture[] vertices, int[] indices)
 		{
-			if (this.drawablesUsed > 0 && this.drawables[this.drawablesUsed - 1] is LinesList)
+			if (this.drawablesUsed > 0 && this.drawables[this.drawablesUsed - 1] is LinesList ll)
 			{
-				this.drawables[this.drawablesUsed - 1].AppendVertices(vertices, indices);
+				ll.AppendVertices(vertices, indices);
 			}
 			else
 			{

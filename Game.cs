@@ -46,12 +46,12 @@ namespace FrozenEngine
 			}
 
 			this.CurrentScene.Update(gameTime);
+			this.Audio.Update(gameTime);
 		}
 
 		protected override void Draw(GameTime gameTime)
 		{
 			Core.Drawing.DrawScene(this.CurrentScene, gameTime);
-			Core.Audio.Update(gameTime);
 		}
 
 		internal void ChangeScene(Scene nextScene)

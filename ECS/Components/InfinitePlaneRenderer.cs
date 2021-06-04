@@ -22,16 +22,24 @@ namespace FrozenEngine.ECS.Components
 
 		public override void Draw(DrawingSystem drawing)
 		{
-			// drawing.AddTexturedQuad(Texture)
+			drawing.DrawCameraBoundPrimitives(this.DrawForCamera);
+		}
+
+		private IEnumerable<PrimitiveDrawable> DrawForCamera(Camera camera)
+		{
+			Matrix inverseProjection = Matrix.Invert(camera.Projection);
+			Matrix inverseView = Matrix.Invert(camera.View);
+
+			Vector3 topLeft = Vector3.Transform(Vector3.Transform(new Vector3(camera.RenderTarget.Bounds.Left, camera.RenderTarget.Bounds.Top, this.Transform.WorldPosition.Z), inverseProjection), inverseView);
+
+			Vector3 wut = Vector3.Transform(Vector3.Transform(topLeft, camera.View), camera.Projection);
+
+			Vector3 bottomRight = Vector3.Transform(Vector3.Transform(new Vector3(camera.RenderTarget.Bounds.Right, camera.RenderTarget.Bounds.Bottom, this.Transform.WorldPosition.Z), inverseProjection), inverseView);
+
+			yield break;
 		}
 
 		public override void UpdateRenderer(GameTime gameTime)
-		{
-			Camera c = this.Entity.Scene.GetComponents<Camera>().FirstOrDefault();
-			if (c != null)
-			{
-				Vector3 currentPosition = Vector3.Transform(this.Transform.Position, c.Projection);
-			}
-		}
+		{ }
 	}
 }
