@@ -98,5 +98,13 @@ namespace FrozenEngine.ECS.Components
 			*/
 			this.desktop.Render();
 		}
+
+		protected override void OnUpdate(GameTime gameTime)
+		{
+			if(this.desktop.IsMouseOverGUI)
+			{
+				int a = 0;
+			}	
+		}
 	}
 }

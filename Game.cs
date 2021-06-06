@@ -19,6 +19,7 @@ namespace FrozenEngine
 
 		protected AudioSystem Audio => Core.Audio;
 		protected KeyboardManager Keyboard { get; private set; }
+		protected MouseManager Mouse { get; private set; }
 		protected IReadOnlyDictionary<PlayerIndex, GamePadManager> GamePad { get; private set; }
 
 		protected override void Initialize()
@@ -28,6 +29,7 @@ namespace FrozenEngine
 			Core.Initialize(this);
 
 			this.Keyboard = new KeyboardManager();
+			this.Mouse = new MouseManager();
 			this.GamePad = Enum.GetValues(typeof(PlayerIndex)).Cast<PlayerIndex>().ToDictionary(k => k, v => new GamePadManager(v));
 		}
 
