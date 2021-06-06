@@ -12,6 +12,7 @@ namespace FrozenEngine.ECS.Components
 		[RequiredComponent]
 		public Transform Transform { get; protected set; }
 
+		public bool IgnoreCamera { get; set; }
 		public abstract Rectangle Bounds { get; }
 		public abstract long RendererSortedHash { get; }
 		public abstract void Draw(DrawingSystem drawing);
