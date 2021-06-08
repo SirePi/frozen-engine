@@ -191,7 +191,7 @@ namespace FrozenEngine.ECS
 				component.UpdateRequirements();
 
 			this.updateOrderedComponents = this.components
-				.OrderBy(kvp => Core.ComponentsUpdateOrder[kvp.Key])
+				.OrderBy(kvp => System.ComponentsUpdateOrder[kvp.Key])
 				.Select(kvp => kvp.Value)
 				.ToArray();
 		}

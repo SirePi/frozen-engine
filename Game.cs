@@ -17,28 +17,21 @@ namespace FrozenEngine
 		internal Scene CurrentScene { get; private set; }
 		private Scene nextScene;
 
-		protected AudioSystem Audio => Core.Audio;
-		protected KeyboardManager Keyboard { get; private set; }
-		protected MouseManager Mouse { get; private set; }
-		protected IReadOnlyDictionary<PlayerIndex, GamePadManager> GamePad { get; private set; }
-
 		protected override void Initialize()
 		{
 			base.Initialize();
-
-			Core.Initialize(this);
-
-			this.Keyboard = new KeyboardManager();
-			this.Mouse = new MouseManager();
-			this.GamePad = Enum.GetValues(typeof(PlayerIndex)).Cast<PlayerIndex>().ToDictionary(k => k, v => new GamePadManager(v));
+			System.Initialize(this);
 		}
 
 		protected override void Update(GameTime gameTime)
 		{
 			base.Update(gameTime);
 
-			this.Keyboard.Update();
-			foreach (GamePadManager gamePad in this.GamePad.Values)
+			System.Audio.Update(gameTime);
+			System.Keyboard.Update();
+			System.Mouse.Update();
+
+			foreach (GamePadManager gamePad in System.GamePad.Values)
 				gamePad.Update();
 
 			if (this.nextScene != null)
@@ -48,12 +41,11 @@ namespace FrozenEngine
 			}
 
 			this.CurrentScene.Update(gameTime);
-			this.Audio.Update(gameTime);
 		}
 
 		protected override void Draw(GameTime gameTime)
 		{
-			Core.Drawing.DrawScene(this.CurrentScene, gameTime);
+			System.Drawing.DrawScene(this.CurrentScene, gameTime);
 		}
 
 		internal void ChangeScene(Scene nextScene)

@@ -7,7 +7,7 @@ namespace FrozenEngine.Drawing
 {
 	public class DrawTechnique
 	{
-		public static DrawTechnique FlatColor { get; private set; } = new DrawTechnique(new BasicEffect(Core.Game.GraphicsDevice) { TextureEnabled = false, VertexColorEnabled = true });
+		public static DrawTechnique FlatColor { get; private set; } = new DrawTechnique(new BasicEffect(System.Game.GraphicsDevice) { TextureEnabled = false, VertexColorEnabled = true });
 
 		internal Effect Effect { get; private set; }
 

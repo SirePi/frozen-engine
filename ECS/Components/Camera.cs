@@ -55,27 +55,51 @@ namespace FrozenEngine.ECS.Components
 			}
 		}
 
+		private readonly CameraViewportSize size;
+		private float windowAspectRatio;
+		private float farPlane;
+		private float nearPlane;
+		private bool dirtyProjection;
+
 		[RequiredComponent]
 		public Transform Transform { get; protected set; }
+		public float FarPlaneDistance 
+		{
+			get => this.farPlane;
+			set
+			{
+				this.farPlane = value;
+				this.dirtyProjection = true;
+			}
+		}
+		public float NearPlaneDistance
+		{
+			get => this.nearPlane;
+			set
+			{
+				this.nearPlane = value;
+				this.dirtyProjection = true;
+			}
+		}
 		public Matrix View { get; protected set; }
 		public Matrix Projection { get; protected set; }
 		public Color ClearColor { get; set; } = Color.Black;
 		public Alignment Alignment { get; set; } = Alignment.None;
 		public Vector2 Margin { get; set; } = Vector2.Zero;
-
-		private readonly CameraViewportSize size;
-		private float windowAspectRatio;
 		public RenderTarget2D RenderTarget { get; private set; }
+		
 
 		protected Camera(CameraViewportSize size)
 		{
 			this.size = size;
+			this.nearPlane = .1f;
+			this.farPlane = 100000f;
 			this.UpdateRenderTarget();
 		}
 
 		private void UpdateRenderTarget()
 		{
-			GraphicsDevice device = Core.Game.GraphicsDevice;
+			GraphicsDevice device = System.Game.GraphicsDevice;
 			float width = this.size.Size.X;
 			float height = this.size.Size.Y;
 
@@ -84,22 +108,47 @@ namespace FrozenEngine.ECS.Components
 				width = device.Viewport.Width * this.size.Size.X;
 				height = device.Viewport.Height * this.size.Size.Y;
 			}
-			this.RenderTarget = new RenderTarget2D(Core.Game.GraphicsDevice, (int)width, (int)height, true, SurfaceFormat.Color, DepthFormat.Depth24Stencil8, 0, RenderTargetUsage.DiscardContents);
+			this.RenderTarget = new RenderTarget2D(System.Game.GraphicsDevice, (int)width, (int)height, true, SurfaceFormat.Color, DepthFormat.Depth24Stencil8, 0, RenderTargetUsage.DiscardContents);
 		}
 
 		protected override void OnUpdate(GameTime gameTime)
 		{
-			GraphicsDevice device = Core.Game.GraphicsDevice;
-			if (this.windowAspectRatio != device.Viewport.AspectRatio && !this.size.IsAbsoluteSize)
+			GraphicsDevice device = System.Game.GraphicsDevice;
+			if ((this.windowAspectRatio != device.Viewport.AspectRatio && !this.size.IsAbsoluteSize) || this.dirtyProjection)
 			{
 				this.UpdateRenderTarget();
 				float aspectRatio = (float)this.RenderTarget.Width / this.RenderTarget.Height;
-				this.Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, aspectRatio, .1f, 100000f);
+				this.Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, aspectRatio, this.nearPlane, this.farPlane);
 
 				this.windowAspectRatio = device.Viewport.AspectRatio;
+				this.dirtyProjection = false;
 			}
 
 			base.OnUpdate(gameTime);
+		}
+
+		public Vector2 WorldToScreen(Vector3 position)
+		{
+			Matrix matrix = Matrix.Multiply(this.View, this.Projection);
+			return Vector3.Transform(position, matrix).XY();
+		}
+
+		public Vector3 ScreenToWorld(Vector2 position, float targetZ)
+		{
+			Matrix matrix = Matrix.Invert(Matrix.Multiply(this.View, this.Projection));
+			return Vector3.Transform(new Vector3(position, targetZ), matrix);
+
+			/*
+			Vector2 xy = position.XY();
+
+			Matrix inverseView = Matrix.Invert(this.View);
+			Matrix inverseProj = Matrix.Invert(this.Projection);
+
+			Vector3 near = Vector3.Transform(Vector3.Transform(new Vector3(xy, 0), inverseView), inverseProj);
+			Vector3 far = Vector3.Transform(Vector3.Transform(new Vector3(xy, 1), inverseView), inverseProj);
+
+			return Vector3.Zero;
+			*/
 		}
 	}
 

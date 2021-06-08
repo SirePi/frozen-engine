@@ -154,7 +154,6 @@ namespace FrozenEngine.ECS.Systems
 
 				this.drawablesUsed++;
 			}
-
 		}
 
 		public void DrawAxisAlignedRectangle(Vector3 position, Vector2 size, Color color)

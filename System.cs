@@ -8,25 +8,32 @@ using System.Text;
 using FrozenEngine.ECS;
 using FrozenEngine.Input;
 using FrozenEngine.ECS.Systems;
+using Myra;
 
 namespace FrozenEngine
 {
-	internal static class Core
+	public static class System
 	{
 		internal static Dictionary<Type, PropertyInfo[]> RequiredComponentsCache { get; private set; }
 		internal static Dictionary<Type, int> ComponentsUpdateOrder { get; private set; }
 		internal static Game Game { get; private set; }
 		internal static DrawingSystem Drawing { get; private set; }
 		internal static DefaultContent DefaultContent { get; private set; }
-		internal static AudioSystem Audio { get; private set; }
+		public static AudioSystem Audio { get; private set; }
+		public static KeyboardManager Keyboard { get; private set; }
+		public static MouseManager Mouse { get; private set; }
+		public static IReadOnlyDictionary<PlayerIndex, GamePadManager> GamePad { get; private set; }
 
-		public static void Initialize(Game game)
+		internal static void Initialize(Game game)
 		{
 			Game = game;
 			DefaultContent = new DefaultContent(game.Content);
 
 			Drawing = new DrawingSystem(game.GraphicsDevice);
 			Audio = new AudioSystem();
+			Keyboard = new KeyboardManager();
+			Mouse = new MouseManager();
+			GamePad = Enum.GetValues(typeof(PlayerIndex)).Cast<PlayerIndex>().ToDictionary(k => k, v => new GamePadManager(v));
 
 			Type[] components = AppDomain.CurrentDomain.GetAssemblies()
 				.SelectMany(
@@ -48,6 +55,9 @@ namespace FrozenEngine
 					.Distinct()
 					.Count()
 			);
+
+			// Setting up Myra
+			MyraEnvironment.Game = game;
 		}
 
 		private static IEnumerable<Type> GetRequiredComponentsFor(Type componentType)

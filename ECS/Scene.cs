@@ -12,10 +12,10 @@ namespace FrozenEngine.ECS
 {
 	public class Scene
 	{
-		public static Scene Current => Core.Game.CurrentScene;
+		public static Scene Current => System.Game.CurrentScene;
 		public static void SwitchTo(Scene nextScene)
 		{
-			Core.Game.ChangeScene(nextScene);
+			System.Game.ChangeScene(nextScene);
 		}
 
 		private readonly EntityManager entityManager = new EntityManager();

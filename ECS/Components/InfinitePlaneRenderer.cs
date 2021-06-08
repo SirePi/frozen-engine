@@ -27,14 +27,9 @@ namespace FrozenEngine.ECS.Components
 
 		private IEnumerable<PrimitiveDrawable> DrawForCamera(Camera camera)
 		{
-			Matrix inverseProjection = Matrix.Invert(camera.Projection);
-			Matrix inverseView = Matrix.Invert(camera.View);
-
-			Vector3 topLeft = Vector3.Transform(Vector3.Transform(new Vector3(camera.RenderTarget.Bounds.Left, camera.RenderTarget.Bounds.Top, this.Transform.WorldPosition.Z), inverseProjection), inverseView);
-
-			Vector3 wut = Vector3.Transform(Vector3.Transform(topLeft, camera.View), camera.Projection);
-
-			Vector3 bottomRight = Vector3.Transform(Vector3.Transform(new Vector3(camera.RenderTarget.Bounds.Right, camera.RenderTarget.Bounds.Bottom, this.Transform.WorldPosition.Z), inverseProjection), inverseView);
+			//Vector3 center = camera.ScreenToWorld(this.Transform.Position);
+			//Vector3 topLeft = camera.ScreenToWorld(new Vector3(camera.RenderTarget.Bounds.Location.ToVector2(), 0));
+			//Vector3 bottomRight = camera.ScreenToWorld(new Vector3(camera.RenderTarget.Bounds.Size.ToVector2(), 0));
 
 			yield break;
 		}
