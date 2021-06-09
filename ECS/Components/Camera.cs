@@ -81,6 +81,38 @@ namespace FrozenEngine.ECS.Components
 				this.dirtyProjection = true;
 			}
 		}
+		public float PixelPerfectPlane
+		{
+			get
+			{
+				float x = this.Viewport.Bounds.Center.X;
+				float y = this.Viewport.Bounds.Center.Y;
+
+				Vector3 nearA = this.Viewport.Unproject(new Vector3(x, y, 0f), this.Projection, this.View, Matrix.Identity);
+				Vector3 nearB = this.Viewport.Unproject(new Vector3(x + 1, y, 0f), this.Projection, this.View, Matrix.Identity);
+				float nearDistance = (nearB - nearA).Length();
+
+				Vector3 mid1A = this.Viewport.Unproject(new Vector3(x, y, .5f), this.Projection, this.View, Matrix.Identity);
+				Vector3 mid1B = this.Viewport.Unproject(new Vector3(x + 1, y, .5f), this.Projection, this.View, Matrix.Identity);
+				float mid1Distance = (mid1B - mid1A).Length();
+
+				Vector3 mid2A = this.Viewport.Unproject(new Vector3(x, y, .75f), this.Projection, this.View, Matrix.Identity);
+				Vector3 mid2B = this.Viewport.Unproject(new Vector3(x + 1, y, .75f), this.Projection, this.View, Matrix.Identity);
+				float mid2Distance = (mid2B - mid2A).Length();
+
+				Vector3 mid3A = this.Viewport.Unproject(new Vector3(x, y, .99f), this.Projection, this.View, Matrix.Identity);
+				Vector3 mid3B = this.Viewport.Unproject(new Vector3(x + 1, y, .99f), this.Projection, this.View, Matrix.Identity);
+				float mid3Distance = (mid3B - mid3A).Length();
+
+				Vector3 farA = this.Viewport.Unproject(new Vector3(x, y, 1f), this.Projection, this.View, Matrix.Identity);
+				Vector3 farB = this.Viewport.Unproject(new Vector3(x + 1, y, 1f), this.Projection, this.View, Matrix.Identity);
+				float farDistance = (farB - farA).Length();
+
+				float z = 1f / (farDistance - nearDistance);
+
+				return this.Viewport.Unproject(new Vector3(0, 0, z), this.Projection, this.View, Matrix.Identity).Z;
+			}
+		}
 		public Matrix View { get; protected set; }
 		public Matrix Projection { get; protected set; }
 		public Color ClearColor { get; set; } = Color.Black;
@@ -98,7 +130,7 @@ namespace FrozenEngine.ECS.Components
 
 		private void UpdateViewport()
 		{
-			GraphicsDevice device = System.Game.GraphicsDevice;
+			GraphicsDevice device = Frozen.Game.GraphicsDevice;
 			int width = (int)this.size.Size.X;
 			int height = (int)this.size.Size.Y;
 
@@ -124,7 +156,7 @@ namespace FrozenEngine.ECS.Components
 
 		protected override void OnUpdate(GameTime gameTime)
 		{
-			GraphicsDevice device = System.Game.GraphicsDevice;
+			GraphicsDevice device = Frozen.Game.GraphicsDevice;
 			if (this.windowAspectRatio != device.Viewport.AspectRatio && !this.size.IsAbsoluteSize)
 			{
 				this.UpdateViewport();
@@ -146,10 +178,6 @@ namespace FrozenEngine.ECS.Components
 		public Vector3 WorldToScreen(Vector3 position)
 		{
 			return this.Viewport.Project(position, this.Projection, this.View, Matrix.Identity);
-			/*
-			Matrix matrix = Matrix.Multiply(this.View, this.Projection);
-			return Vector3.Transform(position, matrix).XY();
-			*/
 		}
 
 		public Vector3 ScreenToWorld(Vector2 position, float targetZ)
@@ -160,22 +188,6 @@ namespace FrozenEngine.ECS.Components
 			float delta = (targetZ - near.Z) / (far.Z - near.Z);
 
 			return near + (far - near) * delta;
-
-			/*
-			Matrix matrix = Matrix.Invert(Matrix.Multiply(this.View, this.Projection));
-			return Vector3.Transform(new Vector3(position, targetZ), matrix);
-
-			/*
-			Vector2 xy = position.XY();
-
-			Matrix inverseView = Matrix.Invert(this.View);
-			Matrix inverseProj = Matrix.Invert(this.Projection);
-
-			Vector3 near = Vector3.Transform(Vector3.Transform(new Vector3(xy, 0), inverseView), inverseProj);
-			Vector3 far = Vector3.Transform(Vector3.Transform(new Vector3(xy, 1), inverseView), inverseProj);
-
-			return Vector3.Zero;
-			*/
 		}
 	}
 

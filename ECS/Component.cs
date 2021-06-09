@@ -41,7 +41,7 @@ namespace FrozenEngine.ECS
 
 		internal void UpdateRequirements()
 		{
-			foreach (PropertyInfo pi in System.RequiredComponentsCache[this.GetType()])
+			foreach (PropertyInfo pi in Frozen.RequiredComponentsCache[this.GetType()])
 			{
 				object component = this.Entity.Get(pi.PropertyType);
 

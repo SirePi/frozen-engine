@@ -43,13 +43,13 @@ namespace FrozenEngine.ECS.Components
 			this.fps.Text = $"fps: {1 / gameTime.ElapsedGameTime.TotalSeconds:0.000}";
 
 			Camera c = this.Entity.Scene.GetCameras().First();
-			Vector3 unproj = c.ScreenToWorld(System.Mouse.Position.ToVector2(), 0);
+			Vector3 unproj = c.ScreenToWorld(Frozen.Mouse.Position.ToVector2(), 0);
 			Vector3 proj = c.WorldToScreen(unproj);
 
 			//Vector2 w2sNear = c.WorldToScreen(Vector3.UnitZ * c.NearPlaneDistance);
 			//Vector2 w2sFar = c.WorldToScreen(Vector3.UnitZ * c.FarPlaneDistance);
 
-			this.mouse.Text = $"{System.Mouse.Position} - S2W: ${unproj} - W2S: ${proj}";
+			this.mouse.Text = $"{Frozen.Mouse.Position} - S2W: {unproj} - W2S: {proj} - PixelZ : {c.PixelPerfectPlane}";
 			//this.mouse.Text = $"Mouse: {System.Mouse.Position} - Camera: {c.Transform.Position.XY()} - Near: ${w2sNear} - Far: ${w2sFar}";
 		}
 	}

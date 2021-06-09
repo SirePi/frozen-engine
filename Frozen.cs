@@ -12,7 +12,7 @@ using Myra;
 
 namespace FrozenEngine
 {
-	public static class System
+	public static class Frozen
 	{
 		internal static Dictionary<Type, PropertyInfo[]> RequiredComponentsCache { get; private set; }
 		internal static Dictionary<Type, int> ComponentsUpdateOrder { get; private set; }

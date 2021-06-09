@@ -20,18 +20,18 @@ namespace FrozenEngine
 		protected override void Initialize()
 		{
 			base.Initialize();
-			System.Initialize(this);
+			Frozen.Initialize(this);
 		}
 
 		protected override void Update(GameTime gameTime)
 		{
 			base.Update(gameTime);
 
-			System.Audio.Update(gameTime);
-			System.Keyboard.Update();
-			System.Mouse.Update();
+			Frozen.Audio.Update(gameTime);
+			Frozen.Keyboard.Update();
+			Frozen.Mouse.Update();
 
-			foreach (GamePadManager gamePad in System.GamePad.Values)
+			foreach (GamePadManager gamePad in Frozen.GamePad.Values)
 				gamePad.Update();
 
 			if (this.nextScene != null)
@@ -45,7 +45,7 @@ namespace FrozenEngine
 
 		protected override void Draw(GameTime gameTime)
 		{
-			System.Drawing.DrawScene(this.CurrentScene, gameTime);
+			Frozen.Drawing.DrawScene(this.CurrentScene, gameTime);
 		}
 
 		internal void ChangeScene(Scene nextScene)
