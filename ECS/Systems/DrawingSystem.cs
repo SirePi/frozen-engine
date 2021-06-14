@@ -44,7 +44,7 @@ namespace FrozenEngine.ECS.Systems
 				this.device.Viewport = camera.Viewport;
 				this.device.BlendState = BlendState.AlphaBlend;
 				this.device.DepthStencilState = DepthStencilState.Default;
-				this.device.SamplerStates[0] = SamplerState.AnisotropicClamp;
+				this.device.SamplerStates[0] = SamplerState.AnisotropicWrap;
 				this.device.RasterizerState = new RasterizerState { CullMode = CullMode.CullCounterClockwiseFace, FillMode = FillMode.Solid };
 
 				for (int i = 0; i < this.drawablesUsed; i++)

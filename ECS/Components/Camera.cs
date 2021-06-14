@@ -81,38 +81,6 @@ namespace FrozenEngine.ECS.Components
 				this.dirtyProjection = true;
 			}
 		}
-		public float PixelPerfectPlane
-		{
-			get
-			{
-				float x = this.Viewport.Bounds.Center.X;
-				float y = this.Viewport.Bounds.Center.Y;
-
-				Vector3 nearA = this.Viewport.Unproject(new Vector3(x, y, 0f), this.Projection, this.View, Matrix.Identity);
-				Vector3 nearB = this.Viewport.Unproject(new Vector3(x + 1, y, 0f), this.Projection, this.View, Matrix.Identity);
-				float nearDistance = (nearB - nearA).Length();
-
-				Vector3 mid1A = this.Viewport.Unproject(new Vector3(x, y, .5f), this.Projection, this.View, Matrix.Identity);
-				Vector3 mid1B = this.Viewport.Unproject(new Vector3(x + 1, y, .5f), this.Projection, this.View, Matrix.Identity);
-				float mid1Distance = (mid1B - mid1A).Length();
-
-				Vector3 mid2A = this.Viewport.Unproject(new Vector3(x, y, .75f), this.Projection, this.View, Matrix.Identity);
-				Vector3 mid2B = this.Viewport.Unproject(new Vector3(x + 1, y, .75f), this.Projection, this.View, Matrix.Identity);
-				float mid2Distance = (mid2B - mid2A).Length();
-
-				Vector3 mid3A = this.Viewport.Unproject(new Vector3(x, y, .99f), this.Projection, this.View, Matrix.Identity);
-				Vector3 mid3B = this.Viewport.Unproject(new Vector3(x + 1, y, .99f), this.Projection, this.View, Matrix.Identity);
-				float mid3Distance = (mid3B - mid3A).Length();
-
-				Vector3 farA = this.Viewport.Unproject(new Vector3(x, y, 1f), this.Projection, this.View, Matrix.Identity);
-				Vector3 farB = this.Viewport.Unproject(new Vector3(x + 1, y, 1f), this.Projection, this.View, Matrix.Identity);
-				float farDistance = (farB - farA).Length();
-
-				float z = 1f / (farDistance - nearDistance);
-
-				return this.Viewport.Unproject(new Vector3(0, 0, z), this.Projection, this.View, Matrix.Identity).Z;
-			}
-		}
 		public Matrix View { get; protected set; }
 		public Matrix Projection { get; protected set; }
 		public Color ClearColor { get; set; } = Color.Black;
@@ -123,8 +91,8 @@ namespace FrozenEngine.ECS.Components
 		protected Camera(CameraViewportSize size)
 		{
 			this.size = size;
-			this.nearPlane = .1f;
-			this.farPlane = 100000f;
+			this.nearPlane = 1;
+			this.farPlane = 10000f;
 			this.UpdateViewport();
 		}
 
@@ -201,6 +169,8 @@ namespace FrozenEngine.ECS.Components
 			base.OnUpdate(gameTime);
 			this.View = Matrix.CreateLookAt(this.Transform.Position, this.Transform.Position + Vector3.UnitZ, -Vector3.UnitY) * Matrix.CreateRotationZ(this.Transform.Rotation);
 		}
+
+		public float PixelPerfectPlane => this.Transform.WorldPosition.Z + (this.Viewport.Height / 2) / (float)Math.Tan(MathHelper.PiOver4 / 2);
 	}
 
 	public class TargetCamera : Camera
