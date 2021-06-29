@@ -47,7 +47,7 @@ namespace FrozenEngine.ECS.Components
 			base.OnUpdate(gameTime);
 			this.fps.Text = $"fps: {1 / gameTime.ElapsedGameTime.TotalSeconds:0.000}";
 
-			TwoPointFiveDCamera c = this.Entity.Scene.GetComponents<TwoPointFiveDCamera>().First() ;
+			Camera c = this.Entity.Scene.GetComponents<Camera>().First() ;
 			Vector3 unproj = c.ScreenToWorld(Frozen.Mouse.Position.ToVector2(), 0);
 			Vector3 unproj2 = c.ScreenToWorld(Frozen.Mouse.Position.ToVector2(), 100);
 			Vector3 proj = c.WorldToScreen(unproj);

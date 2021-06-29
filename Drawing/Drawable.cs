@@ -56,12 +56,7 @@ namespace FrozenEngine.Drawing
 
 			if (primitivesCount > 0)
 			{
-				if (this.Material.Effect is IEffectMatrices iem)
-				{
-					iem.Projection = camera.Projection;
-					iem.View = camera.View;
-					iem.World = Matrix.Identity;
-				}
+				this.Material.EffectParameters["WorldViewProj"].SetValue(Matrix.Identity * camera.View * camera.Projection);
 
 				foreach (EffectPass pass in this.Material.Effect.CurrentTechnique.Passes)
 				{

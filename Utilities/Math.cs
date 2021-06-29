@@ -27,5 +27,15 @@ namespace FrozenEngine.Utilities
 		}
 
 		public static Rectangle InfiniteRectangle { get; private set; } = new Rectangle(int.MinValue, int.MinValue, int.MaxValue, int.MaxValue);
+
+		public static float Min(params float[] values)
+		{
+			return values.Min();
+		}
+
+		public static float Max(params float[] values)
+		{
+			return values.Max();
+		}
 	}
 }

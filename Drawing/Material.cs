@@ -23,16 +23,13 @@ namespace FrozenEngine.Drawing
 				if (this.spriteSheet != value)
 				{
 					this.spriteSheet = value;
-					switch (this.Effect)
-					{
-						case AlphaTestEffect a: a.Texture = this.spriteSheet.Texture; break;
-						case BasicEffect b: b.Texture = this.spriteSheet.Texture; break;
-					}
+					this.EffectParameters["Texture"].SetValue(this.spriteSheet.Texture);
 				}
 			}
 		}
 
 		public Effect Effect { get; private set; }
+		public EffectParameterCollection EffectParameters => this.Effect.Parameters;
 
 		public Material(Effect effect, SpriteSheet spriteSheet = null)
 		{

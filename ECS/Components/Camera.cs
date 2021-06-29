@@ -7,29 +7,31 @@ using System.Text;
 
 namespace FrozenEngine.ECS.Components
 {
-	public abstract class Camera : Component
+	public class Camera : Component
 	{
-		public static T CreateCamera<T>(CameraViewportSize size, Alignment alignment, Point? margin = null) where T : Camera
+		private static float FovOver2 = MathHelper.PiOver4 / 2;
+		private static float FovOver2Tan = (float)Math.Tan(FovOver2);
+
+		public static Camera CreateCamera(CameraViewportSize size, Alignment alignment, Point? margin = null)
 		{
-			T camera = typeof(T)
-				.GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance)[0]
-				.Invoke(new object[] { size }) as T;
-			camera.Alignment = alignment;
-			camera.Margin = margin ?? Point.Zero;
-			return camera;
+			return new Camera(size)
+			{
+				Alignment = alignment,
+				Margin = margin ?? Point.Zero
+			};
 		}
 
-		public static T CreateCamera<T>(Vector2 size, bool isAbsoluteSize, Alignment alignment, Point? margin = null) where T : Camera
+		public static Camera CreateCamera(Vector2 size, bool isAbsoluteSize, Alignment alignment, Point? margin = null)
 		{
-			return CreateCamera<T>(new CameraViewportSize(size, isAbsoluteSize), alignment, margin);
+			return CreateCamera(new CameraViewportSize(size, isAbsoluteSize), alignment, margin);
 		}
 
-		public static T CreateFullScreen<T>() where T : Camera
+		public static Camera CreateFullScreen()
 		{
-			return CreateCamera<T>(Vector2.One, false, Alignment.None);
+			return CreateCamera(Vector2.One, false, Alignment.None);
 		}
 
-		public static IEnumerable<T> CreateSplitScreen<T>(SplitScreen split) where T : Camera
+		public static IEnumerable<Camera> CreateSplitScreen(SplitScreen split)
 		{
 			Vector2 cameraSize;
 
@@ -37,20 +39,20 @@ namespace FrozenEngine.ECS.Components
 			{
 				case SplitScreen.TwoVertical:
 					cameraSize = new Vector2(.5f, 1f);
-					yield return CreateCamera<T>(cameraSize, false, Alignment.Left);
-					yield return CreateCamera<T>(cameraSize, false, Alignment.Right);
+					yield return CreateCamera(cameraSize, false, Alignment.Left);
+					yield return CreateCamera(cameraSize, false, Alignment.Right);
 					break;
 				case SplitScreen.TwoHorizontal:
 					cameraSize = new Vector2(1f, .5f);
-					yield return CreateCamera<T>(cameraSize, false, Alignment.Top);
-					yield return CreateCamera<T>(cameraSize, false, Alignment.Bottom);
+					yield return CreateCamera(cameraSize, false, Alignment.Top);
+					yield return CreateCamera(cameraSize, false, Alignment.Bottom);
 					break;
 				case SplitScreen.FourWays:
 					cameraSize = new Vector2(.5f, .5f);
-					yield return CreateCamera<T>(cameraSize, false, Alignment.TopLeft);
-					yield return CreateCamera<T>(cameraSize, false, Alignment.TopRight);
-					yield return CreateCamera<T>(cameraSize, false, Alignment.BottomLeft);
-					yield return CreateCamera<T>(cameraSize, false, Alignment.BottomRight);
+					yield return CreateCamera(cameraSize, false, Alignment.TopLeft);
+					yield return CreateCamera(cameraSize, false, Alignment.TopRight);
+					yield return CreateCamera(cameraSize, false, Alignment.BottomLeft);
+					yield return CreateCamera(cameraSize, false, Alignment.BottomRight);
 					break;
 			}
 		}
@@ -83,10 +85,14 @@ namespace FrozenEngine.ECS.Components
 		}
 		public Matrix View { get; protected set; }
 		public Matrix Projection { get; protected set; }
-		public Color ClearColor { get; set; } = Color.Black;
 		public Alignment Alignment { get; set; } = Alignment.None;
 		public Point Margin { get; set; } = Point.Zero;
 		public Viewport Viewport { get; private set; }
+
+		/// <summary>
+		/// Returns the Z coordinate of the plane where 1 distance unit equals 1 pixel
+		/// </summary>
+		public float PixelPerfectPlane => this.Transform.WorldPosition.Z + (this.Viewport.Height / 2) / FovOver2Tan;
 
 		protected Camera(CameraViewportSize size)
 		{
@@ -140,14 +146,26 @@ namespace FrozenEngine.ECS.Components
 				this.dirtyProjection = false;
 			}
 
+			this.View = Matrix.CreateLookAt(this.Transform.Position, this.Transform.Position + Vector3.UnitZ, -Vector3.UnitY) * Matrix.CreateRotationZ(this.Transform.Rotation);
 			base.OnUpdate(gameTime);
 		}
 
+		/// <summary>
+		/// Converts a position from world to screen space; Z can be ignored
+		/// </summary>
+		/// <param name="position"></param>
+		/// <returns></returns>
 		public Vector3 WorldToScreen(Vector3 position)
 		{
 			return this.Viewport.Project(position, this.Projection, this.View, Matrix.Identity);
 		}
 
+		/// <summary>
+		/// Converts a position from screen to world space at the specified Z
+		/// </summary>
+		/// <param name="position"></param>
+		/// <param name="targetZ"></param>
+		/// <returns></returns>
 		public Vector3 ScreenToWorld(Vector2 position, float targetZ)
 		{
 			Vector3 near = this.Viewport.Unproject(new Vector3(position, 0), this.Projection, this.View, Matrix.Identity);
@@ -157,73 +175,26 @@ namespace FrozenEngine.ECS.Components
 
 			return near + (far - near) * delta;
 		}
-	}
 
-	public class TwoPointFiveDCamera : Camera
-	{
-		internal TwoPointFiveDCamera(CameraViewportSize size) : base(size)
-		{ }
-
-		protected override void OnUpdate(GameTime gameTime)
+		/// <summary>
+		/// Returns the scale of the graphics at the specified Z
+		/// </summary>
+		/// <param name="z"></param>
+		/// <returns></returns>
+		public float ScaleAtZ(float z)
 		{
-			base.OnUpdate(gameTime);
-			this.View = Matrix.CreateLookAt(this.Transform.Position, this.Transform.Position + Vector3.UnitZ, -Vector3.UnitY) * Matrix.CreateRotationZ(this.Transform.Rotation);
+			return this.HeightAtZ(z) / this.Viewport.Height;
 		}
 
-		public float PixelPerfectPlane => this.Transform.WorldPosition.Z + (this.Viewport.Height / 2) / (float)Math.Tan(MathHelper.PiOver4 / 2);
-	}
-
-	public class TargetCamera : Camera
-	{
-		public Vector3 Target { get; set; }
-
-		public TargetCamera(CameraViewportSize size) : base(size)
-		{ }
-
-		protected override void OnUpdate(GameTime gameTime)
+		/// <summary>
+		/// Returns the visible height of the world at the specified Z
+		/// </summary>
+		/// <param name="z"></param>
+		/// <see cref="https://discourse.threejs.org/t/functions-to-calculate-the-visible-width-height-at-a-given-z-depth-from-a-perspective-camera/269"/>
+		/// <returns></returns>
+		public float HeightAtZ(float z)
 		{
-			base.OnUpdate(gameTime);
-
-			Vector3 forward = this.Target - this.Transform.Position;
-			Vector3 side = Vector3.Cross(forward, Vector3.Up);
-			Vector3 up = Vector3.Cross(forward, side);
-
-			this.View = Matrix.CreateLookAt(this.Transform.Position, this.Target, up) * Matrix.CreateRotationZ(this.Transform.Rotation);
-		}
-	}
-
-	public class FreeCamera : Camera
-	{
-		public float Yaw { get; set; }
-		public float Pitch { get; set; }
-
-		private Vector3 translation;
-
-		public FreeCamera(CameraViewportSize size) : base(size)
-		{ }
-
-		protected override void OnUpdate(GameTime gameTime)
-		{
-			base.OnUpdate(gameTime);
-
-			Matrix rotation = Matrix.CreateFromYawPitchRoll(this.Yaw, this.Pitch, 0);
-			this.translation = Vector3.Transform(this.translation, rotation);
-			this.Transform.MoveBy(this.translation);
-
-			Vector3 forward = Vector3.Transform(Vector3.Forward, rotation);
-			Vector3 target = this.Transform.Position + forward;
-
-			Vector3 up = Vector3.Transform(Vector3.Up, rotation);
-
-			this.View = Matrix.CreateLookAt(this.Transform.Position, target, up);
-
-			this.translation = Vector3.Zero;
-		}
-
-		public void Rotate(float yawChange, float pitchChange)
-		{
-			this.Yaw += yawChange;
-			this.Pitch += pitchChange;
+			return Math.Abs(this.Transform.WorldPosition.Z - z) * FovOver2Tan * 2;
 		}
 	}
 }
