@@ -88,6 +88,8 @@ namespace FrozenEngine.ECS.Components
 		public Alignment Alignment { get; set; } = Alignment.None;
 		public Point Margin { get; set; } = Point.Zero;
 		public Viewport Viewport { get; private set; }
+		public Color ClearColor { get; set; } = Color.Red;
+		public RenderTarget2D RenderTarget { get; private set; }
 
 		/// <summary>
 		/// Returns the Z coordinate of the plane where 1 distance unit equals 1 pixel
@@ -114,6 +116,7 @@ namespace FrozenEngine.ECS.Components
 				height = (int)(device.Viewport.Height * this.size.Size.Y);
 			}
 
+			/*
 			Point location = Point.Zero;
 
 			if (this.Alignment.HasFlag(Alignment.Top))
@@ -124,8 +127,10 @@ namespace FrozenEngine.ECS.Components
 				location.X = this.Margin.X;
 			if (this.Alignment.HasFlag(Alignment.Right))
 				location.X = device.Viewport.Width - width - this.Margin.X;
+			*/
 
-			this.Viewport = new Viewport(location.X, location.Y, (int)width, (int)height);
+			this.Viewport = new Viewport(0, 0, width, height);
+			this.RenderTarget = new RenderTarget2D(device, width, height, true, SurfaceFormat.Color, DepthFormat.Depth24Stencil8, 0, RenderTargetUsage.DiscardContents);
 		}
 
 		protected override void OnUpdate(GameTime gameTime)

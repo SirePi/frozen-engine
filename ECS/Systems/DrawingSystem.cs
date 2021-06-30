@@ -36,12 +36,14 @@ namespace FrozenEngine.ECS.Systems
 
 			this.device.SetRenderTarget(null);
 			this.device.Clear(Color.Black);
-
-			Viewport original = this.device.Viewport;
+			
+			// Viewport original = this.device.Viewport;
 
 			foreach (Camera camera in scene.GetCameras())
 			{
-				this.device.Viewport = camera.Viewport;
+				this.device.SetRenderTarget(camera.RenderTarget);
+
+				this.device.Clear(camera.ClearColor);
 				this.device.BlendState = BlendState.AlphaBlend;
 				this.device.DepthStencilState = DepthStencilState.Default;
 				this.device.SamplerStates[0] = SamplerState.AnisotropicWrap;
@@ -51,9 +53,10 @@ namespace FrozenEngine.ECS.Systems
 					this.drawables[i].Draw(this.device, camera);
 			}
 
-			this.device.Viewport = original;
+			this.device.SetRenderTarget(null);
 
-			/*
+			//this.device.Viewport = original;
+
 			this.batch.Begin();
 			foreach (Camera camera in scene.GetCameras())
 			{
@@ -71,7 +74,7 @@ namespace FrozenEngine.ECS.Systems
 				this.batch.Draw(camera.RenderTarget, location, Color.White);
 			}
 			this.batch.End();
-			*/
+			
 
 			foreach (UI ui in scene.GetActiveComponents<UI>())
 				ui.Draw(gameTime);

@@ -40,6 +40,8 @@ namespace FrozenEngine.ECS.Components
 			float minY = CoreMath.Min(topLeft.Y, topRight.Y, bottomLeft.Y, bottomRight.Y);
 			float maxY = CoreMath.Max(topLeft.Y, topRight.Y, bottomLeft.Y, bottomRight.Y);
 
+			Frozen.Log.Core.Debug($"{camera.Entity.Name} {minX} {maxX} {minY} {maxY}");
+
 			float width = maxX - minX;
 			float height = maxY - minY;
 

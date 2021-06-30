@@ -9,6 +9,7 @@ using FrozenEngine.ECS;
 using FrozenEngine.Input;
 using FrozenEngine.ECS.Systems;
 using Myra;
+using FrozenEngine.Utilities;
 
 namespace FrozenEngine
 {
@@ -19,6 +20,8 @@ namespace FrozenEngine
 		internal static Game Game { get; private set; }
 		internal static DrawingSystem Drawing { get; private set; }
 		internal static DefaultContent DefaultContent { get; private set; }
+
+		public static Log Log { get; private set; }
 		public static AudioSystem Audio { get; private set; }
 		public static KeyboardManager Keyboard { get; private set; }
 		public static MouseManager Mouse { get; private set; }
@@ -30,6 +33,8 @@ namespace FrozenEngine
 			DefaultContent = new DefaultContent(game.Content);
 
 			Drawing = new DrawingSystem(game.GraphicsDevice);
+
+			Log = new Log();
 			Audio = new AudioSystem();
 			Keyboard = new KeyboardManager();
 			Mouse = new MouseManager();
