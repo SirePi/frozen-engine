@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using NLog;
+using NLog.Targets;
+using Serilog;
 
 namespace FrozenEngine.Utilities
 {
@@ -17,37 +19,42 @@ namespace FrozenEngine.Utilities
 		/// <summary>
 		/// The default Game logger; should be used for gameplay-related logs
 		/// </summary>
-		public Logger Game { get; private set; }
+		public Serilog.Core.Logger Game { get; private set; }
 
 		internal Log()
 		{
-			LogManager.Configuration = new NLog.Config.LoggingConfiguration();
+			NLog.Common.InternalLogger.LogLevel = LogLevel.Trace;
+			NLog.Common.InternalLogger.LogToConsole = true;
+			NLog.Common.InternalLogger.LogFile = "nlog-internal.txt";
 
-			this.Core = this.CustomLog("Core", "core.txt");
-			this.Game = this.CustomLog("Game", "game.txt");
+			LogManager.Configuration = new NLog.Config.LoggingConfiguration();
+			LogManager.ThrowExceptions = true;
+
+			this.Core = this.CustomLog("core");
+			this.Core.Info("Done!");
+
+			this.Game = new Serilog.LoggerConfiguration()
+				.WriteTo.File("game.txt")
+				.CreateLogger();
+			this.Game.Information("Yaaa {0}", 3);
 		}
 
 		/// <summary>
 		/// Returns a new NLog Logger object
 		/// </summary>
 		/// <param name="name">The name of the logger</param>
-		/// <param name="fileName">The name of the file written by the logger; if a logger with the same name already exists, it is returned instead</param>
 		/// <returns></returns>
-		public Logger CustomLog(string name, string fileName = null)
+		public Logger CustomLog(string name)
 		{
 			if (name == null)
 				throw new ArgumentNullException(name);
 
-			if (LogManager.Configuration.FindTargetByName(name) == null)
+			if (LogManager.Configuration.FindRuleByName(name) == null)
 			{
-				if (fileName == null)
-					throw new ArgumentNullException(fileName);
-
-				NLog.Targets.FileTarget target = new NLog.Targets.FileTarget(name)
+				FileTarget target = new FileTarget(name)
 				{
-					FileName = fileName,
+					FileName = string.Format("{0}.txt", name),
 					Layout = DefaultLayout,
-					MaxArchiveFiles = 0,
 					AutoFlush = true,
 					DeleteOldFileOnStartup = true
 				};
