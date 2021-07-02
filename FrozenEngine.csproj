@@ -30,7 +30,6 @@
     <PackageReference Include="Monogame.ImGui.Standard" Version="1.0.0" />
     <PackageReference Include="Myra" Version="1.2.4" />
     <PackageReference Include="NLog" Version="4.7.10" />
-    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
     <PackageReference Include="System.Memory" Version="4.5.4" />
   </ItemGroup>
 </Project>

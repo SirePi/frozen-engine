@@ -4,7 +4,6 @@ using System.IO;
 using System.Text;
 using NLog;
 using NLog.Targets;
-using Serilog;
 
 namespace FrozenEngine.Utilities
 {
@@ -19,24 +18,14 @@ namespace FrozenEngine.Utilities
 		/// <summary>
 		/// The default Game logger; should be used for gameplay-related logs
 		/// </summary>
-		public Serilog.Core.Logger Game { get; private set; }
+		public Logger Game { get; private set; }
 
 		internal Log()
 		{
-			NLog.Common.InternalLogger.LogLevel = LogLevel.Trace;
-			NLog.Common.InternalLogger.LogToConsole = true;
-			NLog.Common.InternalLogger.LogFile = "nlog-internal.txt";
-
 			LogManager.Configuration = new NLog.Config.LoggingConfiguration();
-			LogManager.ThrowExceptions = true;
 
 			this.Core = this.CustomLog("core");
-			this.Core.Info("Done!");
-
-			this.Game = new Serilog.LoggerConfiguration()
-				.WriteTo.File("game.txt")
-				.CreateLogger();
-			this.Game.Information("Yaaa {0}", 3);
+			this.Game = this.CustomLog("game");
 		}
 
 		/// <summary>
@@ -56,12 +45,13 @@ namespace FrozenEngine.Utilities
 					FileName = string.Format("{0}.txt", name),
 					Layout = DefaultLayout,
 					AutoFlush = true,
+					KeepFileOpen = true,
 					DeleteOldFileOnStartup = true
 				};
 
 				LogManager.Configuration.AddTarget(target);
 				LogManager.Configuration.AddRule(LogLevel.Trace, LogLevel.Fatal, target, name);
-				LogManager.Configuration.Reload();
+				LogManager.ReconfigExistingLoggers();
 			}
 
 			return LogManager.GetLogger(name);
