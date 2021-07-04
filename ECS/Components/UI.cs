@@ -13,10 +13,13 @@ namespace FrozenEngine.ECS.Components
 	public abstract class UI : Component
 	{
 		protected readonly Desktop desktop;
+		public bool IsMouseOverGUI => this.desktop.IsMouseOverGUI;
 
 		public UI()
 		{
+#pragma warning disable S1699 // Constructors should only call non-overridable methods
 			this.desktop = this.BuildUI();
+#pragma warning restore S1699 // Constructors should only call non-overridable methods
 		}
 
 		public void Draw(GameTime gameTime)
@@ -25,13 +28,5 @@ namespace FrozenEngine.ECS.Components
 		}
 
 		protected abstract Desktop BuildUI();
-
-		protected override void OnUpdate(GameTime gameTime)
-		{
-			if(this.desktop.IsMouseOverGUI)
-			{
-				int a = 0;
-			}	
-		}
 	}
 }

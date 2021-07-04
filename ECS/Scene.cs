@@ -10,7 +10,7 @@ using System.Text;
 
 namespace FrozenEngine.ECS
 {
-	public class Scene
+	public abstract class Scene
 	{
 		public static Scene Current => Frozen.Game.CurrentScene;
 		public static void SwitchTo(Scene nextScene)
@@ -25,28 +25,20 @@ namespace FrozenEngine.ECS
 
 		public int EntitiesCount => this.entityManager.GetEntities().Count();
 
-		public Scene()
+		protected Scene()
 		{
 			this.entityManager.OnEntityAdded += this.OnEntityAdded;
 			this.entityManager.OnEntityRemoved += this.OnEntityRemoved;
 			this.entityManager.OnComponentAdded += this.OnEntityComponentAdded;
 			this.entityManager.OnComponentRemoved += this.OnEntityComponentRemoved;
-
-			/*
-			int i = 0;
-			foreach (Camera c in Camera.CreateSplitScreen<TwoPointFiveDCamera>(SplitScreen.FourWays))
-			{
-				Entity e = new Entity($"Camera_{i}")
-				{
-					new Transform { Position = new Vector3(0, 0, -1000) },
-					c
-				};
-				this.AddEntity(e);
-			}
-			*/
 		}
 
-		public void Update(GameTime gameTime)
+		public virtual void AfterSwitchingFrom() { }
+		public virtual void BeforeSwitchingFrom() { }
+		public virtual void AfterSwitchingTo() { }
+		public virtual void BeforeSwitchingTo() { }
+
+		public virtual void Update(GameTime gameTime)
 		{
 			this.entityManager.Update(gameTime);
 			this.coroutineManager.Update(gameTime);

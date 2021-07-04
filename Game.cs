@@ -12,15 +12,24 @@ using FrozenEngine.ECS.Systems;
 
 namespace FrozenEngine
 {
-	public class Game : Microsoft.Xna.Framework.Game
+	public abstract class Game : Microsoft.Xna.Framework.Game
 	{
+		protected abstract Scene StartingScene { get; }
 		internal Scene CurrentScene { get; private set; }
 		private Scene nextScene;
+		protected GraphicsDeviceManager graphics;
+
+		protected Game()
+		{
+			this.graphics = new GraphicsDeviceManager(this);
+		}
 
 		protected override void Initialize()
 		{
 			base.Initialize();
 			Frozen.Initialize(this);
+
+			this.nextScene = this.StartingScene;
 		}
 
 		protected override void Update(GameTime gameTime)
@@ -36,7 +45,16 @@ namespace FrozenEngine
 
 			if (this.nextScene != null)
 			{
+				Scene current = this.CurrentScene;
+
+				current?.BeforeSwitchingFrom();
+				this.nextScene.BeforeSwitchingTo();
+
 				this.CurrentScene = this.nextScene;
+
+				current?.AfterSwitchingFrom();
+				this.nextScene.AfterSwitchingTo();
+
 				this.nextScene = null;
 			}
 
