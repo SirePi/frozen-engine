@@ -14,7 +14,7 @@ namespace FrozenEngine.ECS.Systems
 		private readonly List<Sound3D> threeDsounds;
 		public event Action<MediaState> OnMediaStateChanged;
 
-		public AudioSystem()
+		internal AudioSystem()
 		{
 			this.threeDsounds = new List<Sound3D>();
 			MediaPlayer.MediaStateChanged += this.MediaPlayer_MediaStateChanged;

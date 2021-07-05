@@ -34,8 +34,8 @@ namespace FrozenEngine.Audio
 				Vector3 distance = this.emitter.Transform.WorldPosition - this.listener.Transform.WorldPosition;
 				Vector3 relativePosition = Vector3.Transform(this.emitter.Transform.WorldPosition, this.listener.Camera.View * this.listener.Camera.Projection);
 
-				float angle = (float)Math.Atan2(relativePosition.Z, relativePosition.X) - MathHelper.PiOver2;
-				this.sfx.Pan = -(float)Math.Sin(angle);
+				float angle = MathF.Atan2(relativePosition.Z, relativePosition.X) - MathHelper.PiOver2;
+				this.sfx.Pan = -MathF.Sin(angle);
 				this.sfx.Volume = MathHelper.Clamp(1 - ((distance.LengthSquared() - this.listener.FullVolumeDistanceSquared) / this.listener.CutOffDistanceSquared), 0, 1) * this.emitter.Volume;
 			}
 		}

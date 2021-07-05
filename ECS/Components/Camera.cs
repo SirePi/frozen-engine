@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using FrozenEngine.Enums;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
@@ -10,28 +11,33 @@ namespace FrozenEngine.ECS.Components
 	public class Camera : Component
 	{
 		private static float FovOver2 = MathHelper.PiOver4 / 2;
-		private static float FovOver2Tan = (float)Math.Tan(FovOver2);
+		private static float FovOver2Tan = MathF.Tan(FovOver2);
 
-		public static Camera CreateCamera(CameraViewportSize size, Alignment alignment, Point? margin = null)
+		public static Camera CreateCamera(CameraType type, CameraViewportSize size, Alignment alignment, Point? margin = null)
 		{
-			return new Camera(size)
+			return new Camera(type, size)
 			{
 				Alignment = alignment,
 				Margin = margin ?? Point.Zero
 			};
 		}
 
-		public static Camera CreateCamera(Vector2 size, bool isAbsoluteSize, Alignment alignment, Point? margin = null)
+		public static Component CreateFullScreen(object cameraType)
 		{
-			return CreateCamera(new CameraViewportSize(size, isAbsoluteSize), alignment, margin);
+			throw new NotImplementedException();
 		}
 
-		public static Camera CreateFullScreen()
+		public static Camera CreateCamera(CameraType type, Vector2 size, bool isAbsoluteSize, Alignment alignment, Point? margin = null)
 		{
-			return CreateCamera(Vector2.One, false, Alignment.None);
+			return CreateCamera(type, new CameraViewportSize(size, isAbsoluteSize), alignment, margin);
 		}
 
-		public static IEnumerable<Camera> CreateSplitScreen(SplitScreen split)
+		public static Camera CreateFullScreen(CameraType type)
+		{
+			return CreateCamera(type, Vector2.One, false, Alignment.None);
+		}
+
+		public static IEnumerable<Camera> CreateSplitScreen(CameraType type, SplitScreen split)
 		{
 			Vector2 cameraSize;
 
@@ -39,24 +45,25 @@ namespace FrozenEngine.ECS.Components
 			{
 				case SplitScreen.TwoVertical:
 					cameraSize = new Vector2(.5f, 1f);
-					yield return CreateCamera(cameraSize, false, Alignment.Left);
-					yield return CreateCamera(cameraSize, false, Alignment.Right);
+					yield return CreateCamera(type, cameraSize, false, Alignment.Left);
+					yield return CreateCamera(type, cameraSize, false, Alignment.Right);
 					break;
 				case SplitScreen.TwoHorizontal:
 					cameraSize = new Vector2(1f, .5f);
-					yield return CreateCamera(cameraSize, false, Alignment.Top);
-					yield return CreateCamera(cameraSize, false, Alignment.Bottom);
+					yield return CreateCamera(type, cameraSize, false, Alignment.Top);
+					yield return CreateCamera(type, cameraSize, false, Alignment.Bottom);
 					break;
 				case SplitScreen.FourWays:
 					cameraSize = new Vector2(.5f, .5f);
-					yield return CreateCamera(cameraSize, false, Alignment.TopLeft);
-					yield return CreateCamera(cameraSize, false, Alignment.TopRight);
-					yield return CreateCamera(cameraSize, false, Alignment.BottomLeft);
-					yield return CreateCamera(cameraSize, false, Alignment.BottomRight);
+					yield return CreateCamera(type, cameraSize, false, Alignment.TopLeft);
+					yield return CreateCamera(type, cameraSize, false, Alignment.TopRight);
+					yield return CreateCamera(type, cameraSize, false, Alignment.BottomLeft);
+					yield return CreateCamera(type, cameraSize, false, Alignment.BottomRight);
 					break;
 			}
 		}
 
+		private readonly CameraType type;
 		private readonly CameraViewportSize size;
 		private float windowAspectRatio;
 		private float farPlane;
@@ -88,19 +95,32 @@ namespace FrozenEngine.ECS.Components
 		public Alignment Alignment { get; set; } = Alignment.None;
 		public Point Margin { get; set; } = Point.Zero;
 		public Viewport Viewport { get; private set; }
-		public Color ClearColor { get; set; } = Color.Red;
+		public Color ClearColor { get; set; } = Color.Black;
 		public RenderTarget2D RenderTarget { get; private set; }
 
 		/// <summary>
 		/// Returns the Z coordinate of the plane where 1 distance unit equals 1 pixel
 		/// </summary>
-		public float PixelPerfectPlane => this.Transform.WorldPosition.Z + (this.Viewport.Height / 2) / FovOver2Tan;
-
-		protected Camera(CameraViewportSize size)
+		public float PixelPerfectPlane
 		{
+			get
+			{
+				switch(this.type)
+				{
+					case CameraType.Perspective: return this.Transform.WorldPosition.Z + (this.Viewport.Height / 2) / FovOver2Tan;
+					case CameraType.Orthogonal: return this.Transform.WorldPosition.Z + this.nearPlane;
+					default: return this.Transform.WorldPosition.Z;
+				}
+			}
+		}
+
+		protected Camera(CameraType type, CameraViewportSize size)
+		{
+			this.type = type;
 			this.size = size;
 			this.nearPlane = 1;
 			this.farPlane = 10000f;
+			this.dirtyProjection = true;
 			this.UpdateViewport();
 		}
 
@@ -115,19 +135,6 @@ namespace FrozenEngine.ECS.Components
 				width = (int)(device.Viewport.Width * this.size.Size.X);
 				height = (int)(device.Viewport.Height * this.size.Size.Y);
 			}
-
-			/*
-			Point location = Point.Zero;
-
-			if (this.Alignment.HasFlag(Alignment.Top))
-				location.Y = this.Margin.Y;
-			if (this.Alignment.HasFlag(Alignment.Bottom))
-				location.Y = device.Viewport.Height - height - this.Margin.Y;
-			if (this.Alignment.HasFlag(Alignment.Left))
-				location.X = this.Margin.X;
-			if (this.Alignment.HasFlag(Alignment.Right))
-				location.X = device.Viewport.Width - width - this.Margin.X;
-			*/
 
 			this.Viewport = new Viewport(0, 0, width, height);
 			this.RenderTarget = new RenderTarget2D(device, width, height, true, SurfaceFormat.Color, DepthFormat.Depth24Stencil8, 0, RenderTargetUsage.DiscardContents);
@@ -144,15 +151,34 @@ namespace FrozenEngine.ECS.Components
 				this.dirtyProjection = true;
 			}
 
-			if(this.dirtyProjection)
+			this.UpdateMatrices();
+			base.OnUpdate(gameTime);
+		}
+
+		private void UpdateMatrices()
+		{
+			if (this.dirtyProjection)
 			{
 				float aspectRatio = (float)this.Viewport.Width / this.Viewport.Height;
-				this.Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, aspectRatio, this.nearPlane, this.farPlane);
+				switch (this.type)
+				{
+					case CameraType.Perspective:
+						this.Projection = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, aspectRatio, this.nearPlane, this.farPlane);
+						break;
+					case CameraType.Orthogonal:
+						this.Projection = Matrix.CreateOrthographic(this.Viewport.Width, this.Viewport.Height, this.nearPlane, this.farPlane);
+						break;
+					case CameraType.Isometric:
+						throw new NotImplementedException();
+				}
+
 				this.dirtyProjection = false;
 			}
 
-			this.View = Matrix.CreateLookAt(this.Transform.Position, this.Transform.Position + Vector3.UnitZ, -Vector3.UnitY) * Matrix.CreateRotationZ(this.Transform.Rotation);
-			base.OnUpdate(gameTime);
+			if (this.type == CameraType.Isometric)
+				this.View = Matrix.CreateLookAt(this.Transform.Position, this.Transform.Position + Vector3.UnitZ, -Vector3.UnitY) * Matrix.CreateRotationZ(this.Transform.Rotation);
+			else
+				this.View = Matrix.CreateLookAt(this.Transform.Position, this.Transform.Position + Vector3.UnitZ, -Vector3.UnitY) * Matrix.CreateRotationZ(this.Transform.Rotation);
 		}
 
 		/// <summary>

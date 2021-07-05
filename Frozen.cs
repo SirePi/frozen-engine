@@ -18,9 +18,9 @@ namespace FrozenEngine
 		internal static Dictionary<Type, PropertyInfo[]> RequiredComponentsCache { get; private set; }
 		internal static Dictionary<Type, int> ComponentsUpdateOrder { get; private set; }
 		internal static DrawingSystem Drawing { get; private set; }
-		internal static DefaultContent DefaultContent { get; private set; }
 
 		public static Game Game { get; private set; }
+		public static ContentProvider ContentProvider { get; private set; }
 		public static Log Log { get; private set; }
 		public static AudioSystem Audio { get; private set; }
 		public static KeyboardManager Keyboard { get; private set; }
@@ -30,8 +30,8 @@ namespace FrozenEngine
 		internal static void Initialize(Game game)
 		{
 			Game = game;
-			DefaultContent = new DefaultContent(game.Content);
 
+			ContentProvider = new ContentProvider(game);
 			Drawing = new DrawingSystem(game.GraphicsDevice);
 
 			Log = new Log();

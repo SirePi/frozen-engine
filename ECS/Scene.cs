@@ -12,10 +12,16 @@ namespace FrozenEngine.ECS
 {
 	public abstract class Scene
 	{
+		private static Dictionary<Type, Scene> scenesDictionary = new Dictionary<Type, Scene>();
 		public static Scene Current => Frozen.Game.CurrentScene;
-		public static void SwitchTo(Scene nextScene)
+		public static void SwitchTo<T>() where T : Scene, new()
 		{
-			Frozen.Game.ChangeScene(nextScene);
+			Type t = typeof(T);
+
+			if (!scenesDictionary.ContainsKey(t))
+				scenesDictionary.Add(t, new T());
+
+			Frozen.Game.ChangeScene(scenesDictionary[t]);
 		}
 
 		private readonly EntityManager entityManager = new EntityManager();

@@ -18,7 +18,7 @@ namespace FrozenEngine
 		private readonly MethodInfo GetContentReaderFromXnb;
 		private readonly MethodInfo ReadAsset;
 
-		public DefaultContent(ContentManager contentManager)
+		internal DefaultContent(ContentManager contentManager)
 		{
 			this.contentManager = contentManager;
 			this.assembly = Assembly.GetExecutingAssembly();
