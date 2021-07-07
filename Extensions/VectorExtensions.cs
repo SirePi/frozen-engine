@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xna.Framework;
 
-namespace Frozen.Extensions
+namespace Frozen
 {
 	public static class Vector2Extensions
 	{
