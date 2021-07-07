@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using FrozenEngine.ECS.Components;
+using Frozen.ECS.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 
-namespace FrozenEngine.Audio
+namespace Frozen.Audio
 {
 	class Sound3D
 	{
@@ -25,7 +25,7 @@ namespace FrozenEngine.Audio
 			this.IsActive = true;
 		}
 
-		public void Update(GameTime gameTime)
+		public void Update()
 		{
 			if (this.sfx.State == SoundState.Stopped)
 				this.IsActive = false;

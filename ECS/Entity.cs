@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace FrozenEngine.ECS
+namespace Frozen.ECS
 {
 	public class Entity : IEnumerable<Component>, IDisposable
 	{
@@ -39,6 +39,12 @@ namespace FrozenEngine.ECS
 					child.Scene = value;
 			}
 		}
+
+		/// <summary>
+		/// Constructor
+		/// </summary>
+		public Entity() : this(null, NoComponents)
+		{ }
 
 		/// <summary>
 		/// Constructor
@@ -173,15 +179,15 @@ namespace FrozenEngine.ECS
 			}
 		}
 
-		public void Update(GameTime gameTime, bool force = false)
+		public void Update(bool force = false)
 		{
 			if (this.IsActive || force)
 			{
 				foreach (Component component in this.updateOrderedComponents)
-					component.Update(gameTime, force);
+					component.Update(force);
 
 				foreach (Entity child in this.children)
-					child.Update(gameTime, force);
+					child.Update(force);
 			}
 		}
 
@@ -191,7 +197,7 @@ namespace FrozenEngine.ECS
 				component.UpdateRequirements();
 
 			this.updateOrderedComponents = this.components
-				.OrderBy(kvp => Frozen.ComponentsUpdateOrder[kvp.Key])
+				.OrderBy(kvp => Engine.ComponentsUpdateOrder[kvp.Key])
 				.Select(kvp => kvp.Value)
 				.ToArray();
 		}

@@ -1,4 +1,4 @@
-﻿using FrozenEngine.ECS.Components;
+﻿using Frozen.ECS.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System;
@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace FrozenEngine.Input
+namespace Frozen.Input
 {
 	public class GamePadManager
 	{

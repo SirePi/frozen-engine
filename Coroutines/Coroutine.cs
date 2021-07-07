@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 
-namespace FrozenEngine.Coroutines
+namespace Frozen.Coroutines
 {
 	/// <summary>
 	/// A Coroutine's management class
@@ -41,13 +41,13 @@ namespace FrozenEngine.Coroutines
 			this.enumerator = values.GetEnumerator();
 		}
 
-		internal void Update(GameTime gameTime)
+		internal void Update()
 		{
 			if (this.Status != CoroutineStatus.Running) return;
 
 			try
 			{
-				this.currentCondition.Update(gameTime);
+				this.currentCondition.Update();
 				if (this.currentCondition.IsComplete)
 				{
 					if (this.enumerator.MoveNext())

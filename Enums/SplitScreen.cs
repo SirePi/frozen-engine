@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace FrozenEngine
+namespace Frozen
 {
 	public enum SplitScreen : byte
 	{

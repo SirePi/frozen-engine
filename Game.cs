@@ -4,13 +4,13 @@ using System.Linq;
 using System.IO;
 using System.Reflection;
 using System.Text;
-using FrozenEngine.ECS;
-using FrozenEngine.Input;
+using Frozen.ECS;
+using Frozen.Input;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
-using FrozenEngine.ECS.Systems;
+using Frozen.ECS.Systems;
 
-namespace FrozenEngine
+namespace Frozen
 {
 	public abstract class Game : Microsoft.Xna.Framework.Game
 	{
@@ -27,7 +27,7 @@ namespace FrozenEngine
 		protected override void Initialize()
 		{
 			base.Initialize();
-			Frozen.Initialize(this);
+			Engine.Initialize(this);
 
 			this.nextScene = this.StartingScene;
 		}
@@ -35,12 +35,13 @@ namespace FrozenEngine
 		protected override void Update(GameTime gameTime)
 		{
 			base.Update(gameTime);
+			Time.Update(gameTime);
 
-			Frozen.Audio.Update(gameTime);
-			Frozen.Keyboard.Update();
-			Frozen.Mouse.Update();
+			Engine.Audio.Update();
+			Engine.Keyboard.Update();
+			Engine.Mouse.Update();
 
-			foreach (GamePadManager gamePad in Frozen.GamePad.Values)
+			foreach (GamePadManager gamePad in Engine.GamePad.Values)
 				gamePad.Update();
 
 			if (this.nextScene != null)
@@ -58,12 +59,12 @@ namespace FrozenEngine
 				this.nextScene = null;
 			}
 
-			this.CurrentScene.Update(gameTime);
+			this.CurrentScene.Update();
 		}
 
 		protected override void Draw(GameTime gameTime)
 		{
-			Frozen.Drawing.DrawScene(this.CurrentScene, gameTime);
+			Engine.Drawing.DrawScene(this.CurrentScene);
 		}
 
 		internal void ChangeScene(Scene nextScene)

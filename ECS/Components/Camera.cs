@@ -1,4 +1,4 @@
-﻿using FrozenEngine.Enums;
+﻿using Frozen.Enums;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 
-namespace FrozenEngine.ECS.Components
+namespace Frozen.ECS.Components
 {
 	public class Camera : Component
 	{
@@ -126,7 +126,7 @@ namespace FrozenEngine.ECS.Components
 
 		private void UpdateViewport()
 		{
-			GraphicsDevice device = Frozen.Game.GraphicsDevice;
+			GraphicsDevice device = Engine.Game.GraphicsDevice;
 			int width = (int)this.size.Size.X;
 			int height = (int)this.size.Size.Y;
 
@@ -140,9 +140,9 @@ namespace FrozenEngine.ECS.Components
 			this.RenderTarget = new RenderTarget2D(device, width, height, true, SurfaceFormat.Color, DepthFormat.Depth24Stencil8, 0, RenderTargetUsage.DiscardContents);
 		}
 
-		protected override void OnUpdate(GameTime gameTime)
+		protected override void OnUpdate()
 		{
-			GraphicsDevice device = Frozen.Game.GraphicsDevice;
+			GraphicsDevice device = Engine.Game.GraphicsDevice;
 			if (this.windowAspectRatio != device.Viewport.AspectRatio && !this.size.IsAbsoluteSize)
 			{
 				this.UpdateViewport();
@@ -152,7 +152,7 @@ namespace FrozenEngine.ECS.Components
 			}
 
 			this.UpdateMatrices();
-			base.OnUpdate(gameTime);
+			base.OnUpdate();
 		}
 
 		private void UpdateMatrices()

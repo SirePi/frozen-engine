@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace FrozenEngine.Drawing
+namespace Frozen.Drawing
 {
 	public static class DefaultGraphics
 	{
-		public static AlphaTestEffect AlphaTestTexture { get; private set; } = new AlphaTestEffect(Frozen.Game.GraphicsDevice) { VertexColorEnabled = true };
-		public static BasicEffect DefaultTexture { get; private set; } = new BasicEffect(Frozen.Game.GraphicsDevice) { TextureEnabled = true, VertexColorEnabled = true };
-		public static BasicEffect FlatColor { get; private set; } = new BasicEffect(Frozen.Game.GraphicsDevice) { TextureEnabled = false, VertexColorEnabled = true };
+		public static AlphaTestEffect AlphaTestTexture { get; private set; } = new AlphaTestEffect(Engine.Game.GraphicsDevice) { VertexColorEnabled = true };
+		public static BasicEffect DefaultTexture { get; private set; } = new BasicEffect(Engine.Game.GraphicsDevice) { TextureEnabled = true, VertexColorEnabled = true };
+		public static BasicEffect FlatColor { get; private set; } = new BasicEffect(Engine.Game.GraphicsDevice) { TextureEnabled = false, VertexColorEnabled = true };
 	}
 }

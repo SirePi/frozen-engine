@@ -1,11 +1,11 @@
-﻿using FrozenEngine.ECS.Components;
+﻿using Frozen.ECS.Components;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace FrozenEngine.ECS
+namespace Frozen.ECS
 {
 	internal class EntityManager
 	{
@@ -21,7 +21,7 @@ namespace FrozenEngine.ECS
 
 		internal EntityManager() { }
 
-		internal void Update(GameTime gameTime)
+		internal void Update()
 		{
 			foreach (Entity e in this.disposedEntities)
 				this.entities.Remove(e);
@@ -39,7 +39,7 @@ namespace FrozenEngine.ECS
 			this.dirtyEntities.Clear();
 
 			foreach (Entity e in this.GetActiveRootEntities())
-				e.Update(gameTime, false);
+				e.Update(false);
 		}
 
 		public bool AddEntity(Entity entity)
@@ -70,7 +70,15 @@ namespace FrozenEngine.ECS
 			return toRemove;
 		}
 
-		private void Entity_OnComponentAdded(Entity entity, Component component)
+		public void Clear()
+		{
+			this.entities.Clear();
+			this.pendingEntities.Clear();
+			this.disposedEntities.Clear();
+			this.dirtyEntities.Clear();
+		}
+
+	private void Entity_OnComponentAdded(Entity entity, Component component)
 		{
 			this.dirtyEntities.Add(entity);
 			this.OnComponentAdded?.Invoke(entity, component);

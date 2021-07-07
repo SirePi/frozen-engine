@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace FrozenEngine.Utilities
+namespace Frozen.Utilities
 {
 	public static class CoreMath
 	{

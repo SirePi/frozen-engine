@@ -1,6 +1,6 @@
-﻿using FrozenEngine.ECS.Components;
-using FrozenEngine.ECS.Systems;
-using FrozenEngine.Utilities;
+﻿using Frozen.ECS.Components;
+using Frozen.ECS.Systems;
+using Frozen.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -8,7 +8,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace FrozenEngine.Drawing
+namespace Frozen.Drawing
 {
 	public abstract class Drawable
 	{

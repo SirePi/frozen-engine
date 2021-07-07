@@ -5,7 +5,7 @@ using System.Text;
 using NLog;
 using NLog.Targets;
 
-namespace FrozenEngine.Utilities
+namespace Frozen.Utilities
 {
 	public class Log
 	{

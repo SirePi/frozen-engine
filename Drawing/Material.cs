@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace FrozenEngine.Drawing
+namespace Frozen.Drawing
 {
 	public class Material
 	{

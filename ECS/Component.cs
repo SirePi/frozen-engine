@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 
-namespace FrozenEngine.ECS
+namespace Frozen.ECS
 {
 	public abstract class Component
 	{
@@ -31,17 +31,17 @@ namespace FrozenEngine.ECS
 
 		public virtual void OnActivate() { }
 		public virtual void OnDeactivate() { }
-		public void Update(GameTime gameTime, bool force = false)
+		public void Update(bool force = false)
 		{
 			if (this.IsActive || force)
-				this.OnUpdate(gameTime);
+				this.OnUpdate();
 		}
 
-		protected virtual void OnUpdate(GameTime gameTime) { }
+		protected virtual void OnUpdate() { }
 
 		internal void UpdateRequirements()
 		{
-			foreach (PropertyInfo pi in Frozen.RequiredComponentsCache[this.GetType()])
+			foreach (PropertyInfo pi in Engine.RequiredComponentsCache[this.GetType()])
 			{
 				object component = this.Entity.Get(pi.PropertyType);
 

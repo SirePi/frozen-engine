@@ -5,20 +5,21 @@ using System.Linq;
 using System.IO;
 using System.Reflection;
 using System.Text;
-using FrozenEngine.ECS;
-using FrozenEngine.Input;
-using FrozenEngine.ECS.Systems;
+using Frozen.ECS;
+using Frozen.Input;
+using Frozen.ECS.Systems;
 using Myra;
-using FrozenEngine.Utilities;
+using Frozen.Utilities;
 
-namespace FrozenEngine
+namespace Frozen
 {
-	public static class Frozen
+	public static class Engine
 	{
 		internal static Dictionary<Type, PropertyInfo[]> RequiredComponentsCache { get; private set; }
 		internal static Dictionary<Type, int> ComponentsUpdateOrder { get; private set; }
 		internal static DrawingSystem Drawing { get; private set; }
 
+		public static Random Random { get; private set; }
 		public static Game Game { get; private set; }
 		public static ContentProvider ContentProvider { get; private set; }
 		public static Log Log { get; private set; }
@@ -31,6 +32,7 @@ namespace FrozenEngine
 		{
 			Game = game;
 
+			Random = new Random((int)DateTime.Now.TimeOfDay.TotalMilliseconds);
 			ContentProvider = new ContentProvider(game);
 			Drawing = new DrawingSystem(game.GraphicsDevice);
 
@@ -63,6 +65,11 @@ namespace FrozenEngine
 
 			// Setting up Myra
 			MyraEnvironment.Game = game;
+		}
+
+		public static void ReseedRandom(int seed)
+		{
+			Random = new Random(seed);
 		}
 
 		private static IEnumerable<Type> GetRequiredComponentsFor(Type componentType)

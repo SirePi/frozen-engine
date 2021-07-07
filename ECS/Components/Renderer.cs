@@ -1,11 +1,11 @@
-﻿using FrozenEngine.ECS.Systems;
+﻿using Frozen.ECS.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace FrozenEngine.ECS.Components
+namespace Frozen.ECS.Components
 {
 	public abstract class Renderer : Component
 	{
@@ -16,11 +16,11 @@ namespace FrozenEngine.ECS.Components
 		public abstract Rectangle Bounds { get; }
 		public abstract long RendererSortedHash { get; }
 		public abstract void Draw(DrawingSystem drawing);
-		public abstract void UpdateRenderer(GameTime gameTime);
-		protected override void OnUpdate(GameTime gameTime)
+		public abstract void UpdateRenderer();
+		protected override void OnUpdate()
 		{
-			base.OnUpdate(gameTime);
-			this.UpdateRenderer(gameTime);
+			base.OnUpdate();
+			this.UpdateRenderer();
 		}
 	}
 }

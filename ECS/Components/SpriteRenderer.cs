@@ -1,12 +1,12 @@
-﻿using FrozenEngine.Drawing;
-using FrozenEngine.ECS.Systems;
+﻿using Frozen.Drawing;
+using Frozen.ECS.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace FrozenEngine.ECS.Components
+namespace Frozen.ECS.Components
 {
 	public class SpriteRenderer : Renderer
 	{
@@ -57,7 +57,7 @@ namespace FrozenEngine.ECS.Components
 			drawing.DrawTexturedTriangles(this.Material, this.vertices, SpriteRenderer.indices);
 		}
 
-		public override void UpdateRenderer(GameTime gameTime)
+		public override void UpdateRenderer()
 		{
 			Matrix matrix = this.Transform.FullTransformMatrix;
 			UVRect uv = this.material.SpriteSheet.Atlas[this.spriteIndex];

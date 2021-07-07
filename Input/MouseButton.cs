@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace FrozenEngine.Input
+namespace Frozen.Input
 {
 	public enum MouseButton : byte
 	{

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 
-namespace FrozenEngine.Coroutines
+namespace Frozen.Coroutines
 {
 	/// <summary>
 	/// The Coroutine Manager
@@ -40,7 +40,7 @@ namespace FrozenEngine.Coroutines
 				coroutine = new Coroutine();
 
 			coroutine.Setup(enumerator);
-			coroutine.Update(TimeZero); // run once as initialization phase, to get past the first Invalid (not yet set) Wait condition
+			coroutine.Update(); // run once as initialization phase, to get past the first Invalid (not yet set) Wait condition
 
 			this.nextCycle.Enqueue(coroutine);
 			return coroutine;
@@ -69,7 +69,7 @@ namespace FrozenEngine.Coroutines
 		/// <summary>
 		/// The Coroutine's update cycle.
 		/// </summary>
-		public void Update(GameTime gameTime)
+		public void Update()
 		{
 			// swap around the queues
 			Queue<Coroutine> swap = this.currentCycle;
@@ -80,7 +80,7 @@ namespace FrozenEngine.Coroutines
 			for (int i = 0; i < count; i++)
 			{
 				Coroutine c = this.currentCycle.Dequeue();
-				c.Update(gameTime);
+				c.Update();
 
 				if (c.Status == CoroutineStatus.Running || c.Status == CoroutineStatus.Paused)
 					this.nextCycle.Enqueue(c);

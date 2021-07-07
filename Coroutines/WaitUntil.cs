@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xna.Framework;
 
-namespace FrozenEngine.Coroutines
+namespace Frozen.Coroutines
 {
 	/// <summary>
 	/// Struct in charge of managing the timings of a Coroutine's execution
@@ -36,7 +36,7 @@ namespace FrozenEngine.Coroutines
 			this.type = type;
 		}
 
-		internal void Update(GameTime gameTime)
+		internal void Update()
 		{
 			switch (this.type)
 			{
@@ -45,7 +45,7 @@ namespace FrozenEngine.Coroutines
 					break;
 
 				case WaitType.GameTime:
-					this.internalValue -= gameTime != null ? (float)gameTime.ElapsedGameTime.TotalSeconds : 0;
+					this.internalValue -= Time.FrameSeconds;
 					break;
 					/*
 				case WaitType.RealTime:

@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using FrozenEngine.Audio;
-using FrozenEngine.ECS.Components;
+using Frozen.Audio;
+using Frozen.ECS.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Media;
 
-namespace FrozenEngine.ECS.Systems
+namespace Frozen.ECS.Systems
 {
 	public class AudioSystem
 	{
@@ -69,12 +69,12 @@ namespace FrozenEngine.ECS.Systems
 			return instance;
 		}
 
-		public void Update(GameTime gameTime)
+		public void Update()
 		{
 			foreach(Sound3D s in this.threeDsounds)
 			{
 				if(s.IsActive)
-					s.Update(gameTime);
+					s.Update();
 			}
 		}
 	}

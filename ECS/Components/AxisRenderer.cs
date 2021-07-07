@@ -1,13 +1,13 @@
-﻿using FrozenEngine.Drawing;
-using FrozenEngine.ECS.Systems;
-using FrozenEngine.Utilities;
+﻿using Frozen.Drawing;
+using Frozen.ECS.Systems;
+using Frozen.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace FrozenEngine.ECS.Components
+namespace Frozen.ECS.Components
 {
     public class AxisRenderer : Renderer
     {
@@ -23,7 +23,7 @@ namespace FrozenEngine.ECS.Components
 			drawing.DrawLines(this.vertices, indices);
         }
 
-        public override void UpdateRenderer(GameTime gameTime)
+        public override void UpdateRenderer()
         {
 			Matrix matrix = this.Transform.FullTransformMatrix;
 

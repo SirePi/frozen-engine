@@ -1,4 +1,4 @@
-﻿using FrozenEngine.ECS.Components;
+﻿using Frozen.ECS.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using System;
@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace FrozenEngine.Input
+namespace Frozen.Input
 {
 	public class MouseManager
 	{
@@ -41,7 +41,7 @@ namespace FrozenEngine.Input
 
 		public Point Delta => this.currentFrameState.Position - this.lastFrameState.Position;
 		public Point Position => this.currentFrameState.Position;
-		public int HorizontalScrollWheelValue => this.currentFrameState.HorizontalScrollWheelValue;
-		public int ScrollWheelValue => this.currentFrameState.ScrollWheelValue;
+		public int HorizontalScrollWheelDelta => this.currentFrameState.HorizontalScrollWheelValue - this.lastFrameState.HorizontalScrollWheelValue;
+		public int ScrollWheelDelta => this.currentFrameState.ScrollWheelValue - this.lastFrameState.ScrollWheelValue;
 	}
 }

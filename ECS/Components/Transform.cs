@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace FrozenEngine.ECS.Components
+namespace Frozen.ECS.Components
 {
 	public sealed class Transform : Component
 	{
@@ -90,9 +90,9 @@ namespace FrozenEngine.ECS.Components
 
 		public Vector3 Velocity { get; private set; }
 
-		protected override void OnUpdate(GameTime gameTime)
+		protected override void OnUpdate()
 		{
-			this.Velocity = (this.position - this.lastPosition) / (float)gameTime.ElapsedGameTime.TotalSeconds;
+			this.Velocity = (this.position - this.lastPosition) / Time.FrameSeconds;
 			this.lastPosition = this.position;
 		}
 	}

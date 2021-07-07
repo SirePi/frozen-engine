@@ -4,7 +4,7 @@ using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 
-namespace FrozenEngine.ECS.Components
+namespace Frozen.ECS.Components
 {
 	public class SoundListener : Component
 	{

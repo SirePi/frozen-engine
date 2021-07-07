@@ -1,5 +1,5 @@
-﻿using FrozenEngine.Coroutines;
-using FrozenEngine.ECS.Components;
+﻿using Frozen.Coroutines;
+using Frozen.ECS.Components;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -8,12 +8,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace FrozenEngine.ECS
+namespace Frozen.ECS
 {
 	public abstract class Scene
 	{
 		private static Dictionary<Type, Scene> scenesDictionary = new Dictionary<Type, Scene>();
-		public static Scene Current => Frozen.Game.CurrentScene;
+		public static Scene Current => Engine.Game.CurrentScene;
 		public static void SwitchTo<T>() where T : Scene, new()
 		{
 			Type t = typeof(T);
@@ -21,7 +21,7 @@ namespace FrozenEngine.ECS
 			if (!scenesDictionary.ContainsKey(t))
 				scenesDictionary.Add(t, new T());
 
-			Frozen.Game.ChangeScene(scenesDictionary[t]);
+			Engine.Game.ChangeScene(scenesDictionary[t]);
 		}
 
 		private readonly EntityManager entityManager = new EntityManager();
@@ -44,10 +44,10 @@ namespace FrozenEngine.ECS
 		public virtual void AfterSwitchingTo() { }
 		public virtual void BeforeSwitchingTo() { }
 
-		public virtual void Update(GameTime gameTime)
+		public virtual void Update()
 		{
-			this.entityManager.Update(gameTime);
-			this.coroutineManager.Update(gameTime);
+			this.entityManager.Update();
+			this.coroutineManager.Update();
 		}
 
 		public void AddEntity(Entity entity)
@@ -61,6 +61,18 @@ namespace FrozenEngine.ECS
 		{
 			if (this.entityManager.RemoveEntity(entity))
 				entity.Scene = null;
+		}
+
+		public void RemoveWhere(Func<Entity, bool> predicate)
+		{
+			Entity[] toRemove = this.entityManager.GetEntities(predicate).ToArray();
+			foreach (Entity e in toRemove)
+				this.RemoveEntity(e);
+		}
+
+		public void Clear()
+		{
+			this.entityManager.Clear();
 		}
 
 		public IEnumerable<T> GetComponents<T>() where T : Component

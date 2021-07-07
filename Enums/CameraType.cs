@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace FrozenEngine.Enums
+namespace Frozen.Enums
 {
 	public enum CameraType
 	{

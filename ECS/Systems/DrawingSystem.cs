@@ -1,6 +1,6 @@
-﻿using FrozenEngine.Drawing;
-using FrozenEngine.ECS.Components;
-using FrozenEngine.Utilities;
+﻿using Frozen.Drawing;
+using Frozen.ECS.Components;
+using Frozen.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace FrozenEngine.ECS.Systems
+namespace Frozen.ECS.Systems
 {
 	public class DrawingSystem
 	{
@@ -27,7 +27,7 @@ namespace FrozenEngine.ECS.Systems
 			this.batch = new SpriteBatch(device);
 		}
 
-		internal void DrawScene(Scene scene, GameTime gameTime)
+		internal void DrawScene(Scene scene)
 		{
 			this.ClearDrawables();
 
@@ -77,7 +77,7 @@ namespace FrozenEngine.ECS.Systems
 			
 
 			foreach (UI ui in scene.GetActiveComponents<UI>())
-				ui.Draw(gameTime);
+				ui.Draw();
 		}
 
 		private void ClearDrawables()

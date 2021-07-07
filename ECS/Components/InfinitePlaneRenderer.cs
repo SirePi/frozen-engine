@@ -1,6 +1,6 @@
-﻿using FrozenEngine.Drawing;
-using FrozenEngine.ECS.Systems;
-using FrozenEngine.Utilities;
+﻿using Frozen.Drawing;
+using Frozen.ECS.Systems;
+using Frozen.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace FrozenEngine.ECS.Components
+namespace Frozen.ECS.Components
 {
 	public class InfinitePlaneRenderer : Renderer
 	{
@@ -40,7 +40,7 @@ namespace FrozenEngine.ECS.Components
 			float minY = CoreMath.Min(topLeft.Y, topRight.Y, bottomLeft.Y, bottomRight.Y);
 			float maxY = CoreMath.Max(topLeft.Y, topRight.Y, bottomLeft.Y, bottomRight.Y);
 
-			Frozen.Log.Core.Debug($"{camera.Entity.Name} {minX} {maxX} {minY} {maxY}");
+			Engine.Log.Core.Debug($"{camera.Entity.Name} {minX} {maxX} {minY} {maxY}");
 
 			float width = maxX - minX;
 			float height = maxY - minY;
@@ -69,7 +69,7 @@ namespace FrozenEngine.ECS.Components
 			yield return this.tList;
 		}
 
-		public override void UpdateRenderer(GameTime gameTime)
+		public override void UpdateRenderer()
 		{ }
 	}
 }

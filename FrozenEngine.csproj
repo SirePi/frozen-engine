@@ -2,13 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <AssemblyName>FrozenEngine</AssemblyName>
+    <AssemblyName>Frozen.Engine</AssemblyName>
     <Version>0.1-alpha</Version>
-    <PackageId>SnowyPeak.FrozenEngine</PackageId>
+    <PackageId>SnowyPeak.Frozen.Engine</PackageId>
     <Authors>Alessandro Pilati</Authors>
     <Company>SnowyPeakStudio</Company>
     <PackageTags>Monogame, ECS, Framework</PackageTags>
     <RepositoryUrl>https://github.com/SirePi/frozen-engine</RepositoryUrl>
+    <RootNamespace>Frozen</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

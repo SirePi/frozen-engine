@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xna.Framework;
 
-namespace FrozenEngine
+namespace Frozen
 {
 	public struct UVRect
 	{

@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace FrozenEngine.ECS.Components
+namespace Frozen.ECS.Components
 {
 	public class DebugUI : UI
 	{
@@ -42,24 +42,10 @@ namespace FrozenEngine.ECS.Components
 			return new Desktop { Root = grid };
 		}
 
-		protected override void OnUpdate(GameTime gameTime)
+		protected override void OnUpdate()
 		{
-			base.OnUpdate(gameTime);
-			this.fps.Text = $"fps: {1 / gameTime.ElapsedGameTime.TotalSeconds:0.000}";
-
-			Camera c = this.Entity.Scene.GetComponents<Camera>().First() ;
-			Vector3 unproj = c.ScreenToWorld(Frozen.Mouse.Position.ToVector2(), 0);
-			Vector3 unproj2 = c.ScreenToWorld(Frozen.Mouse.Position.ToVector2(), 100);
-			Vector3 proj = c.WorldToScreen(unproj);
-
-			Entity orbiter = this.Entity.Scene.GetEntityByName("delta");
-
-			//Vector2 w2sNear = c.WorldToScreen(Vector3.UnitZ * c.NearPlaneDistance);
-			//Vector2 w2sFar = c.WorldToScreen(Vector3.UnitZ * c.FarPlaneDistance);
-
-			this.mouse.Text = $"{Frozen.Mouse.Position} - S2W: {unproj} - S2W: {unproj2} - W2S: {proj} - PixelZ : {c.PixelPerfectPlane}";
-			this.orbiter.Text = $"{orbiter.Get<Transform>().WorldPosition}";
-			//this.mouse.Text = $"Mouse: {System.Mouse.Position} - Camera: {c.Transform.Position.XY()} - Near: ${w2sNear} - Far: ${w2sFar}";
+			base.OnUpdate();
+			this.fps.Text = $"fps: {1 / Time.FrameSeconds:0.000}";
 		}
 	}
 }

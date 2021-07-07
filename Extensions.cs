@@ -1,16 +1,27 @@
-﻿using FrozenEngine.Utilities;
+﻿using Frozen.Utilities;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
-namespace FrozenEngine
+namespace Frozen
 {
 	public static class PointExtensions
 	{
 		public static Vector2 ToVector2(this Point point)
 		{
 			return new Vector2(point.X, point.Y);
+		}
+	}
+
+
+
+	public static class Vector2Extensions
+	{
+		public static float GetAngle(this Vector2 vector)
+		{
+			return MathF.Atan2(vector.Y, vector.X);
 		}
 	}
 

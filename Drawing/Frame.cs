@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Xna.Framework;
 
-namespace FrozenEngine.Drawing
+namespace Frozen.Drawing
 {
 	public struct Frame
 	{

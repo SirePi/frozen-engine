@@ -8,7 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace FrozenEngine.ECS.Components
+namespace Frozen.ECS.Components
 {
 	public abstract class UI : Component
 	{
@@ -22,7 +22,7 @@ namespace FrozenEngine.ECS.Components
 #pragma warning restore S1699 // Constructors should only call non-overridable methods
 		}
 
-		public void Draw(GameTime gameTime)
+		public void Draw()
 		{
 			this.desktop.Render();
 		}

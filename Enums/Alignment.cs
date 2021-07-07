@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace FrozenEngine
+namespace Frozen
 {
 	[Flags]
 	public enum Alignment : byte

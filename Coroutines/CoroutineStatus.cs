@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FrozenEngine.Coroutines
+namespace Frozen.Coroutines
 {
 	/// <summary>
 	/// A Coroutine's current execution Status
