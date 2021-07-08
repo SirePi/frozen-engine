@@ -29,8 +29,8 @@ namespace Frozen.ECS
 			this.IsActive = true;
 		}
 
-		public virtual void OnActivate() { }
-		public virtual void OnDeactivate() { }
+		protected virtual void OnActivate() { }
+		protected virtual void OnDeactivate() { }
 		public void Update(bool force = false)
 		{
 			if (this.IsActive || force)
