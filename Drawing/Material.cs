@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -45,6 +46,13 @@ namespace Frozen.Drawing
 			this.Effect = effect.Clone();
 			this.BlendState = blendState ?? BlendState.AlphaBlend;
 			this.SpriteSheet = spriteSheet;
+		}
+
+		internal void SetShaderParameters(Matrix view, Matrix projection)
+		{
+			this.EffectParameters["WorldViewProj"].SetValue(Matrix.Identity * view * projection);
+			this.EffectParameters["TotalTime"]?.SetValue(Time.TotalGameSeconds);
+			this.EffectParameters["LastFrameTime"]?.SetValue(Time.FrameSeconds);
 		}
 
 		public long DefaultSortingHash(float z)

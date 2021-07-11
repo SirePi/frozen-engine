@@ -57,10 +57,7 @@ namespace Frozen.Drawing
 			if (primitivesCount > 0)
 			{
 				device.BlendState = this.Material.BlendState;
-
-				this.Material.EffectParameters["WorldViewProj"].SetValue(Matrix.Identity * camera.View * camera.Projection);
-				this.Material.EffectParameters["TotalTime"]?.SetValue(Time.TotalGameSeconds);
-				this.Material.EffectParameters["LastFrameTime"]?.SetValue(Time.FrameSeconds);
+				this.Material.SetShaderParameters(camera.View, camera.Projection);
 
 				foreach (EffectPass pass in this.Material.Effect.CurrentTechnique.Passes)
 				{
