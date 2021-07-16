@@ -100,6 +100,12 @@ namespace Frozen.ECS
 			return this.GetActiveEntities().SelectMany(e => e.GetAll<T>());
 		}
 
+		internal IEnumerable<T> GetActiveComponents<T>(Func<T, bool> predicate) where T : Component
+		{
+			return this.GetActiveEntities().SelectMany(e => e.GetAll<T>()).Where(predicate);
+		}
+
+
 		internal IEnumerable<Entity> GetActiveEntities()
 		{
 			return this.entities.Where(e => e.IsActive);

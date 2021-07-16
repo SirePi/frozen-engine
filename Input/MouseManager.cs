@@ -39,6 +39,11 @@ namespace Frozen.Input
 			return key.GetButtonState(this.currentFrameState) == ButtonState.Pressed && key.GetButtonState(this.lastFrameState) == ButtonState.Released;
 		}
 
+		public bool IsButtonReleased(MouseButton key)
+		{
+			return key.GetButtonState(this.currentFrameState) == ButtonState.Released && key.GetButtonState(this.lastFrameState) == ButtonState.Pressed;
+		}
+
 		public Point Delta => this.currentFrameState.Position - this.lastFrameState.Position;
 		public Point Position => this.currentFrameState.Position;
 		public int HorizontalScrollWheelDelta => this.currentFrameState.HorizontalScrollWheelValue - this.lastFrameState.HorizontalScrollWheelValue;

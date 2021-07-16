@@ -82,7 +82,12 @@ namespace Frozen.ECS
 
 		public IEnumerable<T> GetActiveComponents<T>() where T : Component
 		{
-			return this.entityManager.GetComponents<T>();
+			return this.entityManager.GetActiveComponents<T>();
+		}
+
+		public IEnumerable<T> GetActiveComponents<T>(Func<T, bool> predicate) where T : Component
+		{
+			return this.entityManager.GetActiveComponents(predicate);
 		}
 
 		public IEnumerable<Entity> GetActiveEntities()
@@ -103,6 +108,11 @@ namespace Frozen.ECS
 		public IEnumerable<Entity> GetActiveEntities<T>(Func<Entity, bool> predicate) where T : Component
 		{
 			return this.entityManager.GetActiveEntities<T>(predicate);
+		}
+
+		public IEnumerable<Entity> GetActiveEntities<T>(Func<T, bool> predicate) where T : Component
+		{
+			return this.entityManager.GetActiveComponents<T>().Where(predicate).Select(t => t.Entity);
 		}
 
 		public IEnumerable<Entity> GetEntities()

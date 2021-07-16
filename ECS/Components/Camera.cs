@@ -214,7 +214,7 @@ namespace Frozen.ECS.Components
 		/// <returns></returns>
 		public float ScaleAtZ(float z)
 		{
-			return this.HeightAtZ(z) / this.Viewport.Height;
+			return this.Viewport.Height / this.HeightAtZ(z);
 		}
 
 		/// <summary>

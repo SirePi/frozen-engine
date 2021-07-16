@@ -42,6 +42,11 @@ namespace Frozen.Input
 			return key.GetButtonState(this.currentFrameState) == ButtonState.Pressed && key.GetButtonState(this.lastFrameState) == ButtonState.Released;
 		}
 
+		public bool IsButtonReleased(GamePadButton key)
+		{
+			return key.GetButtonState(this.currentFrameState) == ButtonState.Released && key.GetButtonState(this.lastFrameState) == ButtonState.Pressed;
+		}
+
 		public bool IsDPadUp(DPad key)
 		{
 			return key.GetDPadState(this.currentFrameState) == ButtonState.Released;
@@ -55,6 +60,11 @@ namespace Frozen.Input
 		public bool IsDPadHit(DPad key)
 		{
 			return key.GetDPadState(this.currentFrameState) == ButtonState.Pressed && key.GetDPadState(this.lastFrameState) == ButtonState.Released;
+		}
+
+		public bool IsButtonReleased(DPad key)
+		{
+			return key.GetDPadState(this.currentFrameState) == ButtonState.Released && key.GetDPadState(this.lastFrameState) == ButtonState.Pressed;
 		}
 	}
 }

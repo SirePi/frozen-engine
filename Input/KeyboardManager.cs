@@ -38,5 +38,10 @@ namespace Frozen.Input
 		{
 			return this.currentFrameState[key] == KeyState.Down && this.lastFrameState[key] == KeyState.Up;
 		}
+
+		public bool IsReleased(Keys key)
+		{
+			return this.currentFrameState[key] == KeyState.Up && this.lastFrameState[key] == KeyState.Down;
+		}
 	}
 }
