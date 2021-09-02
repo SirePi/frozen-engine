@@ -9,6 +9,8 @@ namespace Frozen.ECS.Components
 {
 	public abstract class Renderer : Component
 	{
+		public static readonly int[] QUAD_INDICES = new int[] { 0, 1, 2, 1, 3, 2 };
+
 		[RequiredComponent]
 		public Transform Transform { get; protected set; }
 

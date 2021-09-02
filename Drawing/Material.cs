@@ -11,13 +11,13 @@ namespace Frozen.Drawing
 		public static Material FlatColor { get; private set; } = new Material(DefaultGraphics.FlatColor);
 
 #pragma warning disable IDE0022 // Use block body for methods - suppressed for clarity
-		public static Material AlphaBlendedSprite(SpriteSheet spriteSheet) => new Material(DefaultGraphics.AlphaTestTexture, null, spriteSheet);
-		public static Material AdditiveSprite(SpriteSheet spriteSheet) => new Material(DefaultGraphics.AlphaTestTexture, BlendState.Additive, spriteSheet);
-		public static Material FromSprite(SpriteSheet spriteSheet) => new Material(DefaultGraphics.DefaultTexture, null, spriteSheet);
+		public static Material AlphaBlendedSprite(Sprite spriteSheet) => new Material(DefaultGraphics.AlphaTestTexture, null, spriteSheet);
+		public static Material AdditiveSprite(Sprite spriteSheet) => new Material(DefaultGraphics.AlphaTestTexture, BlendState.Additive, spriteSheet);
+		public static Material FromSprite(Sprite spriteSheet) => new Material(DefaultGraphics.DefaultTexture, null, spriteSheet);
 #pragma warning restore IDE0022 // Use block body for methods
 
-		private SpriteSheet spriteSheet;
-		public SpriteSheet SpriteSheet
+		private Sprite spriteSheet;
+		public Sprite SpriteSheet
 		{
 			get => this.spriteSheet;
 			set
@@ -41,7 +41,7 @@ namespace Frozen.Drawing
 		/// <param name="effect"></param>
 		/// <param name="blendState">If null, defaults to BlendState.AlphaBlend</param>
 		/// <param name="spriteSheet"></param>
-		public Material(Effect effect, BlendState blendState = null, SpriteSheet spriteSheet = null)
+		public Material(Effect effect, BlendState blendState = null, Sprite spriteSheet = null)
 		{
 			this.Effect = effect.Clone();
 			this.BlendState = blendState ?? BlendState.AlphaBlend;

@@ -6,21 +6,21 @@ using Microsoft.Xna.Framework;
 
 namespace Frozen.Drawing
 {
-	public class SpriteAtlas
+	public class Atlas
 	{
-		public static SpriteAtlas SingleSprite()
+		public static Atlas SingleSprite()
 		{
-			SpriteAtlas result = new SpriteAtlas();
+			Atlas result = new Atlas();
 			result.sprites.Add(UVRect.One);
 			return result;
 		}
 
-		public static SpriteAtlas FromGrid(int rows, int columns)
+		public static Atlas FromGrid(int rows, int columns)
 		{
 			float x = 1f / columns;
 			float y = 1f / rows;
 
-			SpriteAtlas result = new SpriteAtlas();
+			Atlas result = new Atlas();
 
 			for (int r = 0; r < rows; r++)
 				for (int c = 0; c < columns; c++)
@@ -33,7 +33,7 @@ namespace Frozen.Drawing
 		private readonly Dictionary<string, UVRect> atlas = new Dictionary<string, UVRect>();
 		private readonly Dictionary<string, Frame[]> animations = new Dictionary<string, Frame[]>();
 
-		private SpriteAtlas() { }
+		private Atlas() { }
 
 		public UVRect this[int spriteIndex] => this.sprites[spriteIndex];
 

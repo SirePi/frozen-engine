@@ -14,7 +14,6 @@ namespace Frozen.ECS.Components
 	{
 		private readonly TriangleList tList = new TriangleList();
 		private readonly VertexPositionColorTexture[] vertices = new VertexPositionColorTexture[4];
-		private readonly int[] indices = new int[] { 0, 1, 2, 1, 3, 2 };
 
 		public Material Material { get; set; }
 		public Color ColorTint { get; set; } = Color.White;
@@ -65,7 +64,7 @@ namespace Frozen.ECS.Components
 
 			this.tList.Clean();
 			this.tList.Reset(this.Material);
-			this.tList.AppendVertices(this.vertices, this.indices);
+			this.tList.AppendVertices(this.vertices, Renderer.QUAD_INDICES);
 			yield return this.tList;
 		}
 

@@ -11,7 +11,7 @@ namespace Frozen.ECS.Components
 {
     public class AxisRenderer : Renderer
     {
-		private static readonly int[] indices = new int[] { 0, 1, 0, 2, 0, 3 };
+		private static readonly int[] LINE_INDICES = new int[] { 0, 1, 0, 2, 0, 3 };
 
 		private readonly VertexPositionColorTexture[] vertices = new VertexPositionColorTexture[4];
         public override Rectangle Bounds => CoreMath.InfiniteRectangle;
@@ -20,7 +20,7 @@ namespace Frozen.ECS.Components
 
         public override void Draw(DrawingSystem drawing)
         {
-			drawing.DrawLines(this.vertices, indices);
+			drawing.DrawLines(this.vertices, AxisRenderer.LINE_INDICES);
         }
 
         public override void UpdateRenderer()

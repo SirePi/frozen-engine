@@ -6,27 +6,27 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Frozen.Drawing
 {
-	public class SpriteSheet
+	public class Sprite
 	{
 		private Texture2D texture;
 
 		public Texture2D Texture 
 		{
 			get => this.texture;
-			set => this.texture = value ?? throw new InvalidOperationException("");
+			set => this.texture = value ?? throw new ArgumentNullException(nameof(this.Texture));
 		}
-		public SpriteAtlas Atlas { get; private set; }
+		public Atlas Atlas { get; private set; }
 
-		public SpriteSheet(Texture2D texture)
+		public Sprite(Texture2D texture)
 		{
 			this.Texture = texture;
-			this.Atlas = SpriteAtlas.SingleSprite();
+			this.Atlas = Atlas.SingleSprite();
 		}
-
-		public SpriteSheet(Texture2D texture, int rows, int columns)
+		
+		public Sprite(Texture2D texture, int rows, int columns)
 		{
 			this.Texture = texture;
-			this.Atlas = SpriteAtlas.FromGrid(rows, columns);
+			this.Atlas = Atlas.FromGrid(rows, columns);
 		}
 
 		public Rectangle this[int spriteIndex] 

@@ -10,8 +10,6 @@ namespace Frozen.ECS.Components
 {
 	public class SpriteRenderer : Renderer
 	{
-		private static readonly int[] indices = new int[] { 0, 1, 2, 1, 3, 2 };
-
 		private readonly VertexPositionColorTexture[] vertices = new VertexPositionColorTexture[4];
 		private Material material;
 		private int spriteIndex;
@@ -54,7 +52,7 @@ namespace Frozen.ECS.Components
 
 		public override void Draw(DrawingSystem drawing)
 		{
-			drawing.DrawTexturedTriangles(this.Material, this.vertices, SpriteRenderer.indices);
+			drawing.DrawTexturedTriangles(this.Material, this.vertices, Renderer.QUAD_INDICES);
 		}
 
 		public override void UpdateRenderer()

@@ -37,8 +37,6 @@ namespace Frozen.ECS.Systems
 			this.device.SetRenderTarget(null);
 			this.device.Clear(Color.Black);
 			
-			// Viewport original = this.device.Viewport;
-
 			foreach (Camera camera in scene.GetCameras())
 			{
 				this.device.SetRenderTarget(camera.RenderTarget);
@@ -54,8 +52,6 @@ namespace Frozen.ECS.Systems
 			}
 
 			this.device.SetRenderTarget(null);
-
-			//this.device.Viewport = original;
 
 			this.batch.Begin();
 			foreach (Camera camera in scene.GetCameras())
@@ -74,7 +70,6 @@ namespace Frozen.ECS.Systems
 				this.batch.Draw(camera.RenderTarget, location, Color.White);
 			}
 			this.batch.End();
-			
 
 			foreach (UI ui in scene.GetActiveComponents<UI>())
 				ui.Draw();
