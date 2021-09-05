@@ -11,6 +11,12 @@ namespace Frozen.ECS.Components
 {
 	public class TextRenderer : Renderer
 	{
+		private static readonly string[] LineSeparators = new[]
+		{
+			"\n\r",
+			"\n",
+		};
+
 		private class TextPart
 		{
 			public string Text { get; set; }
@@ -36,27 +42,27 @@ namespace Frozen.ECS.Components
 			set
 			{
 				this.dirtyText = this.maxWidth != value;
-				if (value <= 0) throw new ArgumentOutOfRangeException(nameof(this.MaxWidth));
+				if (value <= 0) throw new ArgumentOutOfRangeException(nameof(value));
 				float mWidth = this.font.MeasureString("M").X;
-				if (mWidth > value) throw new ArgumentOutOfRangeException(nameof(this.MaxWidth));
+				if (mWidth > value) throw new ArgumentOutOfRangeException(nameof(value));
 				this.maxWidth = value;
 			}
 		}
-		public SpriteFont Font 
+		public SpriteFont Font
 		{
 			get => this.font;
 			set
 			{
 				this.dirtyText = this.font != value;
-				this.font = value ?? throw new ArgumentNullException(nameof(this.Font));
+				this.font = value ?? throw new ArgumentNullException(nameof(value));
 
-				Vector2 txSize = this.font.Texture.Bounds.Size.ToVector2();
+				Vector2 texelSize = Vector2.One / this.font.Texture.Bounds.Size.ToVector2();
 				this.glyphs = this.font.GetGlyphs().ToDictionary(
 					k => k.Key,
 					v =>
 					{
-						Vector2 topLeft = v.Value.BoundsInTexture.Location.ToVector2() / txSize;
-						Vector2 bottomRight = (v.Value.BoundsInTexture.Location + v.Value.BoundsInTexture.Size).ToVector2() / txSize;
+						Vector2 topLeft = v.Value.BoundsInTexture.Location.ToVector2() * texelSize;
+						Vector2 bottomRight = (v.Value.BoundsInTexture.Location + v.Value.BoundsInTexture.Size).ToVector2() * texelSize;
 						return new GlyphInfo
 						{
 							Glyph = v.Value,
@@ -68,8 +74,8 @@ namespace Frozen.ECS.Components
 					});
 
 				this.lineHeight = this.font.MeasureString("Wq").Y;
-				this.spaceWidth = this.glyphs[' '].Glyph.Width;
-				this.material = Material.FromSprite(new Sprite(this.font.Texture));
+				this.spaceWidth = this.glyphs[' '].Glyph.BoundsInTexture.Width + this.glyphs[' '].Glyph.RightSideBearing;
+				this.material = Material.AlphaBlendedSprite(new Sprite(this.font.Texture));
 			}
 		}
 		public string Text
@@ -112,35 +118,40 @@ namespace Frozen.ECS.Components
 			{
 				Matrix matrix = this.Transform.FullTransformMatrix;
 
-				TextPart[] parts = this.text
-					.Split(' ')
-					.Select(word => new TextPart { Text = word, Width = this.font.MeasureString(word).X })
-					.ToArray();
-
+				string[] srcRows = this.text.Split(LineSeparators, StringSplitOptions.RemoveEmptyEntries);
 				List<TextPart> rows = new List<TextPart>();
-				rows.Add(new TextPart { Text = parts[0].Text, Width = parts[0].Width });
 
-				for(int i = 1; i < parts.Length; i++)
+				foreach (string srcRow in srcRows)
 				{
-					if(rows[rows.Count - 1].Width + this.spaceWidth + parts[i].Width > this.maxWidth)
-					{
-						rows.Add(new TextPart { Text = parts[i].Text, Width = parts[i].Width });
-					}
-					else if(parts[i].Width > this.maxWidth)
-					{
-						// special case.. try to cut
-						float cutoff = this.maxWidth / parts[i].Width;
-						int cutPosition = (int)(parts[i].Width * cutoff);
+					TextPart[] parts = srcRow
+						.Split(' ')
+						.Select(word => new TextPart { Text = word, Width = this.font.MeasureString(word).X })
+						.ToArray();
 
-						string cutString = parts[i].Text.Substring(0, cutPosition);
-						float cutWidth = this.font.MeasureString(cutString).X;
-						rows.Add(new TextPart { Text = cutString, Width = cutWidth });
-						rows.Add(new TextPart { Text = parts[i].Text.Substring(cutPosition), Width = parts[i].Width - cutWidth });
-					}
-					else
+					rows.Add(new TextPart { Text = parts[0].Text, Width = parts[0].Width });
+
+					for (int i = 1; i < parts.Length; i++)
 					{
-						rows[rows.Count - 1].Text += ' ' + parts[i].Text;
-						rows[rows.Count - 1].Width += this.spaceWidth + parts[i].Width;
+						if (rows[rows.Count - 1].Width + this.spaceWidth + parts[i].Width > this.maxWidth)
+						{
+							rows.Add(new TextPart { Text = parts[i].Text, Width = parts[i].Width });
+						}
+						else if (parts[i].Width > this.maxWidth)
+						{
+							// special case.. try to cut
+							float cutoff = this.maxWidth / parts[i].Width;
+							int cutPosition = (int)(parts[i].Width * cutoff);
+
+							string cutString = parts[i].Text.Substring(0, cutPosition);
+							float cutWidth = this.font.MeasureString(cutString).X;
+							rows.Add(new TextPart { Text = cutString, Width = cutWidth });
+							rows.Add(new TextPart { Text = parts[i].Text.Substring(cutPosition), Width = parts[i].Width - cutWidth });
+						}
+						else
+						{
+							rows[rows.Count - 1].Text = string.Format("{0} {1}", rows[rows.Count - 1].Text, parts[i].Text);
+							rows[rows.Count - 1].Width += this.spaceWidth + parts[i].Width;
+						}
 					}
 				}
 
@@ -153,27 +164,30 @@ namespace Frozen.ECS.Components
 
 				int o = 0;
 				int vOffset, iOffset;
-				for(int i = 0; i < rows.Count; i++)
+				for (int i = 0; i < rows.Count; i++)
 				{
 					foreach (char c in rows[i].Text)
 					{
 						if (this.glyphs.TryGetValue(c, out GlyphInfo glyph))
 						{
 							vOffset = o * 4;
+							float x = start.X + glyph.Glyph.Cropping.X;
+							float y = start.Y + glyph.Glyph.Cropping.Y;
+
 							this.vertices[vOffset + 0].Color = this.ColorTint;
-							this.vertices[vOffset + 0].Position = Vector3.Transform(new Vector3(start.X, start.Y, 0), matrix);
+							this.vertices[vOffset + 0].Position = Vector3.Transform(new Vector3(x, y, 0), matrix);
 							this.vertices[vOffset + 0].TextureCoordinate.X = glyph.UVLeft;
 							this.vertices[vOffset + 0].TextureCoordinate.Y = glyph.UVTop;
 							this.vertices[vOffset + 1].Color = this.ColorTint;
-							this.vertices[vOffset + 1].Position = Vector3.Transform(new Vector3(start.X + glyph.Glyph.Width, start.Y, 0), matrix);
+							this.vertices[vOffset + 1].Position = Vector3.Transform(new Vector3(x + glyph.Glyph.BoundsInTexture.Width, y, 0), matrix);
 							this.vertices[vOffset + 1].TextureCoordinate.X = glyph.UVRight;
 							this.vertices[vOffset + 1].TextureCoordinate.Y = glyph.UVTop;
 							this.vertices[vOffset + 2].Color = this.ColorTint;
-							this.vertices[vOffset + 2].Position = Vector3.Transform(new Vector3(start.X, start.Y + this.lineHeight, 0), matrix);
+							this.vertices[vOffset + 2].Position = Vector3.Transform(new Vector3(x, y + glyph.Glyph.BoundsInTexture.Height, 0), matrix);
 							this.vertices[vOffset + 2].TextureCoordinate.X = glyph.UVLeft;
 							this.vertices[vOffset + 2].TextureCoordinate.Y = glyph.UVBottom;
 							this.vertices[vOffset + 3].Color = this.ColorTint;
-							this.vertices[vOffset + 3].Position = Vector3.Transform(new Vector3(start.X + glyph.Glyph.Width, start.Y + this.lineHeight, 0), matrix);
+							this.vertices[vOffset + 3].Position = Vector3.Transform(new Vector3(x + glyph.Glyph.BoundsInTexture.Width, y + glyph.Glyph.BoundsInTexture.Height, 0), matrix);
 							this.vertices[vOffset + 3].TextureCoordinate.X = glyph.UVRight;
 							this.vertices[vOffset + 3].TextureCoordinate.Y = glyph.UVBottom;
 
@@ -185,7 +199,7 @@ namespace Frozen.ECS.Components
 							this.indices[iOffset + 4] = Renderer.QUAD_INDICES[4] + vOffset;
 							this.indices[iOffset + 5] = Renderer.QUAD_INDICES[5] + vOffset;
 
-							start.X += glyph.Glyph.Width;
+							start.X += glyph.Glyph.Width + glyph.Glyph.RightSideBearing;
 						}
 						else
 						{
@@ -198,7 +212,7 @@ namespace Frozen.ECS.Components
 					start.X = startX;
 					start.Y += this.lineHeight;
 				}
-				
+
 				/*
 				this.vertices = new VertexPositionColorTexture[4];
 				this.indices = Renderer.QUAD_INDICES;
