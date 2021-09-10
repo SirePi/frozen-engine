@@ -26,7 +26,7 @@ namespace Frozen.ECS.Components
 			drawing.DrawCameraBoundPrimitives(this.DrawForCamera);
 		}
 
-		private IEnumerable<PrimitiveDrawable> DrawForCamera(Camera camera)
+		private IEnumerable<PrimitiveItem> DrawForCamera(Camera camera)
 		{
 			Vector2 bound = camera.Viewport.Bounds.Size.ToVector2();
 			Vector3 topLeft = camera.ScreenToWorld(Vector2.Zero, this.Transform.WorldPosition.Z);

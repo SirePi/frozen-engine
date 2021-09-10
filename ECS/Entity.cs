@@ -15,8 +15,9 @@ namespace Frozen.ECS
 
 		private Component[] updateOrderedComponents;
 		private bool disposedValue;
+		private bool dirtyComponents;
 
-		private Scene scene;
+		private Entity parent;
 
 		public event Action<Entity, Component> OnComponentAdded;
 		public event Action<Entity, Component> OnComponentRemoved;
@@ -27,24 +28,27 @@ namespace Frozen.ECS
 		public bool IsActive { get; set; } = true;
 		public IEnumerable<Entity> Children => this.children;
 
-		public Entity Parent { get; private set; }
-
-		public Scene Scene
+		public Entity Parent
 		{
-			get { return this.Parent == null ? this.scene : this.Parent.Scene; }
-			internal set
+			get { return this.parent; }
+			set
 			{
-				this.scene = value;
-				foreach (Entity child in this.Children)
-					child.Scene = value;
+				Scene oldScene = this.Scene;
+				Scene newScene = value?.Scene;
+
+				if(oldScene != newScene)
+				{
+					oldScene?.Remove(this);
+					newScene?.Add(this);
+				}
+
+				this.parent?.children.Remove(this);
+				this.parent = value;
+				this.parent?.children.Add(this);
 			}
 		}
 
-		/// <summary>
-		/// Constructor
-		/// </summary>
-		public Entity() : this(null, NoComponents)
-		{ }
+		public Scene Scene { get; internal set; }
 
 		/// <summary>
 		/// Constructor
@@ -66,43 +70,6 @@ namespace Frozen.ECS
 				this.Add(cmp);
 		}
 
-		private void AddChild(Entity child)
-		{
-			if (!this.children.Contains(child))
-			{
-				this.children.Add(child);
-				this.Scene.AddEntity(child);
-				child.Parent = this;
-			}
-		}
-
-		private void RemoveChild(Entity child)
-		{
-			if (this.children.Contains(child))
-			{
-				this.children.Remove(child);
-				child.Parent = null;
-			}
-		}
-
-		public void AttachToParent(Entity parent)
-		{
-			if (parent == null)
-				this.DetachFromParent();
-			else if (this.Parent != parent)
-			{
-				this.Parent?.RemoveChild(this);
-				parent.AddChild(this);
-				OnParentChanged?.Invoke(this);
-			}
-		}
-
-		public void DetachFromParent()
-		{
-			this.Parent?.RemoveChild(this);
-			OnParentChanged?.Invoke(this);
-		}
-
 		public void Add(Component component)
 		{
 			Type t = component.GetType();
@@ -114,6 +81,7 @@ namespace Frozen.ECS
 				component.Entity = this;
 				this.components.Add(t, component);
 				OnComponentAdded?.Invoke(this, component);
+				this.dirtyComponents = true;
 			}
 		}
 
@@ -128,6 +96,7 @@ namespace Frozen.ECS
 				this.components.Remove(t);
 				component.Entity = null;
 				OnComponentRemoved?.Invoke(this, component);
+				this.dirtyComponents = true;
 			}
 		}
 
@@ -183,15 +152,20 @@ namespace Frozen.ECS
 		{
 			if (this.IsActive || force)
 			{
+				if (this.dirtyComponents)
+					this.RefreshComponents();
+
 				foreach (Component component in this.updateOrderedComponents)
 					component.Update(force);
 
 				foreach (Entity child in this.children)
 					child.Update(force);
+
+				this.dirtyComponents = false;
 			}
 		}
 
-		public void Refresh()
+		public void RefreshComponents()
 		{
 			foreach (Component component in this.components.Values)
 				component.UpdateRequirements();

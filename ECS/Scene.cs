@@ -50,24 +50,37 @@ namespace Frozen.ECS
 			this.coroutineManager.Update();
 		}
 
-		public void AddEntity(Entity entity)
+		public void Add(Entity entity)
 		{
-			entity.Scene?.RemoveEntity(entity);
-			if (this.entityManager.AddEntity(entity))
-				entity.Scene = this;
+			if (entity.Scene != this)
+			{
+				entity.Scene?.Remove(entity);
+				if (this.entityManager.AddEntity(entity))
+				{
+					entity.Scene = this;
+					foreach (Entity child in entity.Children)
+						this.Add(child);
+				}
+			}
 		}
 
-		public void RemoveEntity(Entity entity)
+		public void Remove(Entity entity)
 		{
-			if (this.entityManager.RemoveEntity(entity))
-				entity.Scene = null;
+			if (entity.Scene == this)
+			{
+				if (this.entityManager.RemoveEntity(entity))
+					entity.Scene = null;
+
+				foreach (Entity child in entity.Children)
+					this.Remove(child);
+			}
 		}
 
 		public void RemoveWhere(Func<Entity, bool> predicate)
 		{
 			Entity[] toRemove = this.entityManager.GetEntities(predicate).ToArray();
 			foreach (Entity e in toRemove)
-				this.RemoveEntity(e);
+				this.Remove(e);
 		}
 
 		public void Clear()

@@ -98,7 +98,7 @@ namespace Frozen.ECS.Components
 		private SpriteFont font;
 		private Dictionary<char, GlyphInfo> glyphs;
 		private Material material;
-
+		
 		public TextRenderer()
 		{
 			this.Font = Frozen.Engine.ContentProvider.DefaultContent.Get<SpriteFont>("Arial.xnb");
@@ -168,43 +168,46 @@ namespace Frozen.ECS.Components
 				{
 					foreach (char c in rows[i].Text)
 					{
-						if (this.glyphs.TryGetValue(c, out GlyphInfo glyph))
+						GlyphInfo glyph;
+
+						if (!this.glyphs.TryGetValue(c, out glyph))
 						{
-							vOffset = o * 4;
-							float x = start.X + glyph.Glyph.Cropping.X;
-							float y = start.Y + glyph.Glyph.Cropping.Y;
-
-							this.vertices[vOffset + 0].Color = this.ColorTint;
-							this.vertices[vOffset + 0].Position = Vector3.Transform(new Vector3(x, y, 0), matrix);
-							this.vertices[vOffset + 0].TextureCoordinate.X = glyph.UVLeft;
-							this.vertices[vOffset + 0].TextureCoordinate.Y = glyph.UVTop;
-							this.vertices[vOffset + 1].Color = this.ColorTint;
-							this.vertices[vOffset + 1].Position = Vector3.Transform(new Vector3(x + glyph.Glyph.BoundsInTexture.Width, y, 0), matrix);
-							this.vertices[vOffset + 1].TextureCoordinate.X = glyph.UVRight;
-							this.vertices[vOffset + 1].TextureCoordinate.Y = glyph.UVTop;
-							this.vertices[vOffset + 2].Color = this.ColorTint;
-							this.vertices[vOffset + 2].Position = Vector3.Transform(new Vector3(x, y + glyph.Glyph.BoundsInTexture.Height, 0), matrix);
-							this.vertices[vOffset + 2].TextureCoordinate.X = glyph.UVLeft;
-							this.vertices[vOffset + 2].TextureCoordinate.Y = glyph.UVBottom;
-							this.vertices[vOffset + 3].Color = this.ColorTint;
-							this.vertices[vOffset + 3].Position = Vector3.Transform(new Vector3(x + glyph.Glyph.BoundsInTexture.Width, y + glyph.Glyph.BoundsInTexture.Height, 0), matrix);
-							this.vertices[vOffset + 3].TextureCoordinate.X = glyph.UVRight;
-							this.vertices[vOffset + 3].TextureCoordinate.Y = glyph.UVBottom;
-
-							iOffset = o * 6;
-							this.indices[iOffset + 0] = Renderer.QUAD_INDICES[0] + vOffset;
-							this.indices[iOffset + 1] = Renderer.QUAD_INDICES[1] + vOffset;
-							this.indices[iOffset + 2] = Renderer.QUAD_INDICES[2] + vOffset;
-							this.indices[iOffset + 3] = Renderer.QUAD_INDICES[3] + vOffset;
-							this.indices[iOffset + 4] = Renderer.QUAD_INDICES[4] + vOffset;
-							this.indices[iOffset + 5] = Renderer.QUAD_INDICES[5] + vOffset;
-
-							start.X += glyph.Glyph.Width + glyph.Glyph.RightSideBearing;
+							if (this.font.DefaultCharacter.HasValue)
+								glyph = this.glyphs[this.font.DefaultCharacter.Value];
+							else
+								continue;
 						}
-						else
-						{
-							// missing glyph
-						}
+
+						vOffset = o * 4;
+						float x = start.X + glyph.Glyph.Cropping.X;
+						float y = start.Y + glyph.Glyph.Cropping.Y;
+
+						this.vertices[vOffset + 0].Color = this.ColorTint;
+						this.vertices[vOffset + 0].Position = Vector3.Transform(new Vector3(x, y, 0), matrix);
+						this.vertices[vOffset + 0].TextureCoordinate.X = glyph.UVLeft;
+						this.vertices[vOffset + 0].TextureCoordinate.Y = glyph.UVTop;
+						this.vertices[vOffset + 1].Color = this.ColorTint;
+						this.vertices[vOffset + 1].Position = Vector3.Transform(new Vector3(x + glyph.Glyph.BoundsInTexture.Width, y, 0), matrix);
+						this.vertices[vOffset + 1].TextureCoordinate.X = glyph.UVRight;
+						this.vertices[vOffset + 1].TextureCoordinate.Y = glyph.UVTop;
+						this.vertices[vOffset + 2].Color = this.ColorTint;
+						this.vertices[vOffset + 2].Position = Vector3.Transform(new Vector3(x, y + glyph.Glyph.BoundsInTexture.Height, 0), matrix);
+						this.vertices[vOffset + 2].TextureCoordinate.X = glyph.UVLeft;
+						this.vertices[vOffset + 2].TextureCoordinate.Y = glyph.UVBottom;
+						this.vertices[vOffset + 3].Color = this.ColorTint;
+						this.vertices[vOffset + 3].Position = Vector3.Transform(new Vector3(x + glyph.Glyph.BoundsInTexture.Width, y + glyph.Glyph.BoundsInTexture.Height, 0), matrix);
+						this.vertices[vOffset + 3].TextureCoordinate.X = glyph.UVRight;
+						this.vertices[vOffset + 3].TextureCoordinate.Y = glyph.UVBottom;
+
+						iOffset = o * 6;
+						this.indices[iOffset + 0] = Renderer.QUAD_INDICES[0] + vOffset;
+						this.indices[iOffset + 1] = Renderer.QUAD_INDICES[1] + vOffset;
+						this.indices[iOffset + 2] = Renderer.QUAD_INDICES[2] + vOffset;
+						this.indices[iOffset + 3] = Renderer.QUAD_INDICES[3] + vOffset;
+						this.indices[iOffset + 4] = Renderer.QUAD_INDICES[4] + vOffset;
+						this.indices[iOffset + 5] = Renderer.QUAD_INDICES[5] + vOffset;
+
+						start.X += glyph.Glyph.Width + glyph.Glyph.RightSideBearing;
 
 						o++;
 					}
@@ -212,29 +215,6 @@ namespace Frozen.ECS.Components
 					start.X = startX;
 					start.Y += this.lineHeight;
 				}
-
-				/*
-				this.vertices = new VertexPositionColorTexture[4];
-				this.indices = Renderer.QUAD_INDICES;
-
-				int vOffset = 0;
-				this.vertices[vOffset + 0].Color = this.ColorTint;
-				this.vertices[vOffset + 0].Position = Vector3.Transform(new Vector3(0, 0, 0), matrix);
-				this.vertices[vOffset + 0].TextureCoordinate.X = 0;
-				this.vertices[vOffset + 0].TextureCoordinate.Y = 0;
-				this.vertices[vOffset + 1].Color = this.ColorTint;
-				this.vertices[vOffset + 1].Position = Vector3.Transform(new Vector3(0, this.font.Texture.Height, 0), matrix);
-				this.vertices[vOffset + 1].TextureCoordinate.X = 0;
-				this.vertices[vOffset + 1].TextureCoordinate.Y = 1;
-				this.vertices[vOffset + 2].Color = this.ColorTint;
-				this.vertices[vOffset + 2].Position = Vector3.Transform(new Vector3(this.font.Texture.Width, 0, 0), matrix);
-				this.vertices[vOffset + 2].TextureCoordinate.X = 1;
-				this.vertices[vOffset + 2].TextureCoordinate.Y = 0;
-				this.vertices[vOffset + 3].Color = this.ColorTint;
-				this.vertices[vOffset + 3].Position = Vector3.Transform(new Vector3(this.font.Texture.Width, this.font.Texture.Height, 0), matrix);
-				this.vertices[vOffset + 3].TextureCoordinate.X = 1;
-				this.vertices[vOffset + 3].TextureCoordinate.Y = 1;
-				*/
 			}
 		}
 	}
