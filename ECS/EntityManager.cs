@@ -11,8 +11,7 @@ namespace Frozen.ECS
 	{
 		private readonly HashSet<Entity> entities = new HashSet<Entity>();
 		private readonly HashSet<Entity> pendingEntities = new HashSet<Entity>();
-		private readonly HashSet<Entity> disposedEntities = new HashSet<Entity>();
-		private readonly HashSet<Entity> dirtyEntities = new HashSet<Entity>();
+		private readonly HashSet<Entity> removedEntities = new HashSet<Entity>();
 
 		public event Action<Entity> OnEntityAdded;
 		public event Action<Entity> OnEntityRemoved;
@@ -23,26 +22,20 @@ namespace Frozen.ECS
 
 		internal void Update()
 		{
-			foreach (Entity e in this.disposedEntities)
+			foreach (Entity e in this.removedEntities)
 				this.entities.Remove(e);
-			this.disposedEntities.Clear();
+			this.removedEntities.Clear();
 
 			foreach (Entity e in this.pendingEntities)
-			{
-				this.dirtyEntities.Add(e);
 				this.entities.Add(e);
-			}
+
 			this.pendingEntities.Clear();
 
-			foreach (Entity e in this.dirtyEntities)
-				e.Refresh();
-			this.dirtyEntities.Clear();
-
-			foreach (Entity e in this.GetActiveRootEntities())
+			foreach (Entity e in this.entities.Where(e => e.Parent == null && e.IsActive))
 				e.Update(false);
 		}
 
-		public bool AddEntity(Entity entity)
+		internal bool AddEntity(Entity entity)
 		{
 			bool toAdd = !this.entities.Contains(entity);
 			if (toAdd)
@@ -56,7 +49,7 @@ namespace Frozen.ECS
 			return toAdd;
 		}
 
-		public bool RemoveEntity(Entity entity)
+		internal bool RemoveEntity(Entity entity)
 		{
 			bool toRemove = this.entities.Contains(entity);
 			if (toRemove)
@@ -64,7 +57,7 @@ namespace Frozen.ECS
 				entity.OnComponentAdded -= this.Entity_OnComponentAdded;
 				entity.OnComponentRemoved -= this.Entity_OnComponentRemoved;
 
-				this.disposedEntities.Add(entity);
+				this.removedEntities.Add(entity);
 				this.OnEntityRemoved?.Invoke(entity);
 			}
 			return toRemove;
@@ -74,19 +67,16 @@ namespace Frozen.ECS
 		{
 			this.entities.Clear();
 			this.pendingEntities.Clear();
-			this.disposedEntities.Clear();
-			this.dirtyEntities.Clear();
+			this.removedEntities.Clear();
 		}
 
-	private void Entity_OnComponentAdded(Entity entity, Component component)
+		private void Entity_OnComponentAdded(Entity entity, Component component)
 		{
-			this.dirtyEntities.Add(entity);
 			this.OnComponentAdded?.Invoke(entity, component);
 		}
 
 		private void Entity_OnComponentRemoved(Entity entity, Component component)
 		{
-			this.dirtyEntities.Add(entity);
 			this.OnComponentRemoved?.Invoke(entity, component);
 		}
 
@@ -149,11 +139,6 @@ namespace Frozen.ECS
 		internal IEnumerable<Entity> GetRootEntities()
 		{
 			return this.entities.Where(e => e.Parent == null);
-		}
-
-		internal IEnumerable<Entity> GetActiveRootEntities()
-		{
-			return this.entities.Where(e => e.Parent == null && e.IsActive);
 		}
 
 		internal Entity GetEntityByName(string name)

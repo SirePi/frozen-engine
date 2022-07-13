@@ -10,13 +10,13 @@ using System.Linq;
 
 namespace Frozen.Drawing
 {
-	public abstract class Drawable
+	public abstract class DrawItem
 	{
 		public abstract void Draw(GraphicsDevice device, Camera camera);
 		public abstract void Clean();
 	}
 
-	public abstract class PrimitiveDrawable : Drawable
+	public abstract class PrimitiveItem : DrawItem
 	{ 
 		protected ExpandingArray<VertexPositionColorTexture> vertices;
 		protected ExpandingArray<int> indices;
@@ -27,7 +27,7 @@ namespace Frozen.Drawing
 
 		public PrimitiveType PrimitiveType { get; private set; }
 
-		protected PrimitiveDrawable(PrimitiveType pType)
+		protected PrimitiveItem(PrimitiveType pType)
 		{
 			this.PrimitiveType = pType;
 			this.vertices = new ExpandingArray<VertexPositionColorTexture>();
@@ -68,7 +68,7 @@ namespace Frozen.Drawing
 		}
 	}
 
-	internal class TriangleList : PrimitiveDrawable
+	internal class TriangleList : PrimitiveItem
 	{
 		public override Material Material { get; protected set; }
 		protected override Func<int, bool> ValidateVertices => CoreMath.IsMultipleOf3;
@@ -84,7 +84,7 @@ namespace Frozen.Drawing
 		}
 	}
 
-	internal class LinesList : PrimitiveDrawable
+	internal class LinesList : PrimitiveItem
 	{
 		public override Material Material { get; protected set; } = Material.FlatColor;
 		protected override Func<int, bool> ValidateVertices => CoreMath.IsMultipleOf2;
@@ -94,20 +94,20 @@ namespace Frozen.Drawing
 		{ }
 	}
 
-	internal class CameraBoundDrawable : Drawable
+	internal class CameraBoundItem : DrawItem
 	{
-		private Func<Camera, IEnumerable<PrimitiveDrawable>> drawingFunc;
+		private Func<Camera, IEnumerable<PrimitiveItem>> drawingFunc;
 
 		public override void Draw(GraphicsDevice device, Camera camera)
 		{
-			foreach (PrimitiveDrawable sd in this.drawingFunc(camera))
+			foreach (PrimitiveItem sd in this.drawingFunc(camera))
 				sd.Draw(device, camera);
 		}
 
 		public override void Clean()
 		{ }
 
-		public void Reset(Func<Camera, IEnumerable<PrimitiveDrawable>> drawingFunc)
+		public void Reset(Func<Camera, IEnumerable<PrimitiveItem>> drawingFunc)
 		{
 			this.drawingFunc = drawingFunc;
 		}

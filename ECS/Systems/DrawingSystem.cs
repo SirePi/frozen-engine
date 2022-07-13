@@ -12,7 +12,7 @@ namespace Frozen.ECS.Systems
 {
 	public class DrawingSystem
 	{
-		private readonly List<Drawable> drawables = new List<Drawable>();
+		private readonly List<DrawItem> drawables = new List<DrawItem>();
 		private int drawablesUsed;
 
 		private readonly SpriteBatch batch;
@@ -99,7 +99,7 @@ namespace Frozen.ECS.Systems
 			}
 		}
 
-		private T GetFreeDrawable<T>() where T : Drawable, new()
+		private T GetFreeDrawable<T>() where T : DrawItem, new()
 		{
 			for (int i = this.drawablesUsed; i < this.drawables.Count; i++)
 			{
@@ -108,7 +108,7 @@ namespace Frozen.ECS.Systems
 					if (i != this.drawablesUsed)
 					{
 						// Swap
-						Drawable tmp = this.drawables[this.drawablesUsed];
+						DrawItem tmp = this.drawables[this.drawablesUsed];
 						this.drawables[this.drawablesUsed] = t;
 						this.drawables[i] = tmp;
 					}
@@ -137,9 +137,9 @@ namespace Frozen.ECS.Systems
 			this.DrawTexturedTriangles(Material.FlatColor, vertices, indices);
 		}
 
-		public void DrawCameraBoundPrimitives(Func<Camera, IEnumerable<PrimitiveDrawable>> drawingFunc)
+		public void DrawCameraBoundPrimitives(Func<Camera, IEnumerable<PrimitiveItem>> drawingFunc)
 		{
-			CameraBoundDrawable draw = this.GetFreeDrawable<CameraBoundDrawable>();
+			CameraBoundItem draw = this.GetFreeDrawable<CameraBoundItem>();
 			draw.Reset(drawingFunc);
 
 			this.drawablesUsed++;
@@ -171,6 +171,11 @@ namespace Frozen.ECS.Systems
 			};
 
 			this.DrawLines(vertices, new int[] { 0, 1, 1, 2, 2, 3, 3, 0 });
+		}
+
+		public void DrawString(Vector3 position, SpriteFont font)
+		{
+
 		}
 	}
 }
