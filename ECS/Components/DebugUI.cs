@@ -1,7 +1,5 @@
-﻿using ImGuiNET;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.ImGui.Standard;
 using Myra;
 using Myra.Graphics2D.UI;
 using System;
@@ -46,6 +44,7 @@ namespace Frozen.ECS.Components
 		{
 			base.OnUpdate();
 			this.fps.Text = $"fps: {1 / Time.FrameSeconds:0.000}";
+			this.mouse.Text = Engine.Mouse.Position.ToString();
 		}
 	}
 }

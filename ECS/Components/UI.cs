@@ -1,7 +1,5 @@
-﻿using ImGuiNET;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoGame.ImGui.Standard;
 using Myra;
 using Myra.Graphics2D.UI;
 using System;

@@ -49,6 +49,18 @@ namespace Frozen.Drawing
 			return this.animations[animation];
 		}
 
+		public void AddAnimationChain(string name, int fromSpriteIndex, int toSpriteIndex, float duration)
+		{
+			float[] durations = Enumerable.Range(fromSpriteIndex, toSpriteIndex - fromSpriteIndex + 1).Select(_ => duration).ToArray();
+			this.AddAnimationChain(name, fromSpriteIndex, toSpriteIndex, durations);
+		}
+
+		public void AddAnimationChain(string name, int fromSpriteIndex, int toSpriteIndex, float[] durations)
+		{
+			int[] spriteIndexes = Enumerable.Range(fromSpriteIndex, toSpriteIndex - fromSpriteIndex + 1).ToArray();
+			this.AddAnimationChain(name, spriteIndexes, durations);
+		}
+
 		public void AddAnimationChain(string name, int[] spriteIndexes, float[] durations)
 		{
 			if (spriteIndexes.Length != durations.Length)

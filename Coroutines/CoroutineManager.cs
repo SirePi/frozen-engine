@@ -26,6 +26,26 @@ namespace Frozen.Coroutines
 		}
 
 		/// <summary>
+		/// Cancels all currently active and scheduled Coroutines
+		/// </summary>
+		public void Clear()
+		{
+			foreach (Coroutine c in this.currentCycle)
+			{
+				c.Cancel();
+				this.pool.Enqueue(c);
+			}
+			this.currentCycle.Clear();
+
+			foreach (Coroutine c in this.nextCycle)
+			{
+				c.Cancel();
+				this.pool.Enqueue(c);
+			}
+			this.nextCycle.Clear();
+		}
+
+		/// <summary>
 		/// Prepares a new Coroutine and places it in the scheduled queue, to be started in the next cycle
 		/// </summary>
 		/// <param name="enumerator">The Coroutine's execution body</param>
@@ -44,26 +64,6 @@ namespace Frozen.Coroutines
 
 			this.nextCycle.Enqueue(coroutine);
 			return coroutine;
-		}
-
-		/// <summary>
-		/// Cancels all currently active and scheduled Coroutines
-		/// </summary>
-		public void Clear()
-		{
-			foreach (Coroutine c in this.currentCycle)
-			{
-				c.Cancel();
-				this.pool.Enqueue(c);
-			}
-			this.currentCycle.Clear();
-
-			foreach (Coroutine c in this.nextCycle)
-			{
-				c.Cancel();
-				this.pool.Enqueue(c);
-			}
-			this.nextCycle.Clear();
 		}
 
 		/// <summary>

@@ -10,8 +10,8 @@ namespace Frozen.ECS.Components
 {
 	public class Camera : Component
 	{
-		private static float FovOver2 = MathHelper.PiOver4 / 2;
-		private static float FovOver2Tan = MathF.Tan(FovOver2);
+		private readonly static float FovOver2 = MathHelper.PiOver4 / 2;
+		private readonly static float FovOver2Tan = MathF.Tan(FovOver2);
 
 		public static Camera CreateCamera(CameraType type, CameraViewportSize size, Alignment alignment, Point? margin = null)
 		{
@@ -20,11 +20,6 @@ namespace Frozen.ECS.Components
 				Alignment = alignment,
 				Margin = margin ?? Point.Zero
 			};
-		}
-
-		public static Component CreateFullScreen(object cameraType)
-		{
-			throw new NotImplementedException();
 		}
 
 		public static Camera CreateCamera(CameraType type, Vector2 size, bool isAbsoluteSize, Alignment alignment, Point? margin = null)

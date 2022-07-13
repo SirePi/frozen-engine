@@ -37,8 +37,11 @@ namespace Frozen.ECS
 			this.entityManager.OnEntityRemoved += this.OnEntityRemoved;
 			this.entityManager.OnComponentAdded += this.OnEntityComponentAdded;
 			this.entityManager.OnComponentRemoved += this.OnEntityComponentRemoved;
+
+			this.Build();
 		}
 
+		public abstract void Build();
 		public virtual void AfterSwitchingFrom() { }
 		public virtual void BeforeSwitchingFrom() { }
 		public virtual void AfterSwitchingTo() { }
