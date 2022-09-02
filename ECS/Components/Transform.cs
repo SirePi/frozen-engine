@@ -79,7 +79,7 @@ namespace Frozen.ECS.Components
 				while (entity.Parent != null)
 				{
 					if (entity.Parent.Get<Transform>(out Transform t))
-						result = t.transformMatrix * result;
+						result *= t.transformMatrix;
 
 					entity = entity.Parent;
 				}
