@@ -46,7 +46,7 @@ namespace Frozen.ECS.Components
 
 		private void UpdateMatrix()
 		{
-			this.transformMatrix = Matrix.CreateRotationZ(this.rotation) * Matrix.CreateTranslation(this.position) * Matrix.CreateScale(this.scale);
+			this.transformMatrix = Matrix.CreateScale(this.scale) * Matrix.CreateRotationZ(this.rotation) * Matrix.CreateTranslation(this.position);
 		}
 
 		public void MoveBy(Vector2 movement)
