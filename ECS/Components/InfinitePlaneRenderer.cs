@@ -44,7 +44,7 @@ namespace Frozen.ECS.Components
 			float width = maxX - minX;
 			float height = maxY - minY;
 
-			Vector2 txSize = this.Material.SpriteSheet.Texture.Bounds.Size.ToVector2();
+			Vector2 txSize = this.Material.SpriteSheet.Texture.Bounds.Size.ToVector2() * this.Transform.Scale;
 			Vector2 repetitions = new Vector2(width, height) / txSize;  
 
 			Vector2 tlTexture = (new Vector2(minX, minY) - this.Transform.Position.XY()) / txSize;
