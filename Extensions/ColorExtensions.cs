@@ -97,10 +97,17 @@ namespace Frozen
 			return new Color(R, G, B);
 		}
 
+		public static Color WithAlpha(this Color color, byte alpha)
+		{
+			Color result = color;
+			result.A = alpha;
+			return result;
+		}
+
 		public static Color WithAlpha(this Color color, float alpha)
 		{
 			Color result = color;
-			result.A = (byte)(alpha / 255f);
+			result.A = (byte)(alpha * 255f);
 			return result;
 		}
 

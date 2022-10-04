@@ -13,7 +13,7 @@ namespace Frozen.Drawing
 #pragma warning disable IDE0022 // Use block body for methods - suppressed for clarity
 		public static Material AlphaBlendedSprite(Sprite spriteSheet) => new Material(DefaultGraphics.AlphaTestTexture, null, spriteSheet);
 		public static Material AdditiveSprite(Sprite spriteSheet) => new Material(DefaultGraphics.AlphaTestTexture, BlendState.Additive, spriteSheet);
-		public static Material FromSprite(Sprite spriteSheet) => new Material(DefaultGraphics.DefaultTexture, null, spriteSheet);
+		public static Material FromSprite(Sprite spriteSheet) => new Material(DefaultGraphics.DefaultTexture, BlendState.NonPremultiplied, spriteSheet);
 #pragma warning restore IDE0022 // Use block body for methods
 
 		private Sprite spriteSheet;
