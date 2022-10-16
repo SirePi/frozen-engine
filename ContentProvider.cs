@@ -9,6 +9,8 @@ namespace Frozen
 {
 	public class ContentProvider
 	{
+		private Dictionary<string, object> cache = new Dictionary<string, object>();
+
 		private bool audioEnabled = true;
 		private Game game;
 		internal DefaultContent DefaultContent { get; private set; }
@@ -36,7 +38,12 @@ namespace Frozen
 
 			try
 			{
-				return this.game.Content.Load<T>(assetName);
+				if(this.cache.TryGetValue(assetName, out object cachedAsset) && cachedAsset is T typedAsset)
+					return typedAsset;
+				
+				T asset = this.game.Content.Load<T>(assetName);
+				this.cache[assetName] = asset;
+				return asset;
 			}
 			catch(NoAudioHardwareException)
 			{
@@ -54,7 +61,13 @@ namespace Frozen
 
 			try
 			{
-				return this.game.Content.LoadLocalized<T>(assetName);
+				if (this.cache.TryGetValue(assetName, out object cachedAsset) && cachedAsset is T typedAsset)
+					return typedAsset;
+
+				T asset = this.game.Content.LoadLocalized<T>(assetName);
+				this.cache[assetName] = asset;
+				return asset;
+
 			}
 			catch (NoAudioHardwareException)
 			{
