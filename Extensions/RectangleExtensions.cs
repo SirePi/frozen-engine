@@ -1,20 +1,11 @@
-﻿using Frozen.Utilities;
-using Microsoft.Xna.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
+using Frozen.Utilities;
+using Microsoft.Xna.Framework;
 
-namespace Frozen
+namespace Frozen.Extensions
 {
-	public static class PointExtensions
-	{
-		public static Vector2 ToVector2(this Point point)
-		{
-			return new Vector2(point.X, point.Y);
-		}
-	}
-
 	public static class RectangleExtensions
 	{
 		public static Rectangle Transform2D(this Rectangle rect, Vector2 offset)

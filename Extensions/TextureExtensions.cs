@@ -11,6 +11,22 @@ namespace Frozen
 {
 	public static class Texture2DExtensions
 	{
+		public static void SaveAsJpeg(this Texture2D texture, string path)
+		{
+			using System.IO.FileStream fs = new System.IO.FileStream(path, System.IO.FileMode.OpenOrCreate);
+			texture.SaveAsJpeg(fs, texture.Width, texture.Height);
+			fs.Flush();
+			fs.Close();
+		}
+
+		public static void SaveAsPng(this Texture2D texture, string path)
+		{
+			using System.IO.FileStream fs = new System.IO.FileStream(path, System.IO.FileMode.OpenOrCreate);
+			texture.SaveAsPng(fs, texture.Width, texture.Height);
+			fs.Flush();
+			fs.Close();
+		}
+
 		public static void CreateMipMaps(this Texture2D texture)
 		{
 			int w = texture.Width;
