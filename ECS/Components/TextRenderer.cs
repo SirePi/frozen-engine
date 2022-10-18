@@ -48,6 +48,7 @@ namespace Frozen.ECS.Components
 				this.maxWidth = value;
 			}
 		}
+
 		public SpriteFont Font
 		{
 			get => this.font;
@@ -168,9 +169,7 @@ namespace Frozen.ECS.Components
 				{
 					foreach (char c in rows[i].Text)
 					{
-						GlyphInfo glyph;
-
-						if (!this.glyphs.TryGetValue(c, out glyph))
+						if (!this.glyphs.TryGetValue(c, out GlyphInfo glyph))
 						{
 							if (this.font.DefaultCharacter.HasValue)
 								glyph = this.glyphs[this.font.DefaultCharacter.Value];

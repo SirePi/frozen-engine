@@ -1,5 +1,6 @@
 ﻿using Frozen.Drawing;
 using Frozen.ECS.Systems;
+using Frozen.Extensions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
