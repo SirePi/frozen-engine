@@ -92,14 +92,32 @@ namespace Frozen
 
 		public virtual SoundEffect LoadSoundEffect(string soundEffect)
 		{
-			using (var vorbisStream = new NAudio.Vorbis.VorbisWaveReader(soundEffect))
-			using (var waveOut = new NAudio.Wave.DirectSoundOut())
+			var vorbisStream = new NAudio.Vorbis.VorbisWaveReader(soundEffect);
+			var channel = new NAudio.Wave.WaveChannel32(vorbisStream);
+			var waveOut = new NAudio.Wave.DirectSoundOut();
 			{
-				waveOut.Init(vorbisStream);
+				waveOut.Init(channel);
+				channel.Volume = 1;
+				channel.Pan = -1;
 				waveOut.Play();
 
+				int i = 0;
+				float delta = .2f;
 				while (waveOut.PlaybackState == NAudio.Wave.PlaybackState.Playing)
+				{
 					System.Threading.Thread.Sleep(100);
+					channel.Pan += delta;
+					channel.Volume = MathF.Max(0, channel.Volume - .1f);
+
+					if(++i == 8)
+					{
+						channel.Position = 0;
+						channel.Pan = delta * 5;
+						channel.Volume = 1;
+						delta *= -1;
+						i = 0;
+					}
+				}
 
 				// wait here until playback stops or should stop
 			}

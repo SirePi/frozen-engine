@@ -9,7 +9,7 @@ namespace Frozen.Utilities
 {
 	public static class CoreMath
 	{
-		private static Viewport viewport = new Viewport();
+		public static Rectangle InfiniteRectangle { get; private set; } = new Rectangle(int.MinValue, int.MinValue, int.MaxValue, int.MaxValue);
 
 		private static bool[] multiplesOfThree = Enumerable
 			.Range(0, 1024000)
@@ -25,8 +25,6 @@ namespace Frozen.Utilities
 		{
 			return multiplesOfThree[value];
 		}
-
-		public static Rectangle InfiniteRectangle { get; private set; } = new Rectangle(int.MinValue, int.MinValue, int.MaxValue, int.MaxValue);
 
 		public static float Min(params float[] values)
 		{

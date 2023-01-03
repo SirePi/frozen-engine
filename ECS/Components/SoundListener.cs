@@ -13,36 +13,7 @@ namespace Frozen.ECS.Components
 		[RequiredComponent]
 		internal Camera Camera { get; set; }
 
-		private float fullVolumeDistance;
-		private float cutOffDistance;
-
-		public float CutOffDistance
-		{
-			get => this.cutOffDistance;
-			set
-			{
-				this.cutOffDistance = value;
-				this.CutOffDistanceSquared = value * value;
-			}
-		}
-
-		public float FullVolumeDistance
-		{
-			get => this.fullVolumeDistance;
-			set
-			{
-				this.fullVolumeDistance = value;
-				this.FullVolumeDistanceSquared = value * value;
-			}
-		}
-
-		internal float CutOffDistanceSquared { get; private set; }
-		internal float FullVolumeDistanceSquared { get; private set; }
-
-		public SoundListener()
-		{
-			this.CutOffDistance = 100000;
-			this.FullVolumeDistance = 1000;
-		}
+		public float CutOffDistance { get; set; } = 100000;
+		public float FullVolumeDistance { get; set; } = 1000;
 	}
 }
