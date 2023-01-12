@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using FontStashSharp;
 using Frozen.Drawing;
@@ -92,19 +93,22 @@ namespace Frozen
 
 		public virtual SoundEffect LoadSoundEffect(string soundEffect)
 		{
-			using (var vorbisStream = new NAudio.Vorbis.VorbisWaveReader(soundEffect))
-			using (var waveOut = new NAudio.Wave.DirectSoundOut())
+			string extension = soundEffect.Split(".").Last().ToLowerInvariant();
+
+			if (extension == "ogg")
 			{
-				waveOut.Init(vorbisStream);
-				waveOut.Play();
+				using NVorbis.VorbisReader reader = new NVorbis.VorbisReader(soundEffect);
+				float[] data = new float[reader.TotalSamples];
 
-				while (waveOut.PlaybackState == NAudio.Wave.PlaybackState.Playing)
-					System.Threading.Thread.Sleep(100);
+				reader.ReadSamples(data, 0, (int)reader.TotalSamples);
+				byte[] x = data.SelectMany(f => BitConverter.GetBytes((short)(f * short.MaxValue))).ToArray();
 
-				// wait here until playback stops or should stop
+				return new SoundEffect(x, reader.SampleRate, reader.Channels == 1 ? AudioChannels.Mono : AudioChannels.Stereo);
 			}
-
-			return null;
+			else
+			{
+				return SoundEffect.FromFile(soundEffect);
+			}
 		}
 
 		public virtual T LoadXNALocalized<T>(string assetName)
