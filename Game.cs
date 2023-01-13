@@ -21,6 +21,7 @@ namespace Frozen
 
 		protected Game()
 		{
+			System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 			this.graphics = new GraphicsDeviceManager(this);
 		}
 

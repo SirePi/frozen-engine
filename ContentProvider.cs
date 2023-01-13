@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using FontStashSharp;
+using Frozen.Audio;
 using Frozen.Drawing;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
@@ -17,6 +18,7 @@ namespace Frozen
 		private Dictionary<string, object> cache = new Dictionary<string, object>();
 		private Dictionary<string, FontSystem> fontCache = new Dictionary<string, FontSystem>();
 		private Dictionary<string, Texture2D> textureCache = new Dictionary<string, Texture2D>();
+		private Dictionary<string, AudioSource> audioCache = new Dictionary<string, AudioSource>();
 
 		private bool audioEnabled = true;
 		private Game game;
@@ -90,39 +92,15 @@ namespace Frozen
 			return tx;
 		}
 
-		public virtual SoundEffect LoadSoundEffect(string soundEffect)
+		public virtual AudioSource LoadAudio(string audio)
 		{
-			var vorbisStream = new NAudio.Vorbis.VorbisWaveReader(soundEffect);
-			var channel = new NAudio.Wave.WaveChannel32(vorbisStream);
-			var waveOut = new NAudio.Wave.DirectSoundOut();
+			if (!this.audioCache.TryGetValue(audio, out AudioSource source))
 			{
-				waveOut.Init(channel);
-				channel.Volume = 1;
-				channel.Pan = -1;
-				waveOut.Play();
-
-				int i = 0;
-				float delta = .2f;
-				while (waveOut.PlaybackState == NAudio.Wave.PlaybackState.Playing)
-				{
-					System.Threading.Thread.Sleep(100);
-					channel.Pan += delta;
-					channel.Volume = MathF.Max(0, channel.Volume - .1f);
-
-					if(++i == 8)
-					{
-						channel.Position = 0;
-						channel.Pan = delta * 5;
-						channel.Volume = 1;
-						delta *= -1;
-						i = 0;
-					}
-				}
-
-				// wait here until playback stops or should stop
+				source = new FileAudioSource(audio);
+				this.audioCache[audio] = source;
 			}
 
-			return null;
+			return source;
 		}
 
 		public virtual T LoadXNALocalized<T>(string assetName)

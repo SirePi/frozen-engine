@@ -15,7 +15,7 @@ namespace Frozen.Audio
 		private SoundEmitter emitter;
 		private SoundListener listener;
 
-		public bool IsActive => this.sfx.State != SoundState.Stopped;
+		public bool IsActive { get; private set; }
 
 		internal Sound3D()
 		{ }
@@ -26,6 +26,7 @@ namespace Frozen.Audio
 			this.emitter = emitter;
 			this.listener = listener;
 
+			this.IsActive = true;
 			this.Update();
 		}
 
@@ -47,6 +48,8 @@ namespace Frozen.Audio
 				this.sfx.Pan = -MathF.Sin(angle);
 
 				this.sfx.Volume = MathHelper.Clamp(1 - ((length - this.listener.FullVolumeDistance) / this.listener.CutOffDistance), 0, 1) * this.emitter.Volume;
+
+				this.IsActive = this.sfx.IsActive;
 			}
 		}
 	}

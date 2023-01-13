@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text;
 using Microsoft.Xna.Framework.Audio;
 using NAudio.Wave;
@@ -9,7 +11,7 @@ namespace Frozen.Audio
 {
 	public class AudioInstance
 	{
-		private readonly WaveStream source;
+		private readonly AudioProvider source;
 
 		private readonly PanningSampleProvider pan;
 		private readonly SmbPitchShiftingSampleProvider pitch;
@@ -37,7 +39,7 @@ namespace Frozen.Audio
 
 		public float Pitch { get => this.pitch.PitchFactor; set => this.pitch.PitchFactor = value; }
 		public float Volume { get => this.volume.Volume; set => this.volume.Volume = value; }
-		public bool IsActive => this.source.CurrentTime < this.source.TotalTime;
+		public bool IsActive => this.source.IsActive;
 
 		private SoundState state;
 		public SoundState State
@@ -53,12 +55,12 @@ namespace Frozen.Audio
 			}
 		}
 
-		internal AudioInstance(WaveStream source)
+		internal AudioInstance(AudioProvider provider)
 		{
-			this.source = source;
-			ISampleProvider src = this.source.ToSampleProvider();
+			this.source = provider;
+			ISampleProvider src = this.source.SampleProvider;
 
-			if (source.WaveFormat.Channels == 1)
+			if (this.source.WaveFormat.Channels == 1)
 			{
 				this.pan = new PanningSampleProvider(src);
 				src = this.pan;
@@ -69,10 +71,16 @@ namespace Frozen.Audio
 			this.pcm16 = this.volume.ToWaveProvider16();
 		}
 
-		public void Play()
+		public void Play(float volume, float pan, float pitch)
 		{
-			this.source.Position = 0;
-			DynamicSoundEffectInstance sfx = new DynamicSoundEffectInstance(this.source.WaveFormat.SampleRate, AudioChannels.Stereo);
+			this.source.Reset();
+
+			// reset all values
+			this.Pan = pan;
+			this.Pitch = pitch;
+			this.Volume = volume;
+
+			DynamicSoundEffectInstance sfx = new DynamicSoundEffectInstance(this.pcm16.WaveFormat.SampleRate, AudioChannels.Stereo);
 			sfx.BufferNeeded += (sender, args) => this.ReadBuffer(sender as DynamicSoundEffectInstance);
 			sfx.Play();
 			this.State = SoundState.Playing;
@@ -95,10 +103,15 @@ namespace Frozen.Audio
 			this.State = SoundState.Stopped;
 		}
 
+		public WaveGenerator GetGenerator() 
+		{
+			return (this.source as GeneratedAudioProvider)?.Source;
+		}
+
 		private void ReadBuffer(DynamicSoundEffectInstance sfx)
 		{
-			int bufferSize = (int)MathF.Floor(this.pcm16.WaveFormat.AverageBytesPerSecond * Time.FrameSeconds);
-			bufferSize = (int)(MathF.Ceiling(bufferSize / this.pcm16.WaveFormat.BlockAlign)) * this.pcm16.WaveFormat.BlockAlign;
+			int bufferSize = (int)MathF.Ceiling(this.pcm16.WaveFormat.AverageBytesPerSecond * .05f);
+			bufferSize = (int)MathF.Ceiling(bufferSize / this.pcm16.WaveFormat.BlockAlign) * this.pcm16.WaveFormat.BlockAlign;
 
 			while (bufferSize > this.buffer.Length)
 				this.buffer = new byte[this.buffer.Length * 2];
@@ -110,7 +123,7 @@ namespace Frozen.Audio
 				if (read > 0)
 					sfx.SubmitBuffer(this.buffer, 0, read);
 				else
-					this.State = SoundState.Stopped;
+					this.Stop();
 			}
 		}
 	}

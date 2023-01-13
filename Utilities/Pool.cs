@@ -4,14 +4,20 @@ using System.Text;
 
 namespace Frozen.Utilities
 {
-	public sealed class Pool<T> where T : class, new()
+	public sealed class Pool<T> where T : class
 	{
+		private readonly Func<T> factory;
 		private readonly Queue<T> pool = new Queue<T>();
+
+		public Pool(Func<T> factory)
+		{
+			this.factory = factory;
+		}
 
 		public T GetOne()
 		{
 			if (!this.pool.TryDequeue(out T result))
-				result = new T();
+				result = this.factory();
 
 			if (result is IPoolable poolable)
 				poolable.OnPickup();
