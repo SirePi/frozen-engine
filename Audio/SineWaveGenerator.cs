@@ -27,10 +27,5 @@ namespace Frozen.Audio
             }
             return sampleCount;
         }
-
-		public override WaveGenerator Clone()
-		{
-			return new SineWaveGenerator(this.Frequency, this.Amplitude, this.WaveFormat.SampleRate);
-		}
 	}
 }

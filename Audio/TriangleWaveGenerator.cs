@@ -26,10 +26,5 @@ namespace Frozen.Audio
             }
             return sampleCount;
         }
-
-		public override WaveGenerator Clone()
-		{
-			return new SquareWaveGenerator(this.Frequency, this.Amplitude, this.WaveFormat.SampleRate);
-		}
 	}
 }

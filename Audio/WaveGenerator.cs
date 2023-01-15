@@ -20,7 +20,6 @@ namespace Frozen.Audio
 			this.sample = 0;
 		}
 
-		public abstract WaveGenerator Clone();
 		public void Reset()
 		{
 			this.sample = 0;

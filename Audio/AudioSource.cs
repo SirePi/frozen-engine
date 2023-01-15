@@ -100,15 +100,15 @@ namespace Frozen.Audio
 
 	public class GeneratedAudioSource : AudioSource
 	{
-		private readonly WaveGenerator source;
-		internal GeneratedAudioSource(WaveGenerator provider)
+		public WaveGenerator Generator { get; private set; }
+		internal GeneratedAudioSource(WaveGenerator generator)
 		{
-			this.source = provider;
+			this.Generator = generator;
 		}
 
 		protected override AudioInstance InternalCreateNewInstance()
 		{
-			AudioProvider provider = new GeneratedAudioProvider(this.source.Clone());
+			AudioProvider provider = new GeneratedAudioProvider(this.Generator);
 			return new AudioInstance(provider);
 		}
 	}

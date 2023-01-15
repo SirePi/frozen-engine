@@ -103,11 +103,6 @@ namespace Frozen.Audio
 			this.State = SoundState.Stopped;
 		}
 
-		public WaveGenerator GetGenerator() 
-		{
-			return (this.source as GeneratedAudioProvider)?.Source;
-		}
-
 		private void ReadBuffer(DynamicSoundEffectInstance sfx)
 		{
 			int bufferSize = (int)MathF.Ceiling(this.pcm16.WaveFormat.AverageBytesPerSecond * .05f);
