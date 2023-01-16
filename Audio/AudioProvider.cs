@@ -5,7 +5,7 @@ using NAudio.Wave;
 
 namespace Frozen.Audio
 {
-	internal abstract class AudioProvider
+	public abstract class AudioProvider
 	{
 		internal ISampleProvider SampleProvider { get; private set; }
 		internal WaveFormat WaveFormat { get; private set; }

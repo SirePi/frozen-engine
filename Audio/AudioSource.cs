@@ -18,11 +18,12 @@ namespace Frozen.Audio
 			this.pool = new Pool<AudioInstance>(() => this.CreateNewInstance());
 		}
 
-		protected abstract AudioInstance InternalCreateNewInstance();
+		internal abstract AudioProvider ToAudioProvider();
 
-		public AudioInstance CreateNewInstance()
+		private AudioInstance CreateNewInstance()
 		{
-			AudioInstance instance = this.InternalCreateNewInstance();
+			AudioProvider provider = this.ToAudioProvider();
+			AudioInstance instance = new AudioInstance(provider);
 			instance.OnStateChanged += this.Instance_OnStateChanged;
 			return instance;
 		}
@@ -33,7 +34,7 @@ namespace Frozen.Audio
 				this.pool.ReturnOne(arg1);
 		}
 
-		public AudioInstance GetAudioInstance()
+		internal AudioInstance GetAudioInstance()
 		{
 			return this.pool.GetOne();
 		}
@@ -91,10 +92,9 @@ namespace Frozen.Audio
 			this.waveFormat = wave.WaveFormat;
 		}
 
-		protected override AudioInstance InternalCreateNewInstance()
+		internal override AudioProvider ToAudioProvider()
 		{
-			AudioProvider provider = new FileAudioProvider(new RawSourceWaveStream(this.source, 0, this.source.Length, this.waveFormat));
-			return new AudioInstance(provider);
+			return new FileAudioProvider(new RawSourceWaveStream(this.source, 0, this.source.Length, this.waveFormat));
 		}
 	}
 
@@ -106,10 +106,9 @@ namespace Frozen.Audio
 			this.Generator = generator;
 		}
 
-		protected override AudioInstance InternalCreateNewInstance()
+		internal override AudioProvider ToAudioProvider()
 		{
-			AudioProvider provider = new GeneratedAudioProvider(this.Generator);
-			return new AudioInstance(provider);
+			return new GeneratedAudioProvider(this.Generator);
 		}
 	}
 }

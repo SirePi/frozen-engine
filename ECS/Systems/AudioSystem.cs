@@ -16,18 +16,21 @@ namespace Frozen.ECS.Systems
 	{
 		public const float SpeedOfSound = 3400;
 		private readonly List<Sound3D> threeDsounds;
+		private BGM bgm;
 
 		internal AudioSystem()
 		{
+			this.bgm = new BGM();
 			this.threeDsounds = new List<Sound3D>();
 
 			// just instantiate it once to make it faster later on
 			using DynamicSoundEffectInstance dummy = new DynamicSoundEffectInstance(48000, AudioChannels.Stereo);
 		}
 
-		public void PlayBGM(AudioSource song, float volume = 1, TimeSpan? fadeIn = null)
+		public void PlayBGM(AudioSource song, float volume = 1, float fadeInMilliseconds = 0)
 		{
-			song.GetAudioInstance().Play(volume, 0, 1);
+			this.bgm.Play(song.ToAudioProvider(), "ya");
+			this.bgm.Volume = volume;
 		}
 
 		/*
@@ -67,6 +70,7 @@ namespace Frozen.ECS.Systems
 
 		public void Update()
 		{
+			this.bgm.Update();
 			foreach (Sound3D s3D in this.threeDsounds)
 				s3D.Update();
 		}
