@@ -48,7 +48,7 @@ namespace Frozen.Audio
 			this.start = DateTime.Now;
 			this.state = SoundState.Playing;
 
-			this.mixChannels[songName].Volume = 1;
+			this.mixChannels[songName].FadeIn(20);
 			this.bgm.Play();
 		}
 

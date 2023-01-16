@@ -17,7 +17,7 @@ namespace Frozen.Audio
 	{
 		private VolumeSampleProvider volume;
 
-		private float targetVolume = 1;
+		private float targetVolume = 0;
 		private float volumeDelta = 0;
 
 		public float Volume { get => this.volume.Volume; set => this.volume.Volume = value; }
@@ -28,18 +28,25 @@ namespace Frozen.Audio
 				provider = provider.ToStereo();
 
 			this.volume = new VolumeSampleProvider(new WdlResamplingSampleProvider(provider, sampleRate));
+			this.Volume = 0;
 		}
 
 		public WaveFormat WaveFormat => this.volume.WaveFormat;
 
 		internal void FadeIn(float fadeSeconds)
 		{
-			this.FadeTo(1, fadeSeconds);
+			if (fadeSeconds == 0)
+				this.Volume = 1;
+			else
+				this.FadeTo(1, fadeSeconds);
 		}
 
 		internal void FadeOut(float fadeSeconds)
 		{
-			this.FadeTo(0, fadeSeconds);
+			if (fadeSeconds == 0)
+				this.Volume = 0;
+			else
+				this.FadeTo(0, fadeSeconds);
 		}
 
 		internal void FadeTo(float targetVolume, float fadeSeconds)
@@ -50,7 +57,7 @@ namespace Frozen.Audio
 
 		internal void Update()
 		{
-			if (this.Volume != this.targetVolume)
+			if (this.volumeDelta != 0)
 			{
 				float delta = this.volumeDelta * Time.FrameSeconds;
 				if (this.targetVolume - this.Volume <= delta)
