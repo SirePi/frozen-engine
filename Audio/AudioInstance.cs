@@ -60,15 +60,11 @@ namespace Frozen.Audio
 			this.source = provider;
 			ISampleProvider src = this.source.SampleProvider;
 
-			if (this.source.WaveFormat.Channels == 1)
-			{
-				this.pan = new PanningSampleProvider(src);
-				src = this.pan;
-			}
-
 			this.pitch = new SmbPitchShiftingSampleProvider(src);
 			this.volume = new VolumeSampleProvider(this.pitch);
-			this.pcm16 = this.volume.ToWaveProvider16();
+			if (this.volume.WaveFormat.Channels == 1)
+				this.pan = new PanningSampleProvider(this.volume);
+			this.pcm16 = this.pan != null ? this.pan.ToWaveProvider16() : this.volume.ToWaveProvider16();
 		}
 
 		public void Play(float volume, float pan, float pitch)

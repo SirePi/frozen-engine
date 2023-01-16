@@ -25,13 +25,12 @@ namespace Frozen.ECS.Systems
 			using DynamicSoundEffectInstance dummy = new DynamicSoundEffectInstance(48000, AudioChannels.Stereo);
 		}
 
-		/*
-		public void PlaySong(Song song, TimeSpan? startPosition = null)
+		public void PlayBGM(AudioSource song, float volume = 1, TimeSpan? fadeIn = null)
 		{
-			MediaPlayer.Play(song, startPosition);
-			MediaPlayer.IsRepeating = false;
+			song.GetAudioInstance().Play(volume, 0, 1);
 		}
 
+		/*
 		public void PlaySongLooping(Song song)
 		{
 			MediaPlayer.Play(song);
