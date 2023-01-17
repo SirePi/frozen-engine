@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Frozen.Audio;
 using Frozen.ECS.Components;
+using Frozen.Enums;
 using Frozen.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
@@ -15,13 +16,13 @@ namespace Frozen.ECS.Systems
 	public class AudioSystem
 	{
 		public const float SpeedOfSound = 3400;
-		private readonly List<Sound3D> threeDsounds;
-		private BGM bgm;
+		private readonly List<ThreeDSound> threeDsounds;
+		private BGMPlayer bgm;
 
 		internal AudioSystem()
 		{
-			this.bgm = new BGM();
-			this.threeDsounds = new List<Sound3D>();
+			this.bgm = new BGMPlayer();
+			this.threeDsounds = new List<ThreeDSound>();
 
 			// just instantiate it once to make it faster later on
 			using DynamicSoundEffectInstance dummy = new DynamicSoundEffectInstance(48000, AudioChannels.Stereo);
@@ -30,7 +31,6 @@ namespace Frozen.ECS.Systems
 		public void PlayBGM(AudioSource song, float volume = 1, float fadeInMilliseconds = 0)
 		{
 			this.bgm.Play(song.ToAudioProvider(), "ya");
-			this.bgm.Volume = volume;
 		}
 
 		/*
@@ -48,7 +48,7 @@ namespace Frozen.ECS.Systems
 			return instance;
 		}
 
-		public AudioInstance PlaySoundEffect3D(AudioSource sfx, SoundEmitter emitter, SoundListener listener)
+		public AudioInstance PlaySoundEffect3D(AudioSource sfx, SoundEmitter emitter, SoundListener listener, ThreeDSoundChange type = ThreeDSoundChange.Default)
 		{
 			AudioInstance instance = this.PlaySoundEffect(sfx);
 
@@ -56,14 +56,14 @@ namespace Frozen.ECS.Systems
 			{
 				if (!this.threeDsounds[i].IsActive)
 				{
-					this.threeDsounds[i].Setup(instance, emitter, listener);
+					this.threeDsounds[i].Setup(instance, emitter, listener, type);
 					return instance;
 				}
 			}
 
-			Sound3D s3D = new Sound3D();
-			s3D.Setup(instance, emitter, listener);
-			this.threeDsounds.Add(s3D);
+			ThreeDSound sound = new ThreeDSound();
+			sound.Setup(instance, emitter, listener, type);
+			this.threeDsounds.Add(sound);
 
 			return instance;
 		}
@@ -71,7 +71,7 @@ namespace Frozen.ECS.Systems
 		public void Update()
 		{
 			this.bgm.Update();
-			foreach (Sound3D s3D in this.threeDsounds)
+			foreach (ThreeDSound s3D in this.threeDsounds)
 				s3D.Update();
 		}
 	}

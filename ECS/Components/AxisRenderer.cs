@@ -14,7 +14,7 @@ namespace Frozen.ECS.Components
 		private static readonly int[] LINE_INDICES = new int[] { 0, 1, 0, 2, 0, 3 };
 
 		private readonly VertexPositionColorTexture[] vertices = new VertexPositionColorTexture[4];
-        public override Rectangle Bounds => CoreMath.InfiniteRectangle;
+        public override Rectangle Bounds => Utilities.Math.InfiniteRectangle;
 
 		public override long RendererSortedHash => (long)this.Transform.Position.Z << 32;
 

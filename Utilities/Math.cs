@@ -7,9 +7,10 @@ using System.Text;
 
 namespace Frozen.Utilities
 {
-	public static class CoreMath
+	public static class Math
 	{
 		public const float TWO_PI = MathF.PI * 2;
+
 		public static Rectangle InfiniteRectangle { get; private set; } = new Rectangle(int.MinValue, int.MinValue, int.MaxValue, int.MaxValue);
 
 		private static bool[] multiplesOfThree = Enumerable

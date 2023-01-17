@@ -20,14 +20,14 @@ namespace Frozen.Extensions
 
 		public static Rectangle Transform2D(this Rectangle rect, Vector2 offset, Vector2 scale)
 		{
-			Rectangle result = new Rectangle(0, 0, (int)Math.Ceiling(rect.Width * scale.X), (int)Math.Ceiling(rect.Height * scale.Y));
+			Rectangle result = new Rectangle(0, 0, (int)System.Math.Ceiling(rect.Width * scale.X), (int)System.Math.Ceiling(rect.Height * scale.Y));
 			result.Offset(offset);
 			return result;
 		}
 
 		public static bool IsInfinite(this Rectangle rect)
 		{
-			return rect == CoreMath.InfiniteRectangle;
+			return rect == Utilities.Math.InfiniteRectangle;
 		}
 	}
 }

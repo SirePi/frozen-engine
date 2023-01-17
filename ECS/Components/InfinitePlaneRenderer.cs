@@ -19,7 +19,7 @@ namespace Frozen.ECS.Components
 		public Color ColorTint { get; set; } = Color.White;
 
 		public override long RendererSortedHash => this.Material.DefaultSortingHash(this.Transform.Position.Z);
-		public override Rectangle Bounds => CoreMath.InfiniteRectangle;
+		public override Rectangle Bounds => Utilities.Math.InfiniteRectangle;
 
 		public override void Draw(DrawingSystem drawing)
 		{
@@ -34,10 +34,10 @@ namespace Frozen.ECS.Components
 			Vector3 bottomLeft = camera.ScreenToWorld(bound * Vector2.UnitY, this.Transform.WorldPosition.Z);
 			Vector3 bottomRight = camera.ScreenToWorld(bound, this.Transform.WorldPosition.Z);
 
-			float minX = CoreMath.Min(topLeft.X, topRight.X, bottomLeft.X, bottomRight.X);
-			float maxX = CoreMath.Max(topLeft.X, topRight.X, bottomLeft.X, bottomRight.X);
-			float minY = CoreMath.Min(topLeft.Y, topRight.Y, bottomLeft.Y, bottomRight.Y);
-			float maxY = CoreMath.Max(topLeft.Y, topRight.Y, bottomLeft.Y, bottomRight.Y);
+			float minX = Utilities.Math.Min(topLeft.X, topRight.X, bottomLeft.X, bottomRight.X);
+			float maxX = Utilities.Math.Max(topLeft.X, topRight.X, bottomLeft.X, bottomRight.X);
+			float minY = Utilities.Math.Min(topLeft.Y, topRight.Y, bottomLeft.Y, bottomRight.Y);
+			float maxY = Utilities.Math.Max(topLeft.Y, topRight.Y, bottomLeft.Y, bottomRight.Y);
 
 			Engine.Log.Core.Debug($"{camera.Entity.Name} {minX} {maxX} {minY} {maxY}");
 

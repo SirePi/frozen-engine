@@ -13,7 +13,7 @@ namespace Frozen.Audio
 		FadingOut
 	}
 
-	internal class BGMProvider : ISampleProvider
+	internal class BGMInstance : ISampleProvider
 	{
 		private VolumeSampleProvider volume;
 
@@ -22,7 +22,7 @@ namespace Frozen.Audio
 
 		public float Volume { get => this.volume.Volume; set => this.volume.Volume = value; }
 
-		internal BGMProvider(ISampleProvider provider, int sampleRate)
+		internal BGMInstance(ISampleProvider provider, int sampleRate)
 		{
 			if (provider.WaveFormat.Channels == 1)
 				provider = provider.ToStereo();
@@ -69,7 +69,6 @@ namespace Frozen.Audio
 					this.Volume += delta;
 			}
 		}
-
 
 		public int Read(float[] buffer, int offset, int count)
 		{

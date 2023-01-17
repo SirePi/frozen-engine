@@ -9,7 +9,7 @@ using NAudio.Wave.SampleProviders;
 
 namespace Frozen.Audio
 {
-	public class BGM
+	public class BGMPlayer
 	{
 		private readonly MixingSampleProvider mixer;
 		private readonly VolumeSampleProvider volume;
@@ -18,19 +18,14 @@ namespace Frozen.Audio
 		private readonly DynamicSoundEffectInstance bgm;
 
 		private byte[] buffer = new byte[4096];
-		private SoundState state;
 
 		public event Action<TimeSpan> OnSongEnding;
 
-		private Dictionary<string, BGMProvider> mixChannels;
+		private Dictionary<string, BGMInstance> bgms;
 
-		public float Volume { get => this.volume.Volume; set => this.volume.Volume = value; }
-
-		private DateTime start;
-
-		internal BGM()
+		internal BGMPlayer()
 		{
-			this.mixChannels = new Dictionary<string, BGMProvider>();
+			this.bgms = new Dictionary<string, BGMInstance>();
 
 			this.mixer = new MixingSampleProvider(new ISampleProvider[] { SilenceGenerator.Instance });
 			this.volume = new VolumeSampleProvider(this.mixer);
@@ -40,26 +35,26 @@ namespace Frozen.Audio
 			this.bgm.BufferNeeded += (sender, args) => this.ReadBuffer(sender as DynamicSoundEffectInstance);
 		}
 
-		internal void Play(AudioProvider provider, string songName, float fadeMilliseconds = 0)
+		internal void Play(AudioProvider provider, string songName, float fadeSeconds = 0)
 		{
-			this.mixChannels[songName] = new BGMProvider(provider.SampleProvider, this.mixer.WaveFormat.SampleRate);
-			this.mixer.AddMixerInput(this.mixChannels[songName]);
+			this.bgms[songName] = new BGMInstance(provider.SampleProvider, this.mixer.WaveFormat.SampleRate);
+			this.mixer.AddMixerInput(this.bgms[songName]);
 
-			this.start = DateTime.Now;
-			this.state = SoundState.Playing;
-
-			this.mixChannels[songName].FadeIn(20);
+			this.bgms[songName].FadeIn(fadeSeconds);
 			this.bgm.Play();
 		}
 
-		internal void Stop(float fadeMilliseconds = 0)
+		internal void Stop(float fadeSeconds = 0)
 		{
-			this.mixer.RemoveAllMixerInputs();
+			foreach (BGMInstance bgm in this.bgms.Values)
+				this.mixer.RemoveMixerInput(bgm);
+
+			this.bgms.Clear();
 		}
 
 		internal void Update()
 		{
-			foreach (BGMProvider provider in this.mixChannels.Values)
+			foreach (BGMInstance provider in this.bgms.Values)
 				provider.Update();
 		}
 
@@ -71,7 +66,7 @@ namespace Frozen.Audio
 			while (bufferSize > this.buffer.Length)
 				this.buffer = new byte[this.buffer.Length * 2];
 
-			while (sfx.PendingBufferCount < 2 && this.state == SoundState.Playing)
+			while (sfx.PendingBufferCount < 2)
 			{
 				int read = this.pcm16.Read(this.buffer, 0, bufferSize);
 

@@ -19,7 +19,7 @@ namespace Frozen.Audio
             int sampleRate = this.WaveFormat.SampleRate;
 			for (int n = 0; n < sampleCount; n++)
             {
-                buffer[n + offset] = this.Amplitude * MathF.Sign(MathF.Sin(CoreMath.TWO_PI * this.sample * this.Frequency / sampleRate));
+                buffer[n + offset] = this.Amplitude * MathF.Sign(MathF.Sin(Utilities.Math.TWO_PI * this.sample * this.Frequency / sampleRate));
 
 				this.sample++;
                 if (this.sample >= sampleRate) 
