@@ -15,22 +15,63 @@ namespace Frozen.ECS.Systems
 {
 	public class AudioSystem
 	{
-		public const float SpeedOfSound = 3400;
+		internal const int SampleRate = 48000;
+		internal const float SpeedOfSound = 3400;
+
 		private readonly List<ThreeDSound> threeDsounds;
-		private BGMPlayer bgm;
+		public SoundMixer Master { get; private set; }
+		public SoundMixer Music { get; private set; }
+		public SoundMixer SoundEffects { get; private set; }
+		public SoundMixer Voice { get; private set; }
+
+		private byte[] buffer;
+		private IWaveProvider pcm16; 
+		private DynamicSoundEffectInstance soundOutput;
 
 		internal AudioSystem()
 		{
-			this.bgm = new BGMPlayer();
+			this.Music = new SoundMixer();
+			this.SoundEffects = new SoundMixer();
+			this.Voice = new SoundMixer();
+
+			this.Master = new SoundMixer();
+			this.Master.AddMixerInput(this.Music);
+			this.Master.AddMixerInput(this.SoundEffects);
+			this.Master.AddMixerInput(this.Voice);
+
+			this.pcm16 = this.Master.ToWaveProvider16();
+
+			int bufferSize = (int)MathF.Ceiling(this.pcm16.WaveFormat.AverageBytesPerSecond * .05f);
+			bufferSize = (int)MathF.Ceiling(bufferSize / this.pcm16.WaveFormat.BlockAlign) * this.pcm16.WaveFormat.BlockAlign;
+
+			this.buffer = new byte[bufferSize];
+
 			this.threeDsounds = new List<ThreeDSound>();
 
 			// just instantiate it once to make it faster later on
-			using DynamicSoundEffectInstance dummy = new DynamicSoundEffectInstance(48000, AudioChannels.Stereo);
+			this.soundOutput = new DynamicSoundEffectInstance(this.Master.WaveFormat.SampleRate, AudioChannels.Stereo);
+			this.soundOutput.BufferNeeded += this.SoundOutput_BufferNeeded;
+			this.soundOutput.Play();
 		}
 
-		public void PlayBGM(AudioSource song, float volume = 1, float fadeInMilliseconds = 0)
+		private void SoundOutput_BufferNeeded(object sender, EventArgs e)
 		{
-			this.bgm.Play(song.ToAudioProvider(), "ya");
+			DynamicSoundEffectInstance sfx = sender as DynamicSoundEffectInstance;
+			while (sfx.PendingBufferCount < 2)
+			{
+				int read = this.pcm16.Read(this.buffer, 0, this.buffer.Length);
+				sfx.SubmitBuffer(this.buffer, 0, read);
+			}
+		}
+
+		public AudioInstance PlayMusic(AudioSource song, float volume = 1, float fadeInMilliseconds = 0)
+		{
+			AudioInstance instance = song.GetAudioInstance();
+			this.Music.AddMixerInput(instance);
+			// this.bgm.Play(, "ya");
+
+			instance.Play();
+			return instance;
 		}
 
 		/*
@@ -44,7 +85,13 @@ namespace Frozen.ECS.Systems
 		public AudioInstance PlaySoundEffect(AudioSource sfx, float volume = 1, float pan = 0, float pitch = 1)
 		{
 			AudioInstance instance = sfx.GetAudioInstance();
-			instance.Play(volume, pan, pitch);
+			instance.Volume = volume;
+			instance.Pan = pan;
+			instance.Pitch = pitch;
+
+			this.SoundEffects.AddMixerInput(instance);
+
+			instance.Play();
 			return instance;
 		}
 
@@ -70,7 +117,7 @@ namespace Frozen.ECS.Systems
 
 		public void Update()
 		{
-			this.bgm.Update();
+			// this.bgm.Update();
 			foreach (ThreeDSound s3D in this.threeDsounds)
 				s3D.Update();
 		}

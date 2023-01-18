@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Frozen.ECS.Systems;
 using NAudio.Wave;
 
 namespace Frozen.Audio
@@ -19,9 +20,11 @@ namespace Frozen.Audio
 			}
 		}
 
-		internal SilenceGenerator()
+		internal static SilenceGenerator[] InstanceForMixer { get; private set; } = { Instance };
+
+		private SilenceGenerator()
 		{
-			this.SetWaveFormat(48000, 2);
+			this.SetWaveFormat(AudioSystem.SampleRate, 2);
 		}
 
 		public override int Read(float[] buffer, int offset, int sampleCount)

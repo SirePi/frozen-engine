@@ -9,16 +9,13 @@ using NAudio.Wave.SampleProviders;
 
 namespace Frozen.Audio
 {
-	public class AudioInstance
+	public class AudioInstance : ISampleProvider
 	{
 		private readonly AudioProvider source;
 
 		private readonly PanningSampleProvider pan;
 		private readonly SmbPitchShiftingSampleProvider pitch;
 		private readonly VolumeSampleProvider volume;
-		private readonly IWaveProvider pcm16;
-
-		private byte[] buffer = new byte[4096];
 
 		public event Action<AudioInstance, SoundState> OnStateChanged;
 
@@ -55,30 +52,28 @@ namespace Frozen.Audio
 			}
 		}
 
+		public WaveFormat WaveFormat => this.volume?.WaveFormat;
+
 		internal AudioInstance(AudioProvider provider)
 		{
+			this.state = SoundState.Stopped;
+
 			this.source = provider;
 			ISampleProvider src = this.source.SampleProvider;
 
 			this.pitch = new SmbPitchShiftingSampleProvider(src);
-			this.volume = new VolumeSampleProvider(this.pitch);
-			if (this.volume.WaveFormat.Channels == 1)
-				this.pan = new PanningSampleProvider(this.volume);
-			this.pcm16 = this.pan != null ? this.pan.ToWaveProvider16() : this.volume.ToWaveProvider16();
+			if (this.pitch.WaveFormat.Channels == 1)
+			{
+				this.pan = new PanningSampleProvider(this.pitch);
+				this.volume = new VolumeSampleProvider(this.pan);
+			}
+			else
+				this.volume = new VolumeSampleProvider(this.pitch);
 		}
 
-		public void Play(float volume, float pan, float pitch)
+		public void Play()
 		{
 			this.source.Reset();
-
-			// reset all values
-			this.Pan = pan;
-			this.Pitch = pitch;
-			this.Volume = volume;
-
-			DynamicSoundEffectInstance sfx = new DynamicSoundEffectInstance(this.pcm16.WaveFormat.SampleRate, AudioChannels.Stereo);
-			sfx.BufferNeeded += (sender, args) => this.ReadBuffer(sender as DynamicSoundEffectInstance);
-			sfx.Play();
 			this.State = SoundState.Playing;
 		}
 
@@ -99,23 +94,18 @@ namespace Frozen.Audio
 			this.State = SoundState.Stopped;
 		}
 
-		private void ReadBuffer(DynamicSoundEffectInstance sfx)
+		public int Read(float[] buffer, int offset, int count)
 		{
-			int bufferSize = (int)MathF.Ceiling(this.pcm16.WaveFormat.AverageBytesPerSecond * .05f);
-			bufferSize = (int)MathF.Ceiling(bufferSize / this.pcm16.WaveFormat.BlockAlign) * this.pcm16.WaveFormat.BlockAlign;
-
-			while (bufferSize > this.buffer.Length)
-				this.buffer = new byte[this.buffer.Length * 2];
-
-			while (sfx.PendingBufferCount < 2 && this.State == SoundState.Playing)
+			if (this.State == SoundState.Playing)
 			{
-				int read = this.pcm16.Read(this.buffer, 0, bufferSize);
-
-				if (read > 0)
-					sfx.SubmitBuffer(this.buffer, 0, read);
-				else
+				int read = this.volume.Read(buffer, offset, count);
+				if (!this.source.IsActive)
 					this.Stop();
+
+				return read;
 			}
+			else
+				return 0;
 		}
 	}
 }

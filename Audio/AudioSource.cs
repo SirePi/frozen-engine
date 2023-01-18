@@ -6,6 +6,7 @@ using Frozen.Utilities;
 using Microsoft.Xna.Framework.Audio;
 using NAudio.Vorbis;
 using NAudio.Wave;
+using NLayer.NAudioSupport;
 
 namespace Frozen.Audio
 {
@@ -68,7 +69,8 @@ namespace Frozen.Audio
 					break;
 
 				case "mp3":
-					wave = new MediaFoundationReader(filename);
+					Mp3FileReaderBase.FrameDecompressorBuilder builder = new Mp3FileReaderBase.FrameDecompressorBuilder(wf => new Mp3FrameDecompressor(wf));
+					wave = new Mp3FileReaderBase(filename, builder);
 					break;
 
 				case "aiff":
