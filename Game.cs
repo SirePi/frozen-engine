@@ -38,7 +38,7 @@ namespace Frozen
 			base.Update(gameTime);
 			Time.Update(gameTime);
 
-			Engine.Audio.Update();
+			// Engine.Audio.Update();
 			Engine.Keyboard.Update();
 			Engine.Mouse.Update();
 

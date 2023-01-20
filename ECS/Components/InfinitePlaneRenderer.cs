@@ -1,30 +1,28 @@
-﻿using Frozen.Drawing;
+﻿using System.Collections.Generic;
+using Frozen.Drawing;
 using Frozen.ECS.Systems;
-using Frozen.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Frozen.ECS.Components
 {
 	public class InfinitePlaneRenderer : Renderer
 	{
 		private readonly TriangleList tList = new TriangleList();
+
 		private readonly VertexPositionColorTexture[] vertices = new VertexPositionColorTexture[4];
 
-		public Material Material { get; set; }
+		public override Rectangle Bounds => FrozenMath.InfiniteRectangle;
 		public Color ColorTint { get; set; } = Color.White;
-
+		public Material Material { get; set; }
 		public override long RendererSortedHash => this.Material.DefaultSortingHash(this.Transform.Position.Z);
-		public override Rectangle Bounds => Utilities.Math.InfiniteRectangle;
-
 		public override void Draw(DrawingSystem drawing)
 		{
 			drawing.DrawCameraBoundPrimitives(this.DrawForCamera);
 		}
+
+		public override void UpdateRenderer()
+		{ }
 
 		private IEnumerable<PrimitiveItem> DrawForCamera(Camera camera)
 		{
@@ -34,10 +32,10 @@ namespace Frozen.ECS.Components
 			Vector3 bottomLeft = camera.ScreenToWorld(bound * Vector2.UnitY, this.Transform.WorldPosition.Z);
 			Vector3 bottomRight = camera.ScreenToWorld(bound, this.Transform.WorldPosition.Z);
 
-			float minX = Utilities.Math.Min(topLeft.X, topRight.X, bottomLeft.X, bottomRight.X);
-			float maxX = Utilities.Math.Max(topLeft.X, topRight.X, bottomLeft.X, bottomRight.X);
-			float minY = Utilities.Math.Min(topLeft.Y, topRight.Y, bottomLeft.Y, bottomRight.Y);
-			float maxY = Utilities.Math.Max(topLeft.Y, topRight.Y, bottomLeft.Y, bottomRight.Y);
+			float minX = FrozenMath.Min(topLeft.X, topRight.X, bottomLeft.X, bottomRight.X);
+			float maxX = FrozenMath.Max(topLeft.X, topRight.X, bottomLeft.X, bottomRight.X);
+			float minY = FrozenMath.Min(topLeft.Y, topRight.Y, bottomLeft.Y, bottomRight.Y);
+			float maxY = FrozenMath.Max(topLeft.Y, topRight.Y, bottomLeft.Y, bottomRight.Y);
 
 			Engine.Log.Core.Debug($"{camera.Entity.Name} {minX} {maxX} {minY} {maxY}");
 
@@ -45,7 +43,7 @@ namespace Frozen.ECS.Components
 			float height = maxY - minY;
 
 			Vector2 txSize = this.Material.SpriteSheet.Texture.Bounds.Size.ToVector2() * this.Transform.Scale;
-			Vector2 repetitions = new Vector2(width, height) / txSize;  
+			Vector2 repetitions = new Vector2(width, height) / txSize;
 
 			Vector2 tlTexture = (new Vector2(minX, minY) - this.Transform.Position.XY()) / txSize;
 
@@ -67,8 +65,5 @@ namespace Frozen.ECS.Components
 			this.tList.AppendVertices(this.vertices, Renderer.QUAD_INDICES);
 			yield return this.tList;
 		}
-
-		public override void UpdateRenderer()
-		{ }
 	}
 }

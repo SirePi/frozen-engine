@@ -1,5 +1,4 @@
-﻿using Frozen.Utilities;
-using NAudio.Wave;
+﻿using NAudio.Wave;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Frozen.Audio
 {
-    internal class SineWaveGenerator : WaveGenerator
+	internal class SineWaveGenerator : WaveGenerator
 	{
 		public SineWaveGenerator(int frequency, float amplitude, int sampleRate)
 			: base(frequency, amplitude, sampleRate)
@@ -19,7 +18,7 @@ namespace Frozen.Audio
             int sampleRate = this.WaveFormat.SampleRate;
 			for (int n = 0; n < sampleCount; n++)
             {
-                buffer[n + offset] = this.Amplitude * MathF.Sin(Utilities.Math.TWO_PI * this.sample * this.Frequency / sampleRate);
+                buffer[n + offset] = this.Amplitude * MathF.Sin(FrozenMath.TWO_PI * this.sample * this.Frequency / sampleRate);
 
 				this.sample++;
                 if (this.sample >= sampleRate) 

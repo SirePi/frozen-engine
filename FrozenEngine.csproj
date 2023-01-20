@@ -14,6 +14,9 @@
 
   <ItemGroup>
     <Compile Remove="Audio\AudioContent.cs" />
+    <Compile Remove="Audio\BGMInstance.cs" />
+    <Compile Remove="Audio\BGMPlayer.cs" />
+    <Compile Remove="Audio\ThreeDSound.cs" />
     <Compile Remove="ECS\Components\Camera2d.cs" />
     <Compile Remove="ECS\Components\ShapeRenderer.cs" />
   </ItemGroup>

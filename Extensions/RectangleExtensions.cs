@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Frozen.Utilities;
 using Microsoft.Xna.Framework;
 
 namespace Frozen.Extensions
@@ -27,7 +26,7 @@ namespace Frozen.Extensions
 
 		public static bool IsInfinite(this Rectangle rect)
 		{
-			return rect == Utilities.Math.InfiniteRectangle;
+			return rect == FrozenMath.InfiniteRectangle;
 		}
 	}
 }

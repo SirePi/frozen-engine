@@ -18,7 +18,6 @@ namespace Frozen.ECS.Systems
 		internal const int SampleRate = 48000;
 		internal const float SpeedOfSound = 3400;
 
-		private readonly List<ThreeDSound> threeDsounds;
 		public SoundMixer Master { get; private set; }
 		public SoundMixer Music { get; private set; }
 		public SoundMixer SoundEffects { get; private set; }
@@ -46,9 +45,6 @@ namespace Frozen.ECS.Systems
 
 			this.buffer = new byte[bufferSize];
 
-			this.threeDsounds = new List<ThreeDSound>();
-
-			// just instantiate it once to make it faster later on
 			this.soundOutput = new DynamicSoundEffectInstance(this.Master.WaveFormat.SampleRate, AudioChannels.Stereo);
 			this.soundOutput.BufferNeeded += this.SoundOutput_BufferNeeded;
 			this.soundOutput.Play();
@@ -64,27 +60,19 @@ namespace Frozen.ECS.Systems
 			}
 		}
 
-		public AudioInstance PlayMusic(AudioSource song, float volume = 1, float fadeInMilliseconds = 0)
+		public BgmInstance PlayMusic(AudioSource song, float volume = 1)
 		{
-			AudioInstance instance = song.GetAudioInstance();
+			BgmInstance instance = song.GetMusicInstance();
+
 			this.Music.AddMixerInput(instance);
-			// this.bgm.Play(, "ya");
 
 			instance.Play();
 			return instance;
 		}
 
-		/*
-		public void PlaySongLooping(Song song)
+		public SfxInstance PlaySoundEffect(AudioSource sfx, float volume = 1, float pan = 0, float pitch = 1)
 		{
-			MediaPlayer.Play(song);
-			MediaPlayer.IsRepeating = true;
-		}
-		*/
-
-		public AudioInstance PlaySoundEffect(AudioSource sfx, float volume = 1, float pan = 0, float pitch = 1)
-		{
-			AudioInstance instance = sfx.GetAudioInstance();
+			SfxInstance instance = sfx.GetSoundEffectInstance();
 			instance.Volume = volume;
 			instance.Pan = pan;
 			instance.Pitch = pitch;
@@ -93,33 +81,6 @@ namespace Frozen.ECS.Systems
 
 			instance.Play();
 			return instance;
-		}
-
-		public AudioInstance PlaySoundEffect3D(AudioSource sfx, SoundEmitter emitter, SoundListener listener, ThreeDSoundChange type = ThreeDSoundChange.Default)
-		{
-			AudioInstance instance = this.PlaySoundEffect(sfx);
-
-			for (int i = 0; i < this.threeDsounds.Count; i++)
-			{
-				if (!this.threeDsounds[i].IsActive)
-				{
-					this.threeDsounds[i].Setup(instance, emitter, listener, type);
-					return instance;
-				}
-			}
-
-			ThreeDSound sound = new ThreeDSound();
-			sound.Setup(instance, emitter, listener, type);
-			this.threeDsounds.Add(sound);
-
-			return instance;
-		}
-
-		public void Update()
-		{
-			// this.bgm.Update();
-			foreach (ThreeDSound s3D in this.threeDsounds)
-				s3D.Update();
 		}
 	}
 }

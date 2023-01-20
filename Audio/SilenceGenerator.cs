@@ -20,8 +20,6 @@ namespace Frozen.Audio
 			}
 		}
 
-		internal static SilenceGenerator[] InstanceForMixer { get; private set; } = { Instance };
-
 		private SilenceGenerator()
 		{
 			this.SetWaveFormat(AudioSystem.SampleRate, 2);

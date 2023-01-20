@@ -1,6 +1,5 @@
 ﻿using Frozen.Drawing;
 using Frozen.ECS.Systems;
-using Frozen.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -9,12 +8,12 @@ using System.Text;
 
 namespace Frozen.ECS.Components
 {
-    public class AxisRenderer : Renderer
+	public class AxisRenderer : Renderer
     {
 		private static readonly int[] LINE_INDICES = new int[] { 0, 1, 0, 2, 0, 3 };
 
 		private readonly VertexPositionColorTexture[] vertices = new VertexPositionColorTexture[4];
-        public override Rectangle Bounds => Utilities.Math.InfiniteRectangle;
+        public override Rectangle Bounds => FrozenMath.InfiniteRectangle;
 
 		public override long RendererSortedHash => (long)this.Transform.Position.Z << 32;
 

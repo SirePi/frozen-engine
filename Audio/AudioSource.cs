@@ -12,22 +12,14 @@ namespace Frozen.Audio
 {
 	public abstract class AudioSource
 	{
-		private readonly Pool<AudioInstance> pool;
+		private readonly DerivedObjectsPool<AudioInstance> pool;
 
 		protected AudioSource()
 		{
-			this.pool = new Pool<AudioInstance>(() => this.CreateNewInstance());
+			this.pool = new DerivedObjectsPool<AudioInstance>();
 		}
 
 		internal abstract AudioProvider ToAudioProvider();
-
-		private AudioInstance CreateNewInstance()
-		{
-			AudioProvider provider = this.ToAudioProvider();
-			AudioInstance instance = new AudioInstance(provider);
-			instance.OnStateChanged += this.Instance_OnStateChanged;
-			return instance;
-		}
 
 		private void Instance_OnStateChanged(AudioInstance arg1, SoundState arg2)
 		{
@@ -35,9 +27,18 @@ namespace Frozen.Audio
 				this.pool.ReturnOne(arg1);
 		}
 
-		internal AudioInstance GetAudioInstance()
+		internal SfxInstance GetSoundEffectInstance()
 		{
-			return this.pool.GetOne();
+			SfxInstance instance = this.pool.GetOne(() => new SfxInstance(this.ToAudioProvider()));
+			instance.OnStateChanged += this.Instance_OnStateChanged;
+			return instance;
+		}
+
+		internal BgmInstance GetMusicInstance()
+		{
+			BgmInstance instance = this.pool.GetOne(() => new BgmInstance(this.ToAudioProvider()));
+			instance.OnStateChanged += this.Instance_OnStateChanged;
+			return instance;
 		}
 
 		public static GeneratedAudioSource SineWave(int frequency = 400, float amplitude = .25f, int sampleRate = 48000)

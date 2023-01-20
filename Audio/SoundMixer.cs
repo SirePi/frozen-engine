@@ -10,17 +10,19 @@ namespace Frozen.Audio
 {
 	public class SoundMixer : ISampleProvider
 	{
+		private static readonly ISampleProvider[] silence = new ISampleProvider[] { SilenceGenerator.Instance };
+
 		private readonly MixingSampleProvider mixer;
 		private readonly VolumeSampleProvider volume;
 		private readonly Dictionary<ISampleProvider, ISampleProvider> resampledProviders;
 
-		public float Volume { get => this.volume.Volume; set => this.volume.Volume = value; }
+		public float Volume { get => this.volume.Volume; set => this.volume.Volume = MathF.Max(value, 0); }
 
 		internal SoundMixer()
 		{
 			this.resampledProviders = new Dictionary<ISampleProvider, ISampleProvider>();
 
-			this.mixer = new MixingSampleProvider(SilenceGenerator.InstanceForMixer);
+			this.mixer = new MixingSampleProvider(silence);
 			this.volume = new VolumeSampleProvider(this.mixer);
 		}
 
@@ -47,6 +49,10 @@ namespace Frozen.Audio
 
 		public int Read(float[] buffer, int offset, int count)
 		{
+			foreach (ISampleProvider provider in this.resampledProviders.Keys)
+				if (provider is AudioInstance ai)
+					ai.Update();
+
 			return this.volume.Read(buffer, offset, count);
 		}
 	}

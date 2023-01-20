@@ -71,7 +71,7 @@ namespace Frozen.Drawing
 	internal class TriangleList : PrimitiveItem
 	{
 		public override Material Material { get; protected set; }
-		protected override Func<int, bool> ValidateVertices => Utilities.Math.IsMultipleOf3;
+		protected override Func<int, bool> ValidateVertices => FrozenMath.IsMultipleOf3;
 		protected override int VerticesPerPrimitive => 3;
 
 		public TriangleList() : base(PrimitiveType.TriangleList)
@@ -87,7 +87,7 @@ namespace Frozen.Drawing
 	internal class LinesList : PrimitiveItem
 	{
 		public override Material Material { get; protected set; } = Material.FlatColor;
-		protected override Func<int, bool> ValidateVertices => Utilities.Math.IsMultipleOf2;
+		protected override Func<int, bool> ValidateVertices => FrozenMath.IsMultipleOf2;
 		protected override int VerticesPerPrimitive => 2;
 
 		public LinesList() : base(PrimitiveType.LineList)
