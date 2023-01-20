@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Frozen.Utilities
 {
 	public sealed class Pool<T> where T : class
 	{
 		private readonly Func<T> factory;
+
 		private readonly Queue<T> pool = new Queue<T>();
 
 		public Pool(Func<T> factory)

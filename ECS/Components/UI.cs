@@ -1,16 +1,11 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Myra;
-using Myra.Graphics2D.UI;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Myra.Graphics2D.UI;
 
 namespace Frozen.ECS.Components
 {
 	public abstract class UI : Component
 	{
 		protected readonly Desktop desktop;
+
 		public bool IsMouseOverGUI => this.desktop.IsMouseOverGUI;
 
 		public UI()

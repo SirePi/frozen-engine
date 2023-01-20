@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 using Frozen.ECS.Components;
 using Frozen.ECS.Systems;
 using Frozen.Enums;
@@ -16,14 +12,17 @@ namespace Frozen.Audio
 	public abstract class AudioInstance : ISampleProvider
 	{
 		protected readonly AudioProvider source;
+
 		private readonly VolumeSampleProvider volume;
 
 		public event Action<AudioInstance, SoundState> OnStateChanged;
 
 		public float Volume { get => this.volume.Volume; set => this.volume.Volume = MathF.Max(value, 0); }
+
 		public TimeSpan TimeLeft => this.source.TimeLeft;
 
 		private SoundState state;
+
 		public SoundState State
 		{
 			get => this.state;
@@ -47,6 +46,7 @@ namespace Frozen.Audio
 		}
 
 		protected abstract ISampleProvider SetupPipeline();
+
 		internal abstract void Update();
 
 		public void Play()
@@ -74,7 +74,7 @@ namespace Frozen.Audio
 
 		public int Read(float[] buffer, int offset, int count)
 		{
-			switch(this.State)
+			switch (this.State)
 			{
 				case SoundState.Playing:
 					int read = this.volume.Read(buffer, offset, count);
@@ -95,11 +95,17 @@ namespace Frozen.Audio
 	public class SfxInstance : AudioInstance
 	{
 		private PanningSampleProvider pan;
+
 		private SmbPitchShiftingSampleProvider pitch;
+
 		private SoundEmitter emitter;
+
 		private SoundListener listener;
+
 		private bool updatePitch;
+
 		private bool updatePan;
+
 		private bool updateVolume;
 
 		public float Pan
@@ -184,7 +190,9 @@ namespace Frozen.Audio
 	public class BgmInstance : AudioInstance
 	{
 		private float targetVolume = 0;
+
 		private float volumeDelta = 0;
+
 		private float volumeLimit = 0;
 
 		internal BgmInstance(AudioProvider provider) : base(provider)
@@ -215,7 +223,7 @@ namespace Frozen.Audio
 			{
 				this.targetVolume = targetVolume;
 				this.volumeDelta = (targetVolume - this.Volume) / fadeSeconds;
-				this.volumeLimit = targetVolume + (this.volumeDelta * 2);	// just to be sure
+				this.volumeLimit = targetVolume + (this.volumeDelta * 2);   // just to be sure
 			}
 		}
 

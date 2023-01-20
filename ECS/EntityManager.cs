@@ -1,24 +1,28 @@
-﻿using Frozen.ECS.Components;
-using Microsoft.Xna.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using Frozen.ECS.Components;
 
 namespace Frozen.ECS
 {
 	internal class EntityManager
 	{
 		private readonly HashSet<Entity> entities = new HashSet<Entity>();
+
 		private readonly HashSet<Entity> pendingEntities = new HashSet<Entity>();
+
 		private readonly HashSet<Entity> removedEntities = new HashSet<Entity>();
 
 		public event Action<Entity> OnEntityAdded;
+
 		public event Action<Entity> OnEntityRemoved;
+
 		public event Action<Entity, Component> OnComponentAdded;
+
 		public event Action<Entity, Component> OnComponentRemoved;
 
-		internal EntityManager() { }
+		internal EntityManager()
+		{ }
 
 		internal void Update()
 		{
@@ -94,7 +98,6 @@ namespace Frozen.ECS
 		{
 			return this.GetActiveEntities().SelectMany(e => e.GetAll<T>()).Where(predicate);
 		}
-
 
 		internal IEnumerable<Entity> GetActiveEntities()
 		{

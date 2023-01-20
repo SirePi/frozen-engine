@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -10,11 +8,12 @@ namespace Frozen.Drawing
 	{
 		private Texture2D texture;
 
-		public Texture2D Texture 
+		public Texture2D Texture
 		{
 			get => this.texture;
 			set => this.texture = value ?? throw new ArgumentNullException(nameof(this.Texture));
 		}
+
 		public Atlas Atlas { get; private set; }
 
 		public Sprite(Texture2D texture)
@@ -22,19 +21,19 @@ namespace Frozen.Drawing
 			this.Texture = texture;
 			this.Atlas = Atlas.SingleSprite();
 		}
-		
+
 		public Sprite(Texture2D texture, int rows, int columns)
 		{
 			this.Texture = texture;
 			this.Atlas = Atlas.FromGrid(rows, columns);
 		}
 
-		public Rectangle this[int spriteIndex] 
+		public Rectangle this[int spriteIndex]
 		{
 			get => this.GetRealRectangle(this.Atlas[spriteIndex]);
 		}
 
-		public Rectangle this[string spriteName] 
+		public Rectangle this[string spriteName]
 		{
 			get => this.GetRealRectangle(this.Atlas[spriteName]);
 		}

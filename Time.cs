@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.Xna.Framework;
 
 namespace Frozen
@@ -8,9 +6,13 @@ namespace Frozen
 	public static class Time
 	{
 		public static TimeSpan TotalGameTime { get; private set; }
+
 		public static float TotalGameSeconds { get; private set; }
+
 		public static float FrameSeconds { get; private set; }
+
 		public static float FrameMilliseconds { get; private set; }
+
 		public static bool IsRunningSlowly { get; private set; }
 
 		static Time()

@@ -1,9 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Frozen.Drawing
+﻿namespace Frozen.Drawing
 {
 	/*
 	public abstract class Shape

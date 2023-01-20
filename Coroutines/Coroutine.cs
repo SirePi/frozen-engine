@@ -9,6 +9,7 @@ namespace Frozen.Coroutines
 	public sealed class Coroutine
 	{
 		private WaitUntil currentCondition;
+
 		private IEnumerator<WaitUntil> enumerator = null;
 
 		/// <summary>

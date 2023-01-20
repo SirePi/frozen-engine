@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Microsoft.Xna.Framework;
 
 namespace Frozen
@@ -18,6 +17,7 @@ namespace Frozen
 		{
 			return (byte)(r.Next() % 256);
 		}
+
 		/// <summary>
 		/// Returns a random byte.
 		/// </summary>
@@ -27,6 +27,7 @@ namespace Frozen
 		{
 			return (byte)(r.Next() % ((int)max + 1));
 		}
+
 		/// <summary>
 		/// Returns a random byte.
 		/// </summary>
@@ -46,6 +47,7 @@ namespace Frozen
 		{
 			return (float)r.NextDouble();
 		}
+
 		/// <summary>
 		/// Returns a random float.
 		/// </summary>
@@ -55,6 +57,7 @@ namespace Frozen
 		{
 			return max * (float)r.NextDouble();
 		}
+
 		/// <summary>
 		/// Returns a random float.
 		/// </summary>
@@ -84,6 +87,7 @@ namespace Frozen
 			float angle = r.NextFloat(0.0f, MathHelper.TwoPi);
 			return new Vector2(MathF.Sin(angle), -MathF.Cos(angle));
 		}
+
 		/// <summary>
 		/// Returns a random <see cref="Vector2"/>.
 		/// </summary>
@@ -94,6 +98,7 @@ namespace Frozen
 			float angle = r.NextFloat(0.0f, MathHelper.TwoPi);
 			return new Vector2(MathF.Sin(angle), -MathF.Cos(angle)) * radius;
 		}
+
 		/// <summary>
 		/// Returns a random <see cref="Vector2"/>.
 		/// </summary>
@@ -104,6 +109,7 @@ namespace Frozen
 		{
 			return r.NextVector2(r.NextFloat(minRadius, maxRadius));
 		}
+
 		/// <summary>
 		/// Returns a random <see cref="Vector2"/> pointing to a position inside the specified rect.
 		/// </summary>
@@ -116,6 +122,7 @@ namespace Frozen
 		{
 			return new Vector2(r.NextFloat(x, x + w), r.NextFloat(y, y + h));
 		}
+
 		/// <summary>
 		/// Returns a random <see cref="Vector2"/> pointing to a position inside the specified rect.
 		/// </summary>
@@ -138,6 +145,7 @@ namespace Frozen
 			rot *= Quaternion.CreateFromAxisAngle(Vector3.UnitY, r.NextFloat(MathHelper.TwoPi));
 			return Vector3.Transform(Vector3.UnitX, rot);
 		}
+
 		/// <summary>
 		/// Returns a random <see cref="Vector3"/>.
 		/// </summary>
@@ -151,6 +159,7 @@ namespace Frozen
 			rot *= Quaternion.CreateFromAxisAngle(Vector3.UnitY, r.NextFloat(MathHelper.TwoPi));
 			return Vector3.Transform(new Vector3(radius, 0, 0), rot);
 		}
+
 		/// <summary>
 		/// Returns a random <see cref="Vector3"/>.
 		/// </summary>
@@ -161,6 +170,7 @@ namespace Frozen
 		{
 			return r.NextVector3(r.NextFloat(minRadius, maxRadius));
 		}
+
 		/// <summary>
 		/// Returns a random <see cref="Vector3"/> pointing to a position inside the specified cube.
 		/// </summary>
@@ -184,6 +194,7 @@ namespace Frozen
 		{
 			return ColorExtensions.FromHSV(r.NextFloat(), 1.0f, 1.0f);
 		}
+
 		/// <summary>
 		/// Returns a component-wise random <see cref="Color"/>.
 		/// </summary>
@@ -198,6 +209,7 @@ namespace Frozen
 				r.NextByte(min.B, max.B),
 				r.NextByte(min.A, max.A));
 		}
+
 		/// <summary>
 		/// Returns a random value from a weighted value pool.
 		/// </summary>
@@ -222,6 +234,7 @@ namespace Frozen
 
 			return default(T);
 		}
+
 		/// <summary>
 		/// Returns a random value from a weighted value pool.
 		/// </summary>
@@ -233,6 +246,7 @@ namespace Frozen
 		{
 			return OneOfWeighted<T>(r, values, weights as IEnumerable<float>);
 		}
+
 		/// <summary>
 		/// Returns a random value from a weighted value pool.
 		/// </summary>
@@ -252,6 +266,7 @@ namespace Frozen
 
 			return default(T);
 		}
+
 		/// <summary>
 		/// Returns a random value from a weighted value pool.
 		/// </summary>
@@ -262,6 +277,7 @@ namespace Frozen
 		{
 			return OneOfWeighted<T>(r, weightedValues as IEnumerable<KeyValuePair<T, float>>);
 		}
+
 		/// <summary>
 		/// Returns a random value from a weighted value pool.
 		/// </summary>

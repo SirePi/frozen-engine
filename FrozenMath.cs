@@ -14,6 +14,7 @@ namespace Frozen
 			.ToArray();
 
 		public static Rectangle InfiniteRectangle { get; private set; } = new Rectangle(int.MinValue, int.MinValue, int.MaxValue, int.MaxValue);
+
 		public static bool IsBetween(float value, float a, float b)
 		{
 			if (a < b)

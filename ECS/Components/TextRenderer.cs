@@ -1,11 +1,10 @@
-﻿using Frozen.Drawing;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Frozen.Drawing;
 using Frozen.ECS.Systems;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Frozen.ECS.Components
 {
@@ -20,22 +19,31 @@ namespace Frozen.ECS.Components
 		private class TextPart
 		{
 			public string Text { get; set; }
+
 			public float Width { get; set; }
 		}
 
 		private class GlyphInfo
 		{
 			public SpriteFont.Glyph Glyph { get; set; }
+
 			public float UVTop { get; set; }
+
 			public float UVBottom { get; set; }
+
 			public float UVLeft { get; set; }
+
 			public float UVRight { get; set; }
 		}
 
 		public Rectangle Rect { get; set; } = Rectangle.Empty;
+
 		public Color ColorTint { get; set; } = Color.White;
+
 		public override long RendererSortedHash => (long)this.Transform.Position.Z << 32 + this.Font.GetHashCode();
+
 		public override Rectangle Bounds => this.Rect;
+
 		public float MaxWidth
 		{
 			get => this.maxWidth;
@@ -79,6 +87,7 @@ namespace Frozen.ECS.Components
 				this.material = Material.AlphaBlendedSprite(new Sprite(this.font.Texture));
 			}
 		}
+
 		public string Text
 		{
 			get => this.text;
@@ -90,16 +99,25 @@ namespace Frozen.ECS.Components
 		}
 
 		private VertexPositionColorTexture[] vertices;
+
 		private int[] indices;
+
 		private string text;
+
 		private float maxWidth;
+
 		private float spaceWidth;
+
 		private float lineHeight;
+
 		private bool dirtyText;
+
 		private SpriteFont font;
+
 		private Dictionary<char, GlyphInfo> glyphs;
+
 		private Material material;
-		
+
 		public TextRenderer()
 		{
 			this.Font = Frozen.Engine.ContentProvider.DefaultContent.Get<SpriteFont>("Arial.xnb");

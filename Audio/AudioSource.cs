@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Frozen.Utilities;
 using Microsoft.Xna.Framework.Audio;
 using NAudio.Vorbis;
@@ -55,6 +53,7 @@ namespace Frozen.Audio
 	public class FileAudioSource : AudioSource
 	{
 		private readonly byte[] source;
+
 		private readonly WaveFormat waveFormat;
 
 		internal FileAudioSource(string filename) : base()
@@ -104,6 +103,7 @@ namespace Frozen.Audio
 	public class GeneratedAudioSource : AudioSource
 	{
 		public WaveGenerator Generator { get; private set; }
+
 		internal GeneratedAudioSource(WaveGenerator generator)
 		{
 			this.Generator = generator;

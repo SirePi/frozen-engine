@@ -1,16 +1,17 @@
 ﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Frozen.ECS.Components
 {
 	public sealed class Transform : Component
 	{
 		private Vector3 lastPosition;
+
 		private Vector3 position;
+
 		private float rotation;
+
 		private float scale = 1;
+
 		private Matrix transformMatrix = Matrix.Identity;
 
 		public new bool IsActive => true;
@@ -24,6 +25,7 @@ namespace Frozen.ECS.Components
 				this.UpdateMatrix();
 			}
 		}
+
 		public float Rotation
 		{
 			get => this.rotation;
@@ -34,7 +36,7 @@ namespace Frozen.ECS.Components
 			}
 		}
 
-		public float Scale 
+		public float Scale
 		{
 			get => this.scale;
 			set

@@ -1,16 +1,12 @@
-﻿using Frozen.ECS.Components;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Frozen.Input
 {
 	public class MouseManager
 	{
 		private MouseState lastFrameState;
+
 		private MouseState currentFrameState;
 
 		internal MouseManager()
@@ -45,8 +41,11 @@ namespace Frozen.Input
 		}
 
 		public Point Delta => this.currentFrameState.Position - this.lastFrameState.Position;
+
 		public Point Position => this.currentFrameState.Position;
+
 		public int HorizontalScrollWheelDelta => this.currentFrameState.HorizontalScrollWheelValue - this.lastFrameState.HorizontalScrollWheelValue;
+
 		public int ScrollWheelDelta => this.currentFrameState.ScrollWheelValue - this.lastFrameState.ScrollWheelValue;
 	}
 }

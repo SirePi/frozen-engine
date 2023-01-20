@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using FontStashSharp;
 using Frozen.Drawing;
 using Microsoft.Xna.Framework;
@@ -35,7 +34,6 @@ namespace Frozen
 			sb.Begin();
 			font.DrawText(sb, str, Vector2.Zero, Color.White);
 			sb.End();
-
 
 			return new SpriteFont(rt, bounds, bounds.Select(r => new Rectangle(0, r.Top, r.Width, r.Height)).ToList(), str.ToList(), font.LineHeight, 0, bounds.Select(r => new Vector3(1, r.Width, 1)).ToList(), '?');
 		}

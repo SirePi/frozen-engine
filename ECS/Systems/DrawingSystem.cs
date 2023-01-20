@@ -1,21 +1,20 @@
-﻿using Frozen.Drawing;
+﻿using System;
+using System.Collections.Generic;
+using Frozen.Drawing;
 using Frozen.ECS.Components;
-using Frozen.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Frozen.ECS.Systems
 {
 	public class DrawingSystem
 	{
 		private readonly List<DrawItem> drawables = new List<DrawItem>();
+
 		private int drawablesUsed;
 
 		private readonly SpriteBatch batch;
+
 		private readonly GraphicsDevice device;
 
 		internal DrawingSystem(GraphicsDevice device)
@@ -36,7 +35,7 @@ namespace Frozen.ECS.Systems
 
 			this.device.SetRenderTarget(null);
 			this.device.Clear(Color.Black);
-			
+
 			foreach (Camera camera in scene.GetCameras())
 			{
 				this.device.SetRenderTarget(camera.RenderTarget);
@@ -123,7 +122,6 @@ namespace Frozen.ECS.Systems
 			return result;
 		}
 
-
 		/// <summary>
 		/// Adds indexed triangles to be rendered as flat colored texture. The TextureCoordinates information in the <paramref name="vertices"/> array is discarded.
 		/// </summary>
@@ -175,7 +173,6 @@ namespace Frozen.ECS.Systems
 
 		public void DrawString(Vector3 position, SpriteFont font)
 		{
-
 		}
 	}
 }

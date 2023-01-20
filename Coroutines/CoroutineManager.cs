@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 
@@ -13,8 +12,9 @@ namespace Frozen.Coroutines
 		private static GameTime TimeZero = new GameTime();
 
 		private readonly Queue<Coroutine> pool = new Queue<Coroutine>(64);
-		
+
 		private Queue<Coroutine> currentCycle = new Queue<Coroutine>(256);
+
 		private Queue<Coroutine> nextCycle = new Queue<Coroutine>(256);
 
 		/// <summary>

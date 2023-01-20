@@ -1,19 +1,17 @@
-﻿using Frozen.Coroutines;
-using Frozen.ECS.Components;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using Frozen.Coroutines;
+using Frozen.ECS.Components;
 
 namespace Frozen.ECS
 {
 	public abstract class Scene
 	{
 		private static Dictionary<Type, Scene> scenesDictionary = new Dictionary<Type, Scene>();
+
 		public static Scene Current => Engine.Game.CurrentScene;
+
 		public static void SwitchTo<T>() where T : Scene, new()
 		{
 			Type t = typeof(T);
@@ -25,8 +23,11 @@ namespace Frozen.ECS
 		}
 
 		private readonly EntityManager entityManager = new EntityManager();
+
 		private readonly CoroutineManager coroutineManager = new CoroutineManager();
+
 		private readonly HashSet<Renderer> renderers = new HashSet<Renderer>();
+
 		private readonly HashSet<UI> uis = new HashSet<UI>();
 
 		public int EntitiesCount => this.entityManager.GetEntities().Count();
@@ -42,10 +43,18 @@ namespace Frozen.ECS
 		}
 
 		public abstract void Build();
-		public virtual void AfterSwitchingFrom() { }
-		public virtual void BeforeSwitchingFrom() { }
-		public virtual void AfterSwitchingTo() { }
-		public virtual void BeforeSwitchingTo() { }
+
+		public virtual void AfterSwitchingFrom()
+		{ }
+
+		public virtual void BeforeSwitchingFrom()
+		{ }
+
+		public virtual void AfterSwitchingTo()
+		{ }
+
+		public virtual void BeforeSwitchingTo()
+		{ }
 
 		public virtual void Update()
 		{

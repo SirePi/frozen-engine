@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Audio;
-
-namespace Frozen.ECS.Components
+﻿namespace Frozen.ECS.Components
 {
 	public class SoundEmitter : Component
 	{

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework;
 
 namespace Frozen.Drawing
 {
@@ -25,15 +23,18 @@ namespace Frozen.Drawing
 			for (int r = 0; r < rows; r++)
 				for (int c = 0; c < columns; c++)
 					result.sprites.Add(new UVRect(x * c, y * r, x, y));
-			
+
 			return result;
 		}
 
 		private readonly List<UVRect> sprites = new List<UVRect>();
+
 		private readonly Dictionary<string, UVRect> atlas = new Dictionary<string, UVRect>();
+
 		private readonly Dictionary<string, Frame[]> animations = new Dictionary<string, Frame[]>();
 
-		private Atlas() { }
+		private Atlas()
+		{ }
 
 		public UVRect this[int spriteIndex] => this.sprites[spriteIndex];
 

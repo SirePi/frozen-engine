@@ -1,8 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Frozen.Drawing
 {
@@ -11,12 +8,17 @@ namespace Frozen.Drawing
 		public static Material FlatColor { get; private set; } = new Material(DefaultGraphics.FlatColor);
 
 #pragma warning disable IDE0022 // Use block body for methods - suppressed for clarity
+
 		public static Material AlphaBlendedSprite(Sprite spriteSheet) => new Material(DefaultGraphics.AlphaTestTexture, null, spriteSheet);
+
 		public static Material AdditiveSprite(Sprite spriteSheet) => new Material(DefaultGraphics.AlphaTestTexture, BlendState.Additive, spriteSheet);
+
 		public static Material FromSprite(Sprite spriteSheet) => new Material(DefaultGraphics.DefaultTexture, BlendState.NonPremultiplied, spriteSheet);
+
 #pragma warning restore IDE0022 // Use block body for methods
 
 		private Sprite spriteSheet;
+
 		public Sprite SpriteSheet
 		{
 			get => this.spriteSheet;
@@ -33,10 +35,11 @@ namespace Frozen.Drawing
 		public BlendState BlendState { get; private set; }
 
 		public Effect Effect { get; private set; }
+
 		public EffectParameterCollection EffectParameters => this.Effect.Parameters;
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="effect"></param>
 		/// <param name="blendState">If null, defaults to BlendState.AlphaBlend</param>

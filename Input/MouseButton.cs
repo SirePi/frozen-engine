@@ -1,16 +1,17 @@
 ﻿using Microsoft.Xna.Framework.Input;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Frozen.Input
 {
 	public enum MouseButton : byte
 	{
 		LeftButton,
+
 		MiddleButton,
+
 		RightButton,
+
 		XButton1,
+
 		XButton2
 	}
 

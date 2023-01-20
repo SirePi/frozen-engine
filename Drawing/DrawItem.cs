@@ -1,28 +1,29 @@
-﻿using Frozen.ECS.Components;
-using Frozen.ECS.Systems;
-using Frozen.Utilities;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Frozen.ECS.Components;
+using Frozen.Utilities;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Frozen.Drawing
 {
 	public abstract class DrawItem
 	{
 		public abstract void Draw(GraphicsDevice device, Camera camera);
+
 		public abstract void Clean();
 	}
 
 	public abstract class PrimitiveItem : DrawItem
-	{ 
+	{
 		protected ExpandingArray<VertexPositionColorTexture> vertices;
+
 		protected ExpandingArray<int> indices;
 
 		public abstract Material Material { get; protected set; }
+
 		protected abstract Func<int, bool> ValidateVertices { get; }
+
 		protected abstract int VerticesPerPrimitive { get; }
 
 		public PrimitiveType PrimitiveType { get; private set; }
@@ -42,7 +43,7 @@ namespace Frozen.Drawing
 
 		public void AppendVertices(VertexPositionColorTexture[] vertices, int[] indices)
 		{
-			if(!this.ValidateVertices(indices.Length))
+			if (!this.ValidateVertices(indices.Length))
 				throw new ArgumentException("Not enough vertices");
 
 			// Offsetting indices to match the inserted vertices
@@ -71,7 +72,9 @@ namespace Frozen.Drawing
 	internal class TriangleList : PrimitiveItem
 	{
 		public override Material Material { get; protected set; }
+
 		protected override Func<int, bool> ValidateVertices => FrozenMath.IsMultipleOf3;
+
 		protected override int VerticesPerPrimitive => 3;
 
 		public TriangleList() : base(PrimitiveType.TriangleList)
@@ -87,7 +90,9 @@ namespace Frozen.Drawing
 	internal class LinesList : PrimitiveItem
 	{
 		public override Material Material { get; protected set; } = Material.FlatColor;
+
 		protected override Func<int, bool> ValidateVertices => FrozenMath.IsMultipleOf2;
+
 		protected override int VerticesPerPrimitive => 2;
 
 		public LinesList() : base(PrimitiveType.LineList)

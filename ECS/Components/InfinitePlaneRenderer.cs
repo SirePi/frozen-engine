@@ -13,9 +13,13 @@ namespace Frozen.ECS.Components
 		private readonly VertexPositionColorTexture[] vertices = new VertexPositionColorTexture[4];
 
 		public override Rectangle Bounds => FrozenMath.InfiniteRectangle;
+
 		public Color ColorTint { get; set; } = Color.White;
+
 		public Material Material { get; set; }
+
 		public override long RendererSortedHash => this.Material.DefaultSortingHash(this.Transform.Position.Z);
+
 		public override void Draw(DrawingSystem drawing)
 		{
 			drawing.DrawCameraBoundPrimitives(this.DrawForCamera);

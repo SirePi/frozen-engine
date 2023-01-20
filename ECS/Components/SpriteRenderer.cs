@@ -3,16 +3,15 @@ using Frozen.ECS.Systems;
 using Frozen.Extensions;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Frozen.ECS.Components
 {
 	public class SpriteRenderer : Renderer
 	{
 		private readonly VertexPositionColorTexture[] vertices = new VertexPositionColorTexture[4];
+
 		private Material material;
+
 		private int spriteIndex;
 
 		public Material Material
@@ -27,14 +26,17 @@ namespace Frozen.ECS.Components
 				}
 			}
 		}
+
 		public Rectangle Rect { get; set; } = Rectangle.Empty;
+
 		public Color ColorTint { get; set; } = Color.White;
-		public int SpriteIndex 
+
+		public int SpriteIndex
 		{
 			get => this.spriteIndex;
 			set
 			{
-				if(this.spriteIndex != value)
+				if (this.spriteIndex != value)
 				{
 					this.spriteIndex = value;
 					this.UpdateRect();
@@ -43,6 +45,7 @@ namespace Frozen.ECS.Components
 		}
 
 		public override long RendererSortedHash => this.material.DefaultSortingHash(this.Transform.Position.Z);
+
 		public override Rectangle Bounds => this.Rect;
 
 		private void UpdateRect()

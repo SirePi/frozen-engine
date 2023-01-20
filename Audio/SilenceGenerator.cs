@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Frozen.ECS.Systems;
+﻿using Frozen.ECS.Systems;
 using NAudio.Wave;
 
 namespace Frozen.Audio
@@ -9,6 +6,7 @@ namespace Frozen.Audio
 	internal class SilenceGenerator : WaveProvider32
 	{
 		private static SilenceGenerator instance;
+
 		public static SilenceGenerator Instance
 		{
 			get

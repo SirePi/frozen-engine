@@ -1,10 +1,5 @@
-﻿using Frozen.ECS.Components;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Frozen.Input
 {
@@ -13,6 +8,7 @@ namespace Frozen.Input
 		private readonly PlayerIndex player;
 
 		private GamePadState lastFrameState;
+
 		private GamePadState currentFrameState;
 
 		internal GamePadManager(PlayerIndex player)

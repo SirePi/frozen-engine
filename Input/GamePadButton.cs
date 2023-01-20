@@ -1,22 +1,29 @@
 ﻿using Microsoft.Xna.Framework.Input;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Frozen.Input
 {
 	public enum GamePadButton : byte
 	{
 		A,
+
 		B,
+
 		Back,
+
 		BigButton,
+
 		LeftShoulder,
+
 		LeftStick,
+
 		RightShoulder,
+
 		RightStick,
+
 		Start,
+
 		X,
+
 		Y
 	}
 
@@ -45,8 +52,11 @@ namespace Frozen.Input
 	public enum DPad
 	{
 		Up,
+
 		Down,
+
 		Left,
+
 		Right
 	}
 

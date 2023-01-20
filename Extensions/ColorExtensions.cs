@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.Xna.Framework;
 
 namespace Frozen
@@ -12,10 +10,10 @@ namespace Frozen
 		{
 			float H = h;
 
-			while (H < 0) 
+			while (H < 0)
 				H += 360;
 
-			while (H >= 360) 
+			while (H >= 360)
 				H -= 360;
 
 			float R, G, B;
@@ -24,7 +22,6 @@ namespace Frozen
 				R = G = B = 0;
 			else if (S <= 0)
 				R = G = B = V;
-			
 			else
 			{
 				float hf = H / 60;
@@ -50,6 +47,7 @@ namespace Frozen
 						G = V;
 						B = pv;
 						break;
+
 					case 2:
 						R = pv;
 						G = V;
@@ -62,6 +60,7 @@ namespace Frozen
 						G = qv;
 						B = V;
 						break;
+
 					case 4:
 						R = tv;
 						G = pv;
@@ -81,6 +80,7 @@ namespace Frozen
 						G = tv;
 						B = pv;
 						break;
+
 					case -1:
 						R = V;
 						G = pv;

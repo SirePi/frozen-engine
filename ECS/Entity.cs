@@ -1,31 +1,38 @@
-﻿using Microsoft.Xna.Framework;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Frozen.ECS
 {
 	public class Entity : IEnumerable<Component>, IDisposable
 	{
 		private static readonly Component[] NoComponents = new Component[0];
+
 		private readonly Dictionary<Type, Component> components = new Dictionary<Type, Component>();
+
 		private readonly HashSet<Entity> children = new HashSet<Entity>();
 
 		private Component[] updateOrderedComponents;
+
 		private bool disposedValue;
+
 		private bool dirtyComponents;
 
 		private Entity parent;
 
 		public event Action<Entity, Component> OnComponentAdded;
+
 		public event Action<Entity, Component> OnComponentRemoved;
+
 		public event Action<Entity> OnParentChanged;
 
 		public string Name { get; private set; }
+
 		public object Tag { get; set; }
+
 		public bool IsActive { get; set; } = true;
+
 		public IEnumerable<Entity> Children => this.children;
 
 		public Entity Parent
@@ -36,7 +43,7 @@ namespace Frozen.ECS
 				Scene oldScene = this.Scene;
 				Scene newScene = value?.Scene;
 
-				if(oldScene != newScene)
+				if (oldScene != newScene)
 				{
 					oldScene?.Remove(this);
 					newScene?.Add(this);
@@ -130,7 +137,7 @@ namespace Frozen.ECS
 
 		public Component Get(Type componentType)
 		{
-			foreach(KeyValuePair<Type, Component> kvp in this.components)
+			foreach (KeyValuePair<Type, Component> kvp in this.components)
 			{
 				if (kvp.Key == componentType || kvp.Key.IsSubclassOf(componentType))
 					return kvp.Value;
@@ -138,7 +145,7 @@ namespace Frozen.ECS
 			return null;
 		}
 
-		public IEnumerable<T> GetAll<T>() where T: Component
+		public IEnumerable<T> GetAll<T>() where T : Component
 		{
 			Type componentType = typeof(T);
 			foreach (KeyValuePair<Type, Component> kvp in this.components)

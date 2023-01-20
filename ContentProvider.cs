@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using FontStashSharp;
 using Frozen.Audio;
 using Frozen.Drawing;
@@ -16,12 +15,17 @@ namespace Frozen
 	public class ContentProvider
 	{
 		private Dictionary<string, object> cache = new Dictionary<string, object>();
+
 		private Dictionary<string, FontSystem> fontCache = new Dictionary<string, FontSystem>();
+
 		private Dictionary<string, Texture2D> textureCache = new Dictionary<string, Texture2D>();
+
 		private Dictionary<string, AudioSource> audioCache = new Dictionary<string, AudioSource>();
 
 		private bool audioEnabled = true;
+
 		private Game game;
+
 		internal DefaultContent DefaultContent { get; private set; }
 
 		internal ContentProvider(Game game)
@@ -47,14 +51,14 @@ namespace Frozen
 
 			try
 			{
-				if(this.cache.TryGetValue(assetName, out object cachedAsset) && cachedAsset is T typedAsset)
+				if (this.cache.TryGetValue(assetName, out object cachedAsset) && cachedAsset is T typedAsset)
 					return typedAsset;
 
 				T asset = this.game.Content.Load<T>(assetName);
 				this.cache[assetName] = asset;
 				return asset;
 			}
-			catch(NoAudioHardwareException)
+			catch (NoAudioHardwareException)
 			{
 				this.audioEnabled = false;
 				return default;
@@ -118,7 +122,6 @@ namespace Frozen
 				T asset = this.game.Content.LoadLocalized<T>(assetName);
 				this.cache[assetName] = asset;
 				return asset;
-
 			}
 			catch (NoAudioHardwareException)
 			{

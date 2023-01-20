@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
 using NLog;
 using NLog.Targets;
 
@@ -15,6 +12,7 @@ namespace Frozen.Utilities
 		/// The default Core logger; should be used for engine-related logs
 		/// </summary>
 		public Logger Core { get; private set; }
+
 		/// <summary>
 		/// The default Game logger; should be used for gameplay-related logs
 		/// </summary>

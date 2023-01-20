@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Text;
 using NAudio.Wave;
 
 namespace Frozen.Audio
@@ -9,9 +6,13 @@ namespace Frozen.Audio
 	public abstract class AudioProvider
 	{
 		internal ISampleProvider SampleProvider { get; private set; }
+
 		internal WaveFormat WaveFormat { get; private set; }
+
 		internal abstract void Reset();
+
 		public abstract TimeSpan TimeLeft { get; }
+
 		public abstract bool IsActive { get; }
 
 		protected AudioProvider(ISampleProvider provider, WaveFormat waveFormat)
@@ -31,6 +32,7 @@ namespace Frozen.Audio
 		}
 
 		public override bool IsActive => this.stream.Position < this.stream.Length;
+
 		public override TimeSpan TimeLeft => this.stream.TotalTime - this.stream.CurrentTime;
 
 		internal override void Reset()
@@ -49,6 +51,7 @@ namespace Frozen.Audio
 		}
 
 		public override bool IsActive => true;
+
 		public override TimeSpan TimeLeft => TimeSpan.Zero;
 
 		internal override void Reset()

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.Xna.Framework;
 
 namespace Frozen.Coroutines
 {
@@ -13,7 +10,9 @@ namespace Frozen.Coroutines
 		private enum WaitType
 		{
 			Frames,
+
 			GameTime,
+
 			RealTime
 		}
 
@@ -23,6 +22,7 @@ namespace Frozen.Coroutines
 		public static readonly WaitUntil NextFrame = new WaitUntil(1, WaitType.Frames);
 
 		private readonly WaitType type;
+
 		private float internalValue;
 
 		public bool IsComplete

@@ -1,22 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.IO;
-using System.Reflection;
-using System.Text;
-using Frozen.ECS;
+﻿using Frozen.ECS;
 using Frozen.Input;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content;
-using Frozen.ECS.Systems;
 
 namespace Frozen
 {
 	public abstract class Game : Microsoft.Xna.Framework.Game
 	{
 		protected abstract Scene StartingScene { get; }
+
 		internal Scene CurrentScene { get; private set; }
+
 		private Scene nextScene;
+
 		protected GraphicsDeviceManager graphics;
 
 		protected Game()

@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Frozen.Utilities
 {
 	public sealed class DerivedObjectsPool<T> where T : class
 	{
 		private readonly List<T> pool = new List<T>();
+
 		private int poolIndex = 0;
 
 		public V GetOne<V>(Func<V> builder) where V : class, T

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Frozen.Drawing
+﻿namespace Frozen.Drawing
 {
 	public struct CharacterRange
 	{
@@ -23,6 +19,7 @@ namespace Frozen.Drawing
 		public static readonly CharacterRange Katakana = new CharacterRange((char)0x30A0, (char)0x30FF);
 
 		public char Start { get; private set; }
+
 		public char End { get; private set; }
 
 		public CharacterRange(char start, char end)

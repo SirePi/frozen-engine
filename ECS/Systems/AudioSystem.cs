@@ -1,30 +1,28 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Frozen.Audio;
-using Frozen.ECS.Components;
-using Frozen.Enums;
-using Frozen.Utilities;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Media;
 using NAudio.Wave;
-using NAudio.Wave.SampleProviders;
 
 namespace Frozen.ECS.Systems
 {
 	public class AudioSystem
 	{
 		internal const int SampleRate = 48000;
+
 		internal const float SpeedOfSound = 3400;
 
 		public SoundMixer Master { get; private set; }
+
 		public SoundMixer Music { get; private set; }
+
 		public SoundMixer SoundEffects { get; private set; }
+
 		public SoundMixer Voice { get; private set; }
 
 		private byte[] buffer;
-		private IWaveProvider pcm16; 
+
+		private IWaveProvider pcm16;
+
 		private DynamicSoundEffectInstance soundOutput;
 
 		internal AudioSystem()

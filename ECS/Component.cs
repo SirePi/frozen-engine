@@ -1,14 +1,11 @@
-﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
+﻿using System.Reflection;
 
 namespace Frozen.ECS
 {
 	public abstract class Component
 	{
 		private bool isActive = true;
+
 		public bool IsActive
 		{
 			get { return this.isActive; }
@@ -22,6 +19,7 @@ namespace Frozen.ECS
 				}
 			}
 		}
+
 		public Entity Entity { get; internal set; }
 
 		protected Component()
@@ -29,15 +27,20 @@ namespace Frozen.ECS
 			this.IsActive = true;
 		}
 
-		protected virtual void OnActivate() { }
-		protected virtual void OnDeactivate() { }
+		protected virtual void OnActivate()
+		{ }
+
+		protected virtual void OnDeactivate()
+		{ }
+
 		public void Update(bool force = false)
 		{
 			if (this.IsActive || force)
 				this.OnUpdate();
 		}
 
-		protected virtual void OnUpdate() { }
+		protected virtual void OnUpdate()
+		{ }
 
 		internal void UpdateRequirements()
 		{

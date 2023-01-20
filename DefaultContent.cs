@@ -1,21 +1,23 @@
-﻿using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Frozen
 {
-	class DefaultContent
+	internal class DefaultContent
 	{
 		private readonly ContentManager contentManager;
+
 		private readonly Assembly assembly;
+
 		private readonly Dictionary<string, string> availableResources;
 
 		private readonly MethodInfo GetContentReaderFromXnb;
+
 		private readonly MethodInfo ReadAsset;
 
 		internal DefaultContent(ContentManager contentManager)

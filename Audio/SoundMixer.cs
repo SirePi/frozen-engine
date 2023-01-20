@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using NAudio.Wave.SampleProviders;
 using NAudio.Wave;
-using Frozen.ECS.Systems;
-using System.Linq;
+using NAudio.Wave.SampleProviders;
 
 namespace Frozen.Audio
 {
@@ -13,7 +10,9 @@ namespace Frozen.Audio
 		private static readonly ISampleProvider[] silence = new ISampleProvider[] { SilenceGenerator.Instance };
 
 		private readonly MixingSampleProvider mixer;
+
 		private readonly VolumeSampleProvider volume;
+
 		private readonly Dictionary<ISampleProvider, ISampleProvider> resampledProviders;
 
 		public float Volume { get => this.volume.Volume; set => this.volume.Volume = MathF.Max(value, 0); }
@@ -41,7 +40,7 @@ namespace Frozen.Audio
 
 		internal void RemoveMixerInput(ISampleProvider provider)
 		{
-			if(this.resampledProviders.ContainsKey(provider))
+			if (this.resampledProviders.ContainsKey(provider))
 				this.mixer.RemoveMixerInput(this.resampledProviders[provider]);
 		}
 

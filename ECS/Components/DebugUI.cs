@@ -1,18 +1,13 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Myra;
-using Myra.Graphics2D.UI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Myra.Graphics2D.UI;
 
 namespace Frozen.ECS.Components
 {
 	public class DebugUI : UI
 	{
 		private Label fps;
+
 		private Label mouse;
+
 		private Label orbiter;
 
 		protected override Desktop BuildUI()

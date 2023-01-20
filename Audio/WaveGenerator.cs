@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using NAudio.Wave;
+﻿using NAudio.Wave;
 
 namespace Frozen.Audio
 {
@@ -10,6 +7,7 @@ namespace Frozen.Audio
 		protected int sample;
 
 		public int Frequency { get; set; }
+
 		public float Amplitude { get; set; }
 
 		internal WaveGenerator(int frequency, float amplitude, int sampleRate)

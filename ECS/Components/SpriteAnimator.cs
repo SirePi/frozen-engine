@@ -1,23 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Frozen.Drawing;
+﻿using Frozen.Drawing;
 
 namespace Frozen.ECS.Components
 {
-	public  class SpriteAnimator : Component
+	public class SpriteAnimator : Component
 	{
 		[RequiredComponent]
 		public SpriteRenderer Renderer { get; protected set; }
 
 		private Frame[] frames;
+
 		private Frame currentFrame;
+
 		private int currentFrameIndex;
+
 		private float time;
 
 		private string currentAnimation;
-		
+
 		public void SetAnimation(string animation)
 		{
 			if (this.currentAnimation == animation)

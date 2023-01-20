@@ -1,16 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Frozen.Utilities
 {
 	public class ExpandingArray<T>
 	{
 		private T[] data;
+
 		private int count;
 
 		public T[] Data => this.data;
+
 		public int Count => this.count;
 
 		public ExpandingArray(int startingCapacity = 1024)

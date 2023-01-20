@@ -1,31 +1,38 @@
-﻿using Microsoft.Xna.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.IO;
 using System.Reflection;
-using System.Text;
 using Frozen.ECS;
-using Frozen.Input;
 using Frozen.ECS.Systems;
-using Myra;
+using Frozen.Input;
 using Frozen.Utilities;
+using Microsoft.Xna.Framework;
+using Myra;
 
 namespace Frozen
 {
 	public static class Engine
 	{
 		internal static Dictionary<Type, PropertyInfo[]> RequiredComponentsCache { get; private set; }
+
 		internal static Dictionary<Type, int> ComponentsUpdateOrder { get; private set; }
+
 		internal static DrawingSystem Drawing { get; private set; }
 
 		public static Random Random { get; private set; }
+
 		public static Game Game { get; private set; }
+
 		public static ContentProvider ContentProvider { get; private set; }
+
 		public static Log Log { get; private set; }
+
 		public static AudioSystem Audio { get; private set; }
+
 		public static KeyboardManager Keyboard { get; private set; }
+
 		public static MouseManager Mouse { get; private set; }
+
 		public static IReadOnlyDictionary<PlayerIndex, GamePadManager> GamePad { get; private set; }
 
 		internal static void Initialize(Game game)
