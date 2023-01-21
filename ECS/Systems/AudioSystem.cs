@@ -11,6 +11,12 @@ namespace Frozen.ECS.Systems
 
 		internal const float SpeedOfSound = 3400;
 
+		private byte[] buffer;
+
+		private IWaveProvider pcm16;
+
+		private DynamicSoundEffectInstance soundOutput;
+
 		public SoundMixer Master { get; private set; }
 
 		public SoundMixer Music { get; private set; }
@@ -18,13 +24,6 @@ namespace Frozen.ECS.Systems
 		public SoundMixer SoundEffects { get; private set; }
 
 		public SoundMixer Voice { get; private set; }
-
-		private byte[] buffer;
-
-		private IWaveProvider pcm16;
-
-		private DynamicSoundEffectInstance soundOutput;
-
 		internal AudioSystem()
 		{
 			this.Music = new SoundMixer();
@@ -48,6 +47,41 @@ namespace Frozen.ECS.Systems
 			this.soundOutput.Play();
 		}
 
+		public BgmInstance PlayMusic(AudioSource song, float volume = 1)
+		{
+			BgmInstance instance = song.GetMusicInstance();
+			instance.Volume = volume;
+			instance.Play();
+
+			this.Music.AddMixerInput(instance);
+			return instance;
+		}
+
+		public SfxInstance PlaySoundEffect(AudioSource sfx, float volume = 1, float pan = 0, float pitch = 1)
+		{
+			SfxInstance instance = this.PlaySound(sfx, volume, pan, pitch);
+			this.SoundEffects.AddMixerInput(instance);
+			return instance;
+		}
+
+		public SfxInstance PlayVoice(AudioSource clip, float volume = 1, float pan = 0)
+		{
+			SfxInstance instance = this.PlaySound(clip, volume, pan, 1);
+			this.Voice.AddMixerInput(instance);
+			return instance;
+		}
+
+		private SfxInstance PlaySound(AudioSource source, float volume, float pan, float pitch)
+		{
+			SfxInstance instance = source.GetSoundEffectInstance();
+			instance.Volume = volume;
+			instance.Pan = pan;
+			instance.Pitch = pitch;
+
+			instance.Play();
+			return instance;
+		}
+
 		private void SoundOutput_BufferNeeded(object sender, EventArgs e)
 		{
 			DynamicSoundEffectInstance sfx = sender as DynamicSoundEffectInstance;
@@ -56,29 +90,6 @@ namespace Frozen.ECS.Systems
 				int read = this.pcm16.Read(this.buffer, 0, this.buffer.Length);
 				sfx.SubmitBuffer(this.buffer, 0, read);
 			}
-		}
-
-		public BgmInstance PlayMusic(AudioSource song, float volume = 1)
-		{
-			BgmInstance instance = song.GetMusicInstance();
-
-			this.Music.AddMixerInput(instance);
-
-			instance.Play();
-			return instance;
-		}
-
-		public SfxInstance PlaySoundEffect(AudioSource sfx, float volume = 1, float pan = 0, float pitch = 1)
-		{
-			SfxInstance instance = sfx.GetSoundEffectInstance();
-			instance.Volume = volume;
-			instance.Pan = pan;
-			instance.Pitch = pitch;
-
-			this.SoundEffects.AddMixerInput(instance);
-
-			instance.Play();
-			return instance;
 		}
 	}
 }
