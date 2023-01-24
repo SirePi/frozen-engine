@@ -109,7 +109,7 @@ namespace Frozen.Drawing
 			}
 		}
 
-		public SpriteFont Font { get; set; } = Engine.ContentProvider.DefaultContent.Get<SpriteFont>("Arial.xnb");
+		public SpriteFont Font { get; set; }
 		public Color Color { get; set; } = Color.White;
 		public Color Background { get; set; } = Color.Transparent;
 
