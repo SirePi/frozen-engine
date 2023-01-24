@@ -153,8 +153,9 @@ namespace Frozen.ECS.Systems
 			}
 		}
 
-		public void DrawString(Vector3 position, SpriteFont font)
+		public void DrawString(Vector3 position, SpriteFont font, RichText text)
 		{
+
 		}
 
 		public void DrawTexturedTriangles(Material material, VertexPositionColorTexture[] vertices, int[] indices)

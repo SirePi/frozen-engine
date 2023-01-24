@@ -21,7 +21,7 @@ namespace Frozen
 
 			string str = new string(chars);
 
-			List<Rectangle> bounds = font.GetGlyphRects(str, Vector2.Zero);
+			List<Rectangle> bounds = font.GetGlyphs(str, Vector2.Zero).Select(g => g.Bounds).ToList();
 			Vector2 size = font.MeasureString(str);
 
 			GraphicsDevice gd = Engine.Game.GraphicsDevice;

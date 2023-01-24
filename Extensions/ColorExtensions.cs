@@ -5,6 +5,34 @@ namespace Frozen
 {
 	public static class ColorExtensions
 	{
+		public static Color FromHex(string hex)
+		{
+			if (hex.StartsWith("#"))
+				hex = hex.Substring(1);
+
+			if (hex.Length == 6)
+			{
+				//rgb
+				byte r = byte.Parse(hex.Substring(0, 2), System.Globalization.NumberStyles.HexNumber);
+				byte g = byte.Parse(hex.Substring(2, 2), System.Globalization.NumberStyles.HexNumber);
+				byte b = byte.Parse(hex.Substring(4, 2), System.Globalization.NumberStyles.HexNumber);
+
+				return new Color(r, g, b);
+			}
+			else if (hex.Length == 8)
+			{
+				// argb
+				byte a = byte.Parse(hex.Substring(0, 2), System.Globalization.NumberStyles.HexNumber);
+				byte r = byte.Parse(hex.Substring(2, 2), System.Globalization.NumberStyles.HexNumber);
+				byte g = byte.Parse(hex.Substring(4, 2), System.Globalization.NumberStyles.HexNumber);
+				byte b = byte.Parse(hex.Substring(4, 2), System.Globalization.NumberStyles.HexNumber);
+
+				return new Color(r, g, b).WithAlpha(a);
+			}
+			else throw new ArgumentException("Cannot parse", hex);
+
+		}
+
 		// Adapted from https://stackoverflow.com/a/1335465/1489138
 		public static Color FromHSV(float h, float S, float V)
 		{

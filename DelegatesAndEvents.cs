@@ -1,10 +1,14 @@
-﻿using Frozen.ECS;
+﻿using Frozen.Audio;
+using Frozen.ECS;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 
 namespace Frozen
 {
 	public static class DelegatesAndEvents
 	{
+		public delegate void AudioStateChanged(AudioInstance instance, SoundState newState);
+
 		public delegate void EntityComponentEvent(Entity entity, Component component);
 
 		public delegate void EntityEvent(Entity entity);

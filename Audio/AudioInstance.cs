@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Audio;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
+using static Frozen.DelegatesAndEvents;
 
 namespace Frozen.Audio
 {
@@ -30,7 +31,7 @@ namespace Frozen.Audio
 
 		public WaveFormat WaveFormat => _volume?.WaveFormat;
 
-		public event Action<AudioInstance, SoundState> OnStateChanged;
+		public event AudioStateChanged OnStateChanged;
 
 		internal AudioInstance(AudioProvider provider)
 		{

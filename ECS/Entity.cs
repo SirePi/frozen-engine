@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using static Frozen.DelegatesAndEvents;
 
 namespace Frozen.ECS
 {
@@ -35,9 +36,14 @@ namespace Frozen.ECS
 					newScene?.Add(this);
 				}
 
-				_parent?._children.Remove(this);
-				_parent = value;
-				_parent?._children.Add(this);
+				if (_parent != value)
+				{
+					_parent?._children.Remove(this);
+					_parent = value;
+					_parent?._children.Add(this);
+
+					this.OnParentChanged(this);
+				}
 			}
 		}
 
@@ -45,11 +51,11 @@ namespace Frozen.ECS
 
 		public object Tag { get; set; }
 
-		public event Action<Entity, Component> OnComponentAdded;
+		public event EntityComponentEvent OnComponentAdded;
 
-		public event Action<Entity, Component> OnComponentRemoved;
+		public event EntityComponentEvent OnComponentRemoved;
 
-		public event Action<Entity> OnParentChanged;
+		public event EntityEvent OnParentChanged;
 
 		/// <summary>
 		/// Constructor
