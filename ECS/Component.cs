@@ -4,27 +4,27 @@ namespace Frozen.ECS
 {
 	public abstract class Component
 	{
-		private bool isActive = true;
+		private bool _isActive = true;
+
+		public Entity Entity { get; internal set; }
 
 		public bool IsActive
 		{
-			get { return this.isActive; }
+			get { return _isActive; }
 			set
 			{
-				if (value != this.isActive)
+				if (value != _isActive)
 				{
-					this.isActive = value;
-					if (this.isActive) this.OnActivate();
-					else this.OnDeactivate();
+					_isActive = value;
+					if (_isActive) OnActivate();
+					else OnDeactivate();
 				}
 			}
 		}
 
-		public Entity Entity { get; internal set; }
-
 		protected Component()
 		{
-			this.IsActive = true;
+			IsActive = true;
 		}
 
 		protected virtual void OnActivate()
@@ -33,26 +33,26 @@ namespace Frozen.ECS
 		protected virtual void OnDeactivate()
 		{ }
 
-		public void Update(bool force = false)
-		{
-			if (this.IsActive || force)
-				this.OnUpdate();
-		}
-
 		protected virtual void OnUpdate()
 		{ }
 
 		internal void UpdateRequirements()
 		{
-			foreach (PropertyInfo pi in Engine.RequiredComponentsCache[this.GetType()])
+			foreach (PropertyInfo pi in Engine.RequiredComponentsCache[GetType()])
 			{
-				object component = this.Entity.Get(pi.PropertyType);
+				object component = Entity.Get(pi.PropertyType);
 
 				if (component == null)
-					throw new RequiredComponentNotFoundException(this.Entity.Name, pi.PropertyType.Name);
+					throw new RequiredComponentNotFoundException(Entity.Name, pi.PropertyType.Name);
 
 				pi.SetValue(this, component);
 			}
+		}
+
+		public void Update(bool force = false)
+		{
+			if (IsActive || force)
+				OnUpdate();
 		}
 	}
 }

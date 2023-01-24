@@ -10,48 +10,44 @@ namespace Frozen.Coroutines
 		private enum WaitType
 		{
 			Frames,
-
 			GameTime,
-
 			RealTime
 		}
+
+		private readonly WaitType _type;
+		private float _internalValue;
 
 		/// <summary>
 		/// Waits until the next frame
 		/// </summary>
 		public static readonly WaitUntil NextFrame = new WaitUntil(1, WaitType.Frames);
 
-		private readonly WaitType type;
-
-		private float internalValue;
-
 		public bool IsComplete
 		{
-			get { return this.internalValue <= 0; }
+			get { return _internalValue <= 0; }
 		}
 
 		private WaitUntil(float startingValue, WaitType type)
 		{
-			this.internalValue = startingValue;
-			this.type = type;
+			_internalValue = startingValue;
+			_type = type;
 		}
 
 		internal void Update()
 		{
-			switch (this.type)
+			switch (_type)
 			{
 				case WaitType.Frames:
-					this.internalValue -= 1;
+					_internalValue -= 1;
 					break;
 
 				case WaitType.GameTime:
-					this.internalValue -= Time.FrameSeconds;
+					_internalValue -= Time.FrameSeconds;
 					break;
-					/*
+
 				case WaitType.RealTime:
-					this.internalValue -= Time.UnscaledDeltaTime;
+					_internalValue -= Time.FrameSeconds;
 					break;
-					*/
 			}
 		}
 

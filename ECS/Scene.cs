@@ -8,191 +8,38 @@ namespace Frozen.ECS
 {
 	public abstract class Scene
 	{
-		private static Dictionary<Type, Scene> scenesDictionary = new Dictionary<Type, Scene>();
+		private static Dictionary<Type, Scene> _scenesDictionary = new Dictionary<Type, Scene>();
 
+		private readonly CoroutineManager _coroutineManager = new CoroutineManager();
+		private readonly EntityManager _entityManager = new EntityManager();
+		private readonly HashSet<Renderer> _renderers = new HashSet<Renderer>();
+		private readonly HashSet<UI> _uis = new HashSet<UI>();
 		public static Scene Current => Engine.Game.CurrentScene;
 
-		public static void SwitchTo<T>() where T : Scene, new()
-		{
-			Type t = typeof(T);
-
-			if (!scenesDictionary.ContainsKey(t))
-				scenesDictionary.Add(t, new T());
-
-			Engine.Game.ChangeScene(scenesDictionary[t]);
-		}
-
-		private readonly EntityManager entityManager = new EntityManager();
-
-		private readonly CoroutineManager coroutineManager = new CoroutineManager();
-
-		private readonly HashSet<Renderer> renderers = new HashSet<Renderer>();
-
-		private readonly HashSet<UI> uis = new HashSet<UI>();
-
-		public int EntitiesCount => this.entityManager.GetEntities().Count();
+		public int EntitiesCount => _entityManager.GetEntities().Count();
 
 		protected Scene()
 		{
-			this.entityManager.OnEntityAdded += this.OnEntityAdded;
-			this.entityManager.OnEntityRemoved += this.OnEntityRemoved;
-			this.entityManager.OnComponentAdded += this.OnEntityComponentAdded;
-			this.entityManager.OnComponentRemoved += this.OnEntityComponentRemoved;
+			_entityManager.OnEntityAdded += OnEntityAdded;
+			_entityManager.OnEntityRemoved += OnEntityRemoved;
+			_entityManager.OnComponentAdded += OnEntityComponentAdded;
+			_entityManager.OnComponentRemoved += OnEntityComponentRemoved;
 
-			this.Build();
-		}
-
-		public abstract void Build();
-
-		public virtual void AfterSwitchingFrom()
-		{ }
-
-		public virtual void BeforeSwitchingFrom()
-		{ }
-
-		public virtual void AfterSwitchingTo()
-		{ }
-
-		public virtual void BeforeSwitchingTo()
-		{ }
-
-		public virtual void Update()
-		{
-			this.entityManager.Update();
-			this.coroutineManager.Update();
-		}
-
-		public void Add(Entity entity)
-		{
-			if (entity.Scene != this)
-			{
-				entity.Scene?.Remove(entity);
-				if (this.entityManager.AddEntity(entity))
-				{
-					entity.Scene = this;
-					foreach (Entity child in entity.Children)
-						this.Add(child);
-				}
-			}
-		}
-
-		public void Remove(Entity entity)
-		{
-			if (entity.Scene == this)
-			{
-				if (this.entityManager.RemoveEntity(entity))
-					entity.Scene = null;
-
-				foreach (Entity child in entity.Children)
-					this.Remove(child);
-			}
-		}
-
-		public void RemoveWhere(Func<Entity, bool> predicate)
-		{
-			Entity[] toRemove = this.entityManager.GetEntities(predicate).ToArray();
-			foreach (Entity e in toRemove)
-				this.Remove(e);
-		}
-
-		public void Clear()
-		{
-			this.entityManager.Clear();
-		}
-
-		public IEnumerable<T> GetComponents<T>() where T : Component
-		{
-			return this.entityManager.GetComponents<T>();
-		}
-
-		public IEnumerable<T> GetActiveComponents<T>() where T : Component
-		{
-			return this.entityManager.GetActiveComponents<T>();
-		}
-
-		public IEnumerable<T> GetActiveComponents<T>(Func<T, bool> predicate) where T : Component
-		{
-			return this.entityManager.GetActiveComponents(predicate);
-		}
-
-		public IEnumerable<Entity> GetActiveEntities()
-		{
-			return this.entityManager.GetActiveEntities();
-		}
-
-		public IEnumerable<Entity> GetActiveEntities(Func<Entity, bool> predicate)
-		{
-			return this.entityManager.GetActiveEntities(predicate);
-		}
-
-		public IEnumerable<Entity> GetActiveEntities<T>() where T : Component
-		{
-			return this.entityManager.GetActiveEntities<T>();
-		}
-
-		public IEnumerable<Entity> GetActiveEntities<T>(Func<Entity, bool> predicate) where T : Component
-		{
-			return this.entityManager.GetActiveEntities<T>(predicate);
-		}
-
-		public IEnumerable<Entity> GetActiveEntities<T>(Func<T, bool> predicate) where T : Component
-		{
-			return this.entityManager.GetActiveComponents<T>().Where(predicate).Select(t => t.Entity);
-		}
-
-		public IEnumerable<Entity> GetEntities()
-		{
-			return this.entityManager.GetEntities();
-		}
-
-		public IEnumerable<Entity> GetEntities(Func<Entity, bool> predicate)
-		{
-			return this.entityManager.GetEntities(predicate);
-		}
-
-		public IEnumerable<Entity> GetEntities<T>() where T : Component
-		{
-			return this.entityManager.GetEntities<T>();
-		}
-
-		public IEnumerable<Entity> GetEntities<T>(Func<Entity, bool> predicate) where T : Component
-		{
-			return this.entityManager.GetEntities<T>(predicate);
-		}
-
-		public Entity GetEntityByName(string name)
-		{
-			return this.entityManager.GetEntityByName(name);
-		}
-
-		internal IEnumerable<Renderer> GetSortedRenderers()
-		{
-			return this.entityManager.GetSortedRenderers();
-		}
-
-		internal IEnumerable<Camera> GetCameras()
-		{
-			return this.entityManager.GetActiveComponents<Camera>();
+			Build();
 		}
 
 		private void OnEntityAdded(Entity entity)
 		{
 			foreach (Component cmp in entity)
-				this.OnEntityComponentAdded(entity, cmp);
-		}
-
-		private void OnEntityRemoved(Entity entity)
-		{
-			foreach (Component cmp in entity)
-				this.OnEntityComponentRemoved(entity, cmp);
+				OnEntityComponentAdded(entity, cmp);
 		}
 
 		private void OnEntityComponentAdded(Entity entity, Component component)
 		{
 			switch (component)
 			{
-				case Renderer r: this.renderers.Add(r); break;
-				case UI ui: this.uis.Add(ui); break;
+				case Renderer r: _renderers.Add(r); break;
+				case UI ui: _uis.Add(ui); break;
 			}
 		}
 
@@ -200,14 +47,163 @@ namespace Frozen.ECS
 		{
 			switch (component)
 			{
-				case Renderer r: this.renderers.Remove(r); break;
-				case UI ui: this.uis.Remove(ui); break;
+				case Renderer r: _renderers.Remove(r); break;
+				case UI ui: _uis.Remove(ui); break;
 			}
+		}
+
+		private void OnEntityRemoved(Entity entity)
+		{
+			foreach (Component cmp in entity)
+				OnEntityComponentRemoved(entity, cmp);
+		}
+
+		internal IEnumerable<Camera> GetCameras()
+		{
+			return _entityManager.GetActiveComponents<Camera>();
+		}
+
+		internal IEnumerable<Renderer> GetSortedRenderers()
+		{
+			return _entityManager.GetSortedRenderers();
+		}
+
+		public static void SwitchTo<T>() where T : Scene, new()
+		{
+			Type t = typeof(T);
+
+			if (!_scenesDictionary.ContainsKey(t))
+				_scenesDictionary.Add(t, new T());
+
+			Engine.Game.ChangeScene(_scenesDictionary[t]);
+		}
+
+		public void Add(Entity entity)
+		{
+			if (entity.Scene != this)
+			{
+				entity.Scene?.Remove(entity);
+				if (_entityManager.AddEntity(entity))
+				{
+					entity.Scene = this;
+					foreach (Entity child in entity.Children)
+						Add(child);
+				}
+			}
+		}
+
+		public virtual void AfterSwitchingFrom()
+		{ }
+
+		public virtual void AfterSwitchingTo()
+		{ }
+
+		public virtual void BeforeSwitchingFrom()
+		{ }
+
+		public virtual void BeforeSwitchingTo()
+		{ }
+
+		public abstract void Build();
+
+		public void Clear()
+		{
+			_entityManager.Clear();
+		}
+
+		public IEnumerable<T> GetActiveComponents<T>() where T : Component
+		{
+			return _entityManager.GetActiveComponents<T>();
+		}
+
+		public IEnumerable<T> GetActiveComponents<T>(Func<T, bool> predicate) where T : Component
+		{
+			return _entityManager.GetActiveComponents(predicate);
+		}
+
+		public IEnumerable<Entity> GetActiveEntities()
+		{
+			return _entityManager.GetActiveEntities();
+		}
+
+		public IEnumerable<Entity> GetActiveEntities(Func<Entity, bool> predicate)
+		{
+			return _entityManager.GetActiveEntities(predicate);
+		}
+
+		public IEnumerable<Entity> GetActiveEntities<T>() where T : Component
+		{
+			return _entityManager.GetActiveEntities<T>();
+		}
+
+		public IEnumerable<Entity> GetActiveEntities<T>(Func<Entity, bool> predicate) where T : Component
+		{
+			return _entityManager.GetActiveEntities<T>(predicate);
+		}
+
+		public IEnumerable<Entity> GetActiveEntities<T>(Func<T, bool> predicate) where T : Component
+		{
+			return _entityManager.GetActiveComponents<T>().Where(predicate).Select(t => t.Entity);
+		}
+
+		public IEnumerable<T> GetComponents<T>() where T : Component
+		{
+			return _entityManager.GetComponents<T>();
+		}
+
+		public IEnumerable<Entity> GetEntities()
+		{
+			return _entityManager.GetEntities();
+		}
+
+		public IEnumerable<Entity> GetEntities(Func<Entity, bool> predicate)
+		{
+			return _entityManager.GetEntities(predicate);
+		}
+
+		public IEnumerable<Entity> GetEntities<T>() where T : Component
+		{
+			return _entityManager.GetEntities<T>();
+		}
+
+		public IEnumerable<Entity> GetEntities<T>(Func<Entity, bool> predicate) where T : Component
+		{
+			return _entityManager.GetEntities<T>(predicate);
+		}
+
+		public Entity GetEntityByName(string name)
+		{
+			return _entityManager.GetEntityByName(name);
+		}
+
+		public void Remove(Entity entity)
+		{
+			if (entity.Scene == this)
+			{
+				if (_entityManager.RemoveEntity(entity))
+					entity.Scene = null;
+
+				foreach (Entity child in entity.Children)
+					Remove(child);
+			}
+		}
+
+		public void RemoveWhere(Func<Entity, bool> predicate)
+		{
+			Entity[] toRemove = _entityManager.GetEntities(predicate).ToArray();
+			foreach (Entity e in toRemove)
+				Remove(e);
 		}
 
 		public Coroutine StartCoroutine(IEnumerable<WaitUntil> coroutine)
 		{
-			return this.coroutineManager.StartNew(coroutine);
+			return _coroutineManager.StartNew(coroutine);
+		}
+
+		public virtual void Update()
+		{
+			_entityManager.Update();
+			_coroutineManager.Update();
 		}
 	}
 }

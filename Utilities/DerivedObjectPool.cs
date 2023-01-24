@@ -5,25 +5,25 @@ namespace Frozen.Utilities
 {
 	public sealed class DerivedObjectsPool<T> where T : class
 	{
-		private readonly List<T> pool = new List<T>();
+		private readonly List<T> _pool = new List<T>();
 
-		private int poolIndex = 0;
+		private int _poolIndex = 0;
 
 		public V GetOne<V>(Func<V> builder) where V : class, T
 		{
 			int searchIndex;
 			V result = null;
 
-			for (int i = this.poolIndex; i < this.pool.Count + this.poolIndex; i++)
+			for (int i = _poolIndex; i < _pool.Count + _poolIndex; i++)
 			{
-				searchIndex = i % this.pool.Count;
+				searchIndex = i % _pool.Count;
 
-				result = this.pool[searchIndex] as V;
+				result = _pool[searchIndex] as V;
 
 				if (result != null)
 				{
-					this.poolIndex = searchIndex;
-					this.pool.RemoveAt(this.poolIndex);
+					_poolIndex = searchIndex;
+					_pool.RemoveAt(_poolIndex);
 
 					break;
 				}
@@ -44,7 +44,7 @@ namespace Frozen.Utilities
 				poolable.OnReturn();
 
 			if (obj != null)
-				this.pool.Add(obj);
+				_pool.Add(obj);
 		}
 	}
 }

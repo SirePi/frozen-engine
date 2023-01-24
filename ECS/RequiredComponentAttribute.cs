@@ -2,7 +2,7 @@
 
 namespace Frozen.ECS
 {
-	[global::System.AttributeUsageAttribute(global::System.AttributeTargets.Property, Inherited = false, AllowMultiple = false)]
+	[AttributeUsage(AttributeTargets.Property, Inherited = false, AllowMultiple = false)]
 	public sealed class RequiredComponentAttribute : Attribute
 	{ }
 }

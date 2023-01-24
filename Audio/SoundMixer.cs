@@ -7,52 +7,50 @@ namespace Frozen.Audio
 {
 	public class SoundMixer : ISampleProvider
 	{
-		private static readonly ISampleProvider[] silence = new ISampleProvider[] { SilenceGenerator.Instance };
+		private static readonly ISampleProvider[] _silence = new ISampleProvider[] { SilenceGenerator.Instance };
 
-		private readonly MixingSampleProvider mixer;
+		private readonly MixingSampleProvider _mixer;
+		private readonly Dictionary<ISampleProvider, ISampleProvider> _resampledProviders;
+		private readonly VolumeSampleProvider _volume;
 
-		private readonly VolumeSampleProvider volume;
+		public float Volume { get => _volume.Volume; set => _volume.Volume = MathF.Max(value, 0); }
 
-		private readonly Dictionary<ISampleProvider, ISampleProvider> resampledProviders;
-
-		public float Volume { get => this.volume.Volume; set => this.volume.Volume = MathF.Max(value, 0); }
+		public WaveFormat WaveFormat => _volume.WaveFormat;
 
 		internal SoundMixer()
 		{
-			this.resampledProviders = new Dictionary<ISampleProvider, ISampleProvider>();
+			_resampledProviders = new Dictionary<ISampleProvider, ISampleProvider>();
 
-			this.mixer = new MixingSampleProvider(silence);
-			this.volume = new VolumeSampleProvider(this.mixer);
+			_mixer = new MixingSampleProvider(_silence);
+			_volume = new VolumeSampleProvider(_mixer);
 		}
 
 		internal void AddMixerInput(ISampleProvider provider)
 		{
-			if (!this.resampledProviders.ContainsKey(provider))
+			if (!_resampledProviders.ContainsKey(provider))
 			{
-				if (provider.WaveFormat.SampleRate != this.mixer.WaveFormat.SampleRate)
-					this.resampledProviders[provider] = new WdlResamplingSampleProvider(provider, this.mixer.WaveFormat.SampleRate);
+				if (provider.WaveFormat.SampleRate != _mixer.WaveFormat.SampleRate)
+					_resampledProviders[provider] = new WdlResamplingSampleProvider(provider, _mixer.WaveFormat.SampleRate);
 				else
-					this.resampledProviders[provider] = provider;
+					_resampledProviders[provider] = provider;
 
-				this.mixer.AddMixerInput(this.resampledProviders[provider]);
+				_mixer.AddMixerInput(_resampledProviders[provider]);
 			}
 		}
 
 		internal void RemoveMixerInput(ISampleProvider provider)
 		{
-			if (this.resampledProviders.ContainsKey(provider))
-				this.mixer.RemoveMixerInput(this.resampledProviders[provider]);
+			if (_resampledProviders.ContainsKey(provider))
+				_mixer.RemoveMixerInput(_resampledProviders[provider]);
 		}
-
-		public WaveFormat WaveFormat => this.volume.WaveFormat;
 
 		public int Read(float[] buffer, int offset, int count)
 		{
-			foreach (ISampleProvider provider in this.resampledProviders.Keys)
+			foreach (ISampleProvider provider in _resampledProviders.Keys)
 				if (provider is AudioInstance ai)
 					ai.Update();
 
-			return this.volume.Read(buffer, offset, count);
+			return _volume.Read(buffer, offset, count);
 		}
 	}
 }

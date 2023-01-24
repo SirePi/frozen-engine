@@ -1,8 +1,4 @@
 ﻿using System;
-using Frozen.ECS.Components;
-using Frozen.ECS.Systems;
-using Frozen.Enums;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
@@ -11,75 +7,62 @@ namespace Frozen.Audio
 {
 	public abstract class AudioInstance : ISampleProvider
 	{
-		protected readonly AudioProvider source;
-
-		private readonly VolumeSampleProvider volume;
-
-		public event Action<AudioInstance, SoundState> OnStateChanged;
-
-		public float Volume { get => this.volume.Volume; set => this.volume.Volume = MathF.Max(value, 0); }
-
-		public TimeSpan TimeLeft => this.source.TimeLeft;
-
-		private SoundState state;
+		private readonly VolumeSampleProvider _volume;
+		private SoundState _state;
+		protected readonly AudioProvider _source;
 
 		public SoundState State
 		{
-			get => this.state;
+			get => _state;
 			private set
 			{
-				if (this.state != value)
+				if (_state != value)
 				{
-					this.state = value;
-					this.OnStateChanged?.Invoke(this, this.state);
+					_state = value;
+					OnStateChanged?.Invoke(this, _state);
 				}
 			}
 		}
 
-		public WaveFormat WaveFormat => this.volume?.WaveFormat;
+		public TimeSpan TimeLeft => _source.TimeLeft;
+
+		public float Volume { get => _volume.Volume; set => _volume.Volume = MathF.Max(value, 0); }
+
+		public WaveFormat WaveFormat => _volume?.WaveFormat;
+
+		public event Action<AudioInstance, SoundState> OnStateChanged;
 
 		internal AudioInstance(AudioProvider provider)
 		{
-			this.state = SoundState.Stopped;
-			this.source = provider;
-			this.volume = new VolumeSampleProvider(this.SetupPipeline());
+			_state = SoundState.Stopped;
+			_source = provider;
+			_volume = new VolumeSampleProvider(SetupPipeline());
 		}
 
 		protected abstract ISampleProvider SetupPipeline();
 
 		internal abstract void Update();
 
-		public void Play()
-		{
-			this.source.Reset();
-			this.State = SoundState.Playing;
-		}
-
 		public void Pause()
 		{
-			if (this.State == SoundState.Playing)
-				this.State = SoundState.Paused;
+			if (State == SoundState.Playing)
+				State = SoundState.Paused;
 		}
 
-		public void Resume()
+		public void Play()
 		{
-			if (this.State == SoundState.Paused)
-				this.State = SoundState.Playing;
-		}
-
-		public void Stop()
-		{
-			this.State = SoundState.Stopped;
+			_source.Reset();
+			State = SoundState.Playing;
 		}
 
 		public int Read(float[] buffer, int offset, int count)
 		{
-			switch (this.State)
+			switch (State)
 			{
 				case SoundState.Playing:
-					int read = this.volume.Read(buffer, offset, count);
-					if (!this.source.IsActive)
-						this.Stop();
+					int read = _volume.Read(buffer, offset, count);
+					if (!_source.IsActive)
+						Stop();
 
 					return read;
 
@@ -89,6 +72,17 @@ namespace Frozen.Audio
 				default:
 					return 0;
 			}
+		}
+
+		public void Resume()
+		{
+			if (State == SoundState.Paused)
+				State = SoundState.Playing;
+		}
+
+		public void Stop()
+		{
+			State = SoundState.Stopped;
 		}
 	}
 }

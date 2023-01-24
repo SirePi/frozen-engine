@@ -2,156 +2,152 @@
 using System.Collections.Generic;
 using System.Linq;
 using Frozen.ECS.Components;
+using static Frozen.DelegatesAndEvents;
 
 namespace Frozen.ECS
 {
 	internal class EntityManager
 	{
-		private readonly HashSet<Entity> entities = new HashSet<Entity>();
+		private readonly HashSet<Entity> _entities = new HashSet<Entity>();
+		private readonly HashSet<Entity> _pendingEntities = new HashSet<Entity>();
+		private readonly HashSet<Entity> _removedEntities = new HashSet<Entity>();
 
-		private readonly HashSet<Entity> pendingEntities = new HashSet<Entity>();
-
-		private readonly HashSet<Entity> removedEntities = new HashSet<Entity>();
-
-		public event Action<Entity> OnEntityAdded;
-
-		public event Action<Entity> OnEntityRemoved;
-
-		public event Action<Entity, Component> OnComponentAdded;
-
-		public event Action<Entity, Component> OnComponentRemoved;
+		public event EntityComponentEvent OnComponentAdded;
+		public event EntityComponentEvent OnComponentRemoved;
+		public event EntityEvent OnEntityAdded;
+		public event EntityEvent OnEntityRemoved;
 
 		internal EntityManager()
 		{ }
 
-		internal void Update()
-		{
-			foreach (Entity e in this.removedEntities)
-				this.entities.Remove(e);
-			this.removedEntities.Clear();
-
-			foreach (Entity e in this.pendingEntities)
-				this.entities.Add(e);
-
-			this.pendingEntities.Clear();
-
-			foreach (Entity e in this.entities.Where(e => e.Parent == null && e.IsActive))
-				e.Update(false);
-		}
-
-		internal bool AddEntity(Entity entity)
-		{
-			bool toAdd = !this.entities.Contains(entity);
-			if (toAdd)
-			{
-				entity.OnComponentAdded += this.Entity_OnComponentAdded;
-				entity.OnComponentRemoved += this.Entity_OnComponentRemoved;
-
-				this.pendingEntities.Add(entity);
-				this.OnEntityAdded?.Invoke(entity);
-			}
-			return toAdd;
-		}
-
-		internal bool RemoveEntity(Entity entity)
-		{
-			bool toRemove = this.entities.Contains(entity);
-			if (toRemove)
-			{
-				entity.OnComponentAdded -= this.Entity_OnComponentAdded;
-				entity.OnComponentRemoved -= this.Entity_OnComponentRemoved;
-
-				this.removedEntities.Add(entity);
-				this.OnEntityRemoved?.Invoke(entity);
-			}
-			return toRemove;
-		}
-
-		public void Clear()
-		{
-			this.entities.Clear();
-			this.pendingEntities.Clear();
-			this.removedEntities.Clear();
-		}
-
 		private void Entity_OnComponentAdded(Entity entity, Component component)
 		{
-			this.OnComponentAdded?.Invoke(entity, component);
+			OnComponentAdded?.Invoke(entity, component);
 		}
 
 		private void Entity_OnComponentRemoved(Entity entity, Component component)
 		{
-			this.OnComponentRemoved?.Invoke(entity, component);
+			OnComponentRemoved?.Invoke(entity, component);
 		}
 
-		internal IEnumerable<T> GetComponents<T>() where T : Component
+		internal bool AddEntity(Entity entity)
 		{
-			return this.entities.SelectMany(e => e.GetAll<T>());
+			bool toAdd = !_entities.Contains(entity);
+			if (toAdd)
+			{
+				entity.OnComponentAdded += Entity_OnComponentAdded;
+				entity.OnComponentRemoved += Entity_OnComponentRemoved;
+
+				_pendingEntities.Add(entity);
+				OnEntityAdded?.Invoke(entity);
+			}
+			return toAdd;
 		}
 
 		internal IEnumerable<T> GetActiveComponents<T>() where T : Component
 		{
-			return this.GetActiveEntities().SelectMany(e => e.GetAll<T>());
+			return GetActiveEntities().SelectMany(e => e.GetAll<T>());
 		}
 
 		internal IEnumerable<T> GetActiveComponents<T>(Func<T, bool> predicate) where T : Component
 		{
-			return this.GetActiveEntities().SelectMany(e => e.GetAll<T>()).Where(predicate);
+			return GetActiveEntities().SelectMany(e => e.GetAll<T>()).Where(predicate);
 		}
 
 		internal IEnumerable<Entity> GetActiveEntities()
 		{
-			return this.entities.Where(e => e.IsActive);
+			return _entities.Where(e => e.IsActive);
 		}
 
 		internal IEnumerable<Entity> GetActiveEntities(Func<Entity, bool> predicate)
 		{
-			return this.entities.Where(e => e.IsActive && predicate(e));
+			return _entities.Where(e => e.IsActive && predicate(e));
 		}
 
 		internal IEnumerable<Entity> GetActiveEntities<T>() where T : Component
 		{
-			return this.GetEntities<T>().Where(e => e.IsActive);
+			return GetEntities<T>().Where(e => e.IsActive);
 		}
 
 		internal IEnumerable<Entity> GetActiveEntities<T>(Func<Entity, bool> predicate) where T : Component
 		{
-			return this.GetEntities<T>().Where(e => e.IsActive && predicate(e));
+			return GetEntities<T>().Where(e => e.IsActive && predicate(e));
+		}
+
+		internal IEnumerable<T> GetComponents<T>() where T : Component
+		{
+			return _entities.SelectMany(e => e.GetAll<T>());
 		}
 
 		internal IEnumerable<Entity> GetEntities()
 		{
-			return this.entities;
+			return _entities;
 		}
 
 		internal IEnumerable<Entity> GetEntities(Func<Entity, bool> predicate)
 		{
-			return this.entities.Where(predicate);
+			return _entities.Where(predicate);
 		}
 
 		internal IEnumerable<Entity> GetEntities<T>() where T : Component
 		{
-			return this.GetComponents<T>().Select(c => c.Entity);
+			return GetComponents<T>().Select(c => c.Entity);
 		}
 
 		internal IEnumerable<Entity> GetEntities<T>(Func<Entity, bool> predicate) where T : Component
 		{
-			return this.GetComponents<T>().Select(c => c.Entity).Where(predicate);
-		}
-
-		internal IEnumerable<Entity> GetRootEntities()
-		{
-			return this.entities.Where(e => e.Parent == null);
+			return GetComponents<T>().Select(c => c.Entity).Where(predicate);
 		}
 
 		internal Entity GetEntityByName(string name)
 		{
-			return this.entities.FirstOrDefault(e => e.Name == name);
+			return _entities.FirstOrDefault(e => e.Name == name);
+		}
+
+		internal IEnumerable<Entity> GetRootEntities()
+		{
+			return _entities.Where(e => e.Parent == null);
 		}
 
 		internal IEnumerable<Renderer> GetSortedRenderers()
 		{
-			return this.GetComponents<Renderer>().OrderByDescending(r => r.RendererSortedHash);
+			return GetComponents<Renderer>().OrderByDescending(r => r.RendererSortedHash);
+		}
+
+		internal bool RemoveEntity(Entity entity)
+		{
+			bool toRemove = _entities.Contains(entity);
+			if (toRemove)
+			{
+				entity.OnComponentAdded -= Entity_OnComponentAdded;
+				entity.OnComponentRemoved -= Entity_OnComponentRemoved;
+
+				_removedEntities.Add(entity);
+				OnEntityRemoved?.Invoke(entity);
+			}
+			return toRemove;
+		}
+
+		internal void Update()
+		{
+			foreach (Entity e in _removedEntities)
+				_entities.Remove(e);
+			_removedEntities.Clear();
+
+			foreach (Entity e in _pendingEntities)
+				_entities.Add(e);
+
+			_pendingEntities.Clear();
+
+			foreach (Entity e in _entities.Where(e => e.Parent == null && e.IsActive))
+				e.Update(false);
+		}
+
+		public void Clear()
+		{
+			_entities.Clear();
+			_pendingEntities.Clear();
+			_removedEntities.Clear();
 		}
 	}
 }

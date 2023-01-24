@@ -6,41 +6,36 @@ namespace Frozen.Drawing
 {
 	public class Sprite
 	{
-		private Texture2D texture;
-
-		public Texture2D Texture
-		{
-			get => this.texture;
-			set => this.texture = value ?? throw new ArgumentNullException(nameof(this.Texture));
-		}
+		private Texture2D _texture;
 
 		public Atlas Atlas { get; private set; }
 
+		public Texture2D Texture
+		{
+			get => _texture;
+			set => _texture = value ?? throw new ArgumentNullException(nameof(Texture));
+		}
+
 		public Sprite(Texture2D texture)
 		{
-			this.Texture = texture;
-			this.Atlas = Atlas.SingleSprite();
+			Texture = texture;
+			Atlas = Atlas.SingleSprite();
 		}
 
 		public Sprite(Texture2D texture, int rows, int columns)
 		{
-			this.Texture = texture;
-			this.Atlas = Atlas.FromGrid(rows, columns);
+			Texture = texture;
+			Atlas = Atlas.FromGrid(rows, columns);
 		}
 
 		public Rectangle this[int spriteIndex]
 		{
-			get => this.GetRealRectangle(this.Atlas[spriteIndex]);
+			get => Atlas[spriteIndex].FromTexture(_texture);
 		}
 
 		public Rectangle this[string spriteName]
 		{
-			get => this.GetRealRectangle(this.Atlas[spriteName]);
-		}
-
-		private Rectangle GetRealRectangle(UVRect uv)
-		{
-			return new Rectangle((int)(this.texture.Width * uv.X), (int)(this.texture.Height * uv.Y), (int)(this.texture.Width * uv.Width), (int)(this.texture.Height * uv.Height));
+			get => Atlas[spriteName].FromTexture(_texture);
 		}
 	}
 }

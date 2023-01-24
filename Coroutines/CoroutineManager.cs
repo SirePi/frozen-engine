@@ -9,20 +9,16 @@ namespace Frozen.Coroutines
 	/// </summary>
 	public class CoroutineManager
 	{
-		private static GameTime TimeZero = new GameTime();
-
-		private readonly Queue<Coroutine> pool = new Queue<Coroutine>(64);
-
-		private Queue<Coroutine> currentCycle = new Queue<Coroutine>(256);
-
-		private Queue<Coroutine> nextCycle = new Queue<Coroutine>(256);
+		private readonly Queue<Coroutine> _pool = new Queue<Coroutine>(64);
+		private Queue<Coroutine> _currentCycle = new Queue<Coroutine>(256);
+		private Queue<Coroutine> _nextCycle = new Queue<Coroutine>(256);
 
 		/// <summary>
 		/// Returns an IEnumerable of all currently active and scheduled Coroutines
 		/// </summary>
 		public IEnumerable<Coroutine> Coroutines
 		{
-			get { return this.currentCycle.Concat(this.nextCycle); }
+			get { return _currentCycle.Concat(_nextCycle); }
 		}
 
 		/// <summary>
@@ -30,19 +26,19 @@ namespace Frozen.Coroutines
 		/// </summary>
 		public void Clear()
 		{
-			foreach (Coroutine c in this.currentCycle)
+			foreach (Coroutine c in _currentCycle)
 			{
 				c.Cancel();
-				this.pool.Enqueue(c);
+				_pool.Enqueue(c);
 			}
-			this.currentCycle.Clear();
+			_currentCycle.Clear();
 
-			foreach (Coroutine c in this.nextCycle)
+			foreach (Coroutine c in _nextCycle)
 			{
 				c.Cancel();
-				this.pool.Enqueue(c);
+				_pool.Enqueue(c);
 			}
-			this.nextCycle.Clear();
+			_nextCycle.Clear();
 		}
 
 		/// <summary>
@@ -54,15 +50,15 @@ namespace Frozen.Coroutines
 		public Coroutine StartNew(IEnumerable<WaitUntil> enumerator)
 		{
 			Coroutine coroutine;
-			if (this.pool.Count > 0)
-				coroutine = this.pool.Dequeue();
+			if (_pool.Count > 0)
+				coroutine = _pool.Dequeue();
 			else
 				coroutine = new Coroutine();
 
 			coroutine.Setup(enumerator);
 			coroutine.Update(); // run once as initialization phase, to get past the first Invalid (not yet set) Wait condition
 
-			this.nextCycle.Enqueue(coroutine);
+			_nextCycle.Enqueue(coroutine);
 			return coroutine;
 		}
 
@@ -72,20 +68,20 @@ namespace Frozen.Coroutines
 		public void Update()
 		{
 			// swap around the queues
-			Queue<Coroutine> swap = this.currentCycle;
-			this.currentCycle = this.nextCycle;
-			this.nextCycle = swap;
+			Queue<Coroutine> swap = _currentCycle;
+			_currentCycle = _nextCycle;
+			_nextCycle = swap;
 
-			int count = this.currentCycle.Count;
+			int count = _currentCycle.Count;
 			for (int i = 0; i < count; i++)
 			{
-				Coroutine c = this.currentCycle.Dequeue();
+				Coroutine c = _currentCycle.Dequeue();
 				c.Update();
 
 				if (c.Status == CoroutineStatus.Running || c.Status == CoroutineStatus.Paused)
-					this.nextCycle.Enqueue(c);
+					_nextCycle.Enqueue(c);
 				else
-					this.pool.Enqueue(c);
+					_pool.Enqueue(c);
 			}
 		}
 	}

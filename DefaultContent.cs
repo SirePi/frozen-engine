@@ -10,50 +10,27 @@ namespace Frozen
 {
 	internal class DefaultContent
 	{
-		private readonly ContentManager contentManager;
-
-		private readonly Assembly assembly;
-
-		private readonly Dictionary<string, string> availableResources;
+		private readonly Assembly _assembly;
+		private readonly Dictionary<string, string> _availableResources;
+		private readonly ContentManager _contentManager;
 
 		private readonly MethodInfo GetContentReaderFromXnb;
-
 		private readonly MethodInfo ReadAsset;
 
 		internal DefaultContent(ContentManager contentManager)
 		{
-			this.contentManager = contentManager;
-			this.assembly = Assembly.GetExecutingAssembly();
-			this.availableResources = this.assembly
+			_contentManager = contentManager;
+			_assembly = Assembly.GetExecutingAssembly();
+			_availableResources = _assembly
 				.GetManifestResourceNames()
-				.ToDictionary(k => this.ExtractResourceKey(k), v => v);
+				.ToDictionary(k => ExtractResourceKey(k), v => v);
 
 			// Hacking in MonoGame's Content reader
-			this.GetContentReaderFromXnb = typeof(ContentManager)
-				.GetMethod(nameof(this.GetContentReaderFromXnb), BindingFlags.Instance | BindingFlags.NonPublic);
-			this.ReadAsset = typeof(ContentReader)
+			GetContentReaderFromXnb = typeof(ContentManager)
+				.GetMethod(nameof(GetContentReaderFromXnb), BindingFlags.Instance | BindingFlags.NonPublic);
+			ReadAsset = typeof(ContentReader)
 				.GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
-				.First(m => m.Name == nameof(this.ReadAsset) && m.IsGenericMethodDefinition);
-		}
-
-		public T Get<T>(string assetName)
-		{
-			T result = default;
-			if (this.availableResources.TryGetValue(assetName, out string resourceKey))
-			{
-				Stream stream = this.assembly.GetManifestResourceStream(resourceKey);
-
-				using (BinaryReader xnbReader = new BinaryReader(stream))
-				{
-					using (ContentReader reader = this.GetContentReader(assetName, stream, xnbReader))
-					{
-						result = (T)this.ReadAsset.MakeGenericMethod(typeof(T)).Invoke(reader, null);
-						if (result is GraphicsResource gr)
-							gr.Name = assetName;
-					}
-				}
-			}
-			return result;
+				.First(m => m.Name == nameof(ReadAsset) && m.IsGenericMethodDefinition);
 		}
 
 		private string ExtractResourceKey(string resourceName)
@@ -63,7 +40,27 @@ namespace Frozen
 
 		private ContentReader GetContentReader(string assetName, Stream stream, BinaryReader xnbReader)
 		{
-			return this.GetContentReaderFromXnb.Invoke(this.contentManager, new object[] { assetName, stream, xnbReader, null }) as ContentReader;
+			return GetContentReaderFromXnb.Invoke(_contentManager, new object[] { assetName, stream, xnbReader, null }) as ContentReader;
+		}
+
+		public T Get<T>(string assetName)
+		{
+			T result = default;
+			if (_availableResources.TryGetValue(assetName, out string resourceKey))
+			{
+				Stream stream = _assembly.GetManifestResourceStream(resourceKey);
+
+				using (BinaryReader xnbReader = new BinaryReader(stream))
+				{
+					using (ContentReader reader = GetContentReader(assetName, stream, xnbReader))
+					{
+						result = (T)ReadAsset.MakeGenericMethod(typeof(T)).Invoke(reader, null);
+						if (result is GraphicsResource gr)
+							gr.Name = assetName;
+					}
+				}
+			}
+			return result;
 		}
 	}
 }

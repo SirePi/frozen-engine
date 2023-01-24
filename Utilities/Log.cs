@@ -22,8 +22,8 @@ namespace Frozen.Utilities
 		{
 			LogManager.Configuration = new NLog.Config.LoggingConfiguration();
 
-			this.Core = this.CustomLog("core");
-			this.Game = this.CustomLog("game");
+			Core = CustomLog("core");
+			Game = CustomLog("game");
 		}
 
 		/// <summary>

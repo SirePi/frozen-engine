@@ -10,6 +10,15 @@ namespace Frozen
 	public static class RandomExtensions
 	{
 		/// <summary>
+		/// Returns a random bool.
+		/// </summary>
+		/// <param name="r">A random number generator.</param>
+		public static bool NextBool(this Random r)
+		{
+			return r.NextDouble() > 0.5d;
+		}
+
+		/// <summary>
 		/// Returns a random byte.
 		/// </summary>
 		/// <param name="r">A random number generator.</param>
@@ -40,6 +49,30 @@ namespace Frozen
 		}
 
 		/// <summary>
+		/// Returns a random <see cref="Color"/> with full saturation and maximum brightness.
+		/// </summary>
+		/// <param name="r"></param>
+		public static Color NextColor(this Random r)
+		{
+			return ColorExtensions.FromHSV(r.NextFloat(), 1.0f, 1.0f);
+		}
+
+		/// <summary>
+		/// Returns a component-wise random <see cref="Color"/>.
+		/// </summary>
+		/// <param name="r"></param>
+		/// <param name="min"></param>
+		/// <param name="max"></param>
+		public static Color NextColor(this Random r, Color min, Color max)
+		{
+			return new Color(
+				r.NextByte(min.R, max.R),
+				r.NextByte(min.G, max.G),
+				r.NextByte(min.B, max.B),
+				r.NextByte(min.A, max.A));
+		}
+
+		/// <summary>
 		/// Returns a random float.
 		/// </summary>
 		/// <param name="r">A random number generator.</param>
@@ -67,15 +100,6 @@ namespace Frozen
 		public static float NextFloat(this Random r, float min, float max)
 		{
 			return min + (max - min) * (float)r.NextDouble();
-		}
-
-		/// <summary>
-		/// Returns a random bool.
-		/// </summary>
-		/// <param name="r">A random number generator.</param>
-		public static bool NextBool(this Random r)
-		{
-			return r.NextDouble() > 0.5d;
 		}
 
 		/// <summary>
@@ -187,27 +211,14 @@ namespace Frozen
 		}
 
 		/// <summary>
-		/// Returns a random <see cref="Color"/> with full saturation and maximum brightness.
+		/// Returns one randomly selected element.
 		/// </summary>
+		/// <typeparam name="T"></typeparam>
 		/// <param name="r"></param>
-		public static Color NextColor(this Random r)
+		/// <param name="values"></param>
+		public static T OneOf<T>(this Random r, IEnumerable<T> values)
 		{
-			return ColorExtensions.FromHSV(r.NextFloat(), 1.0f, 1.0f);
-		}
-
-		/// <summary>
-		/// Returns a component-wise random <see cref="Color"/>.
-		/// </summary>
-		/// <param name="r"></param>
-		/// <param name="min"></param>
-		/// <param name="max"></param>
-		public static Color NextColor(this Random r, Color min, Color max)
-		{
-			return new Color(
-				r.NextByte(min.R, max.R),
-				r.NextByte(min.G, max.G),
-				r.NextByte(min.B, max.B),
-				r.NextByte(min.A, max.A));
+			return values.ElementAt(r.Next(values.Count()));
 		}
 
 		/// <summary>
@@ -288,17 +299,6 @@ namespace Frozen
 		public static T OneOfWeighted<T>(this Random r, IEnumerable<T> values, Func<T, float> weightFunc)
 		{
 			return OneOfWeighted<T>(r, values, values.Select(v => weightFunc(v)));
-		}
-
-		/// <summary>
-		/// Returns one randomly selected element.
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="r"></param>
-		/// <param name="values"></param>
-		public static T OneOf<T>(this Random r, IEnumerable<T> values)
-		{
-			return values.ElementAt(r.Next(values.Count()));
 		}
 
 		/// <summary>

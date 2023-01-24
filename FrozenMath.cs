@@ -6,13 +6,12 @@ namespace Frozen
 {
 	public static class FrozenMath
 	{
-		public const float TWO_PI = MathF.PI * 2;
-
 		private static bool[] multiplesOfThree = Enumerable
 			.Range(0, 1024000)
 			.Select(i => i % 3 == 0)
 			.ToArray();
 
+		public const float TWO_PI = MathF.PI * 2;
 		public static Rectangle InfiniteRectangle { get; private set; } = new Rectangle(int.MinValue, int.MinValue, int.MaxValue, int.MaxValue);
 
 		public static bool IsBetween(float value, float a, float b)

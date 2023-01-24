@@ -6,8 +6,8 @@
 		protected VertexPositionColor[] vertices;
 		protected int[] indices;
 
-		public VertexPositionColor[] Vertices => this.vertices;
-		public int[] Indices => this.indices;
+		public VertexPositionColor[] Vertices => vertices;
+		public int[] Indices => indices;
 
 		public abstract void UpdateVertices(Color color, Matrix transform);
 	}
@@ -21,39 +21,39 @@
 		private float halfHeight;
 		public float Width
 		{
-			get => this.width;
+			get => width;
 			set
 			{
-				this.width = value;
-				this.halfWidth = value / 2;
+				width = value;
+				halfWidth = value / 2;
 			}
 		}
 		public float Height
 		{
-			get => this.height;
+			get => height;
 			set
 			{
-				this.height = value;
-				this.halfHeight = value / 2;
+				height = value;
+				halfHeight = value / 2;
 			}
 		}
 
 		public Rectangle()
 		{
-			this.vertices = new VertexPositionColor[4];
-			this.indices = RectangleIndices;
+			vertices = new VertexPositionColor[4];
+			indices = RectangleIndices;
 		}
 
 		public override void UpdateVertices(Color color, Matrix transform)
 		{
-			this.vertices[0].Color = color;
-			this.vertices[0].Position = Vector3.Transform(new Vector3(-this.halfWidth, -this.halfHeight, 0), transform);
-			this.vertices[1].Color = color;
-			this.vertices[1].Position = Vector3.Transform(new Vector3(this.halfWidth, -this.halfHeight, 0), transform);
-			this.vertices[2].Color = color;
-			this.vertices[2].Position = Vector3.Transform(new Vector3(-this.halfWidth, this.halfHeight, 0), transform);
-			this.vertices[3].Color = color;
-			this.vertices[3].Position = Vector3.Transform(new Vector3(this.halfWidth, this.halfHeight, 0), transform);
+			vertices[0].Color = color;
+			vertices[0].Position = Vector3.Transform(new Vector3(-halfWidth, -halfHeight, 0), transform);
+			vertices[1].Color = color;
+			vertices[1].Position = Vector3.Transform(new Vector3(halfWidth, -halfHeight, 0), transform);
+			vertices[2].Color = color;
+			vertices[2].Position = Vector3.Transform(new Vector3(-halfWidth, halfHeight, 0), transform);
+			vertices[3].Color = color;
+			vertices[3].Position = Vector3.Transform(new Vector3(halfWidth, halfHeight, 0), transform);
 		}
 	}
 	*/

@@ -4,11 +4,9 @@ namespace Frozen.ECS.Components
 {
 	public class DebugUI : UI
 	{
-		private Label fps;
+		private Label _fps;
 
-		private Label mouse;
-
-		private Label orbiter;
+		private Label _mouse;
 
 		protected override Desktop BuildUI()
 		{
@@ -23,14 +21,11 @@ namespace Frozen.ECS.Components
 			grid.RowsProportions.Add(new Proportion(ProportionType.Auto));
 			grid.VerticalAlignment = VerticalAlignment.Bottom;
 
-			this.fps = new Label() { GridRow = 0 };
-			grid.Widgets.Add(this.fps);
+			_fps = new Label() { GridRow = 0 };
+			grid.Widgets.Add(_fps);
 
-			this.mouse = new Label() { GridRow = 1 };
-			grid.Widgets.Add(this.mouse);
-
-			this.orbiter = new Label { GridRow = 2 };
-			grid.Widgets.Add(this.orbiter);
+			_mouse = new Label() { GridRow = 1 };
+			grid.Widgets.Add(_mouse);
 
 			return new Desktop { Root = grid };
 		}
@@ -38,8 +33,8 @@ namespace Frozen.ECS.Components
 		protected override void OnUpdate()
 		{
 			base.OnUpdate();
-			this.fps.Text = $"fps: {1 / Time.FrameSeconds:0.000}";
-			this.mouse.Text = Engine.Mouse.Position.ToString();
+			_fps.Text = $"fps: {1 / Time.FrameSeconds:0.000}";
+			_mouse.Text = Engine.Mouse.Position.ToString();
 		}
 	}
 }

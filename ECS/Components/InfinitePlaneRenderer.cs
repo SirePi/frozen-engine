@@ -8,9 +8,9 @@ namespace Frozen.ECS.Components
 {
 	public class InfinitePlaneRenderer : Renderer
 	{
-		private readonly TriangleList tList = new TriangleList();
+		private readonly TriangleList _tList = new TriangleList();
 
-		private readonly VertexPositionColorTexture[] vertices = new VertexPositionColorTexture[4];
+		private readonly VertexPositionColorTexture[] _vertices = new VertexPositionColorTexture[4];
 
 		public override Rectangle Bounds => FrozenMath.InfiniteRectangle;
 
@@ -18,23 +18,15 @@ namespace Frozen.ECS.Components
 
 		public Material Material { get; set; }
 
-		public override long RendererSortedHash => this.Material.DefaultSortingHash(this.Transform.Position.Z);
-
-		public override void Draw(DrawingSystem drawing)
-		{
-			drawing.DrawCameraBoundPrimitives(this.DrawForCamera);
-		}
-
-		public override void UpdateRenderer()
-		{ }
+		public override long RendererSortedHash => Material.DefaultSortingHash(Transform.Position.Z);
 
 		private IEnumerable<PrimitiveItem> DrawForCamera(Camera camera)
 		{
 			Vector2 bound = camera.Viewport.Bounds.Size.ToVector2();
-			Vector3 topLeft = camera.ScreenToWorld(Vector2.Zero, this.Transform.WorldPosition.Z);
-			Vector3 topRight = camera.ScreenToWorld(bound * Vector2.UnitX, this.Transform.WorldPosition.Z);
-			Vector3 bottomLeft = camera.ScreenToWorld(bound * Vector2.UnitY, this.Transform.WorldPosition.Z);
-			Vector3 bottomRight = camera.ScreenToWorld(bound, this.Transform.WorldPosition.Z);
+			Vector3 topLeft = camera.ScreenToWorld(Vector2.Zero, Transform.WorldPosition.Z);
+			Vector3 topRight = camera.ScreenToWorld(bound * Vector2.UnitX, Transform.WorldPosition.Z);
+			Vector3 bottomLeft = camera.ScreenToWorld(bound * Vector2.UnitY, Transform.WorldPosition.Z);
+			Vector3 bottomRight = camera.ScreenToWorld(bound, Transform.WorldPosition.Z);
 
 			float minX = FrozenMath.Min(topLeft.X, topRight.X, bottomLeft.X, bottomRight.X);
 			float maxX = FrozenMath.Max(topLeft.X, topRight.X, bottomLeft.X, bottomRight.X);
@@ -46,28 +38,36 @@ namespace Frozen.ECS.Components
 			float width = maxX - minX;
 			float height = maxY - minY;
 
-			Vector2 txSize = this.Material.SpriteSheet.Texture.Bounds.Size.ToVector2() * this.Transform.Scale;
+			Vector2 txSize = Material.SpriteSheet.Texture.Bounds.Size.ToVector2() * Transform.Scale;
 			Vector2 repetitions = new Vector2(width, height) / txSize;
 
-			Vector2 tlTexture = (new Vector2(minX, minY) - this.Transform.Position.XY()) / txSize;
+			Vector2 tlTexture = (new Vector2(minX, minY) - Transform.Position.XY()) / txSize;
 
-			this.vertices[0].Position = new Vector3(minX, minY, this.Transform.WorldPosition.Z);
-			this.vertices[1].Position = new Vector3(maxX, minY, this.Transform.WorldPosition.Z);
-			this.vertices[2].Position = new Vector3(minX, maxY, this.Transform.WorldPosition.Z);
-			this.vertices[3].Position = new Vector3(maxX, maxY, this.Transform.WorldPosition.Z);
-			this.vertices[0].Color = this.ColorTint;
-			this.vertices[1].Color = this.ColorTint;
-			this.vertices[2].Color = this.ColorTint;
-			this.vertices[3].Color = this.ColorTint;
-			this.vertices[0].TextureCoordinate = tlTexture;
-			this.vertices[1].TextureCoordinate = tlTexture + Vector2.UnitX * repetitions;
-			this.vertices[2].TextureCoordinate = tlTexture + Vector2.UnitY * repetitions;
-			this.vertices[3].TextureCoordinate = tlTexture + repetitions;
+			_vertices[0].Position = new Vector3(minX, minY, Transform.WorldPosition.Z);
+			_vertices[1].Position = new Vector3(maxX, minY, Transform.WorldPosition.Z);
+			_vertices[2].Position = new Vector3(minX, maxY, Transform.WorldPosition.Z);
+			_vertices[3].Position = new Vector3(maxX, maxY, Transform.WorldPosition.Z);
+			_vertices[0].Color = ColorTint;
+			_vertices[1].Color = ColorTint;
+			_vertices[2].Color = ColorTint;
+			_vertices[3].Color = ColorTint;
+			_vertices[0].TextureCoordinate = tlTexture;
+			_vertices[1].TextureCoordinate = tlTexture + Vector2.UnitX * repetitions;
+			_vertices[2].TextureCoordinate = tlTexture + Vector2.UnitY * repetitions;
+			_vertices[3].TextureCoordinate = tlTexture + repetitions;
 
-			this.tList.Clean();
-			this.tList.Reset(this.Material);
-			this.tList.AppendVertices(this.vertices, Renderer.QUAD_INDICES);
-			yield return this.tList;
+			_tList.Clean();
+			_tList.Reset(Material);
+			_tList.AppendVertices(_vertices, Renderer.QUAD_INDICES);
+			yield return _tList;
 		}
+
+		public override void Draw(DrawingSystem drawing)
+		{
+			drawing.DrawCameraBoundPrimitives(DrawForCamera);
+		}
+
+		public override void UpdateRenderer()
+		{ }
 	}
 }

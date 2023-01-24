@@ -7,23 +7,23 @@ namespace Frozen.ECS.Components
 	{
 		public static readonly int[] QUAD_INDICES = new int[] { 0, 1, 2, 1, 3, 2 };
 
-		[RequiredComponent]
-		public Transform Transform { get; protected set; }
+		public abstract Rectangle Bounds { get; }
 
 		public bool IgnoreCamera { get; set; }
 
-		public abstract Rectangle Bounds { get; }
-
 		public abstract long RendererSortedHash { get; }
 
-		public abstract void Draw(DrawingSystem drawing);
-
-		public abstract void UpdateRenderer();
+		[RequiredComponent]
+		public Transform Transform { get; protected set; }
 
 		protected override void OnUpdate()
 		{
 			base.OnUpdate();
-			this.UpdateRenderer();
+			UpdateRenderer();
 		}
+
+		public abstract void Draw(DrawingSystem drawing);
+
+		public abstract void UpdateRenderer();
 	}
 }

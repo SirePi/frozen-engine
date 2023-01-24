@@ -5,38 +5,27 @@ namespace Frozen.Drawing
 {
 	public class Material
 	{
-		public static Material FlatColor { get; private set; } = new Material(DefaultGraphics.FlatColor);
-
-#pragma warning disable IDE0022 // Use block body for methods - suppressed for clarity
-
-		public static Material AlphaBlendedSprite(Sprite spriteSheet) => new Material(DefaultGraphics.AlphaTestTexture, null, spriteSheet);
-
-		public static Material AdditiveSprite(Sprite spriteSheet) => new Material(DefaultGraphics.AlphaTestTexture, BlendState.Additive, spriteSheet);
-
-		public static Material FromSprite(Sprite spriteSheet) => new Material(DefaultGraphics.DefaultTexture, BlendState.NonPremultiplied, spriteSheet);
-
-#pragma warning restore IDE0022 // Use block body for methods
-
 		private Sprite spriteSheet;
-
-		public Sprite SpriteSheet
-		{
-			get => this.spriteSheet;
-			set
-			{
-				if (this.spriteSheet != value)
-				{
-					this.spriteSheet = value;
-					this.EffectParameters["Texture"].SetValue(this.spriteSheet.Texture);
-				}
-			}
-		}
+		public static Material FlatColor { get; private set; } = new Material(DefaultGraphics.FlatColor);
 
 		public BlendState BlendState { get; private set; }
 
 		public Effect Effect { get; private set; }
 
-		public EffectParameterCollection EffectParameters => this.Effect.Parameters;
+		public EffectParameterCollection EffectParameters => Effect.Parameters;
+
+		public Sprite SpriteSheet
+		{
+			get => spriteSheet;
+			set
+			{
+				if (spriteSheet != value)
+				{
+					spriteSheet = value;
+					EffectParameters["Texture"].SetValue(spriteSheet.Texture);
+				}
+			}
+		}
 
 		/// <summary>
 		///
@@ -46,21 +35,36 @@ namespace Frozen.Drawing
 		/// <param name="spriteSheet"></param>
 		public Material(Effect effect, BlendState blendState = null, Sprite spriteSheet = null)
 		{
-			this.Effect = effect.Clone();
-			this.BlendState = blendState ?? BlendState.AlphaBlend;
-			this.SpriteSheet = spriteSheet;
+			Effect = effect.Clone();
+			BlendState = blendState ?? BlendState.AlphaBlend;
+			SpriteSheet = spriteSheet;
 		}
 
 		internal void SetShaderParameters(Matrix view, Matrix projection)
 		{
-			this.EffectParameters["WorldViewProj"].SetValue(Matrix.Identity * view * projection);
-			this.EffectParameters["TotalTime"]?.SetValue(Time.TotalGameSeconds);
-			this.EffectParameters["LastFrameTime"]?.SetValue(Time.FrameSeconds);
+			EffectParameters["WorldViewProj"].SetValue(Matrix.Identity * view * projection);
+			EffectParameters["TotalTime"]?.SetValue(Time.ScaledGameSeconds);
+			EffectParameters["LastFrameTime"]?.SetValue(Time.FrameSeconds);
+		}
+
+		public static Material AdditiveSprite(Sprite spriteSheet)
+		{
+			return new Material(DefaultGraphics.AlphaTestTexture, BlendState.Additive, spriteSheet);
+		}
+
+		public static Material AlphaBlendedSprite(Sprite spriteSheet)
+		{
+			return new Material(DefaultGraphics.AlphaTestTexture, null, spriteSheet);
+		}
+
+		public static Material FromSprite(Sprite spriteSheet)
+		{
+			return new Material(DefaultGraphics.DefaultTexture, BlendState.NonPremultiplied, spriteSheet);
 		}
 
 		public long DefaultSortingHash(float z)
 		{
-			return ((long)z << 32) + this.GetHashCode();
+			return ((long)z << 32) + GetHashCode();
 		}
 	}
 }

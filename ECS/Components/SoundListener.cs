@@ -3,10 +3,10 @@
 	public class SoundListener : Component
 	{
 		[RequiredComponent]
-		internal Transform Transform { get; set; }
+		internal Camera Camera { get; set; }
 
 		[RequiredComponent]
-		internal Camera Camera { get; set; }
+		internal Transform Transform { get; set; }
 
 		public float CutOffDistance { get; set; } = 100000;
 

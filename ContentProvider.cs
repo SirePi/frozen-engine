@@ -14,64 +14,47 @@ namespace Frozen
 {
 	public class ContentProvider
 	{
-		private Dictionary<string, object> cache = new Dictionary<string, object>();
-
-		private Dictionary<string, FontSystem> fontCache = new Dictionary<string, FontSystem>();
-
-		private Dictionary<string, Texture2D> textureCache = new Dictionary<string, Texture2D>();
-
-		private Dictionary<string, AudioSource> audioCache = new Dictionary<string, AudioSource>();
-
-		private bool audioEnabled = true;
-
-		private Game game;
+		private Dictionary<string, AudioSource> _audioCache = new Dictionary<string, AudioSource>();
+		private bool _audioEnabled = true;
+		private Dictionary<string, object> _cache = new Dictionary<string, object>();
+		private Dictionary<string, FontSystem> _fontCache = new Dictionary<string, FontSystem>();
+		private Game _game;
+		private Dictionary<string, Texture2D> _textureCache = new Dictionary<string, Texture2D>();
 
 		internal DefaultContent DefaultContent { get; private set; }
 
 		internal ContentProvider(Game game)
 		{
-			this.game = game;
-			this.game.Content.RootDirectory = "Content";
-			this.DefaultContent = new DefaultContent(this.game.Content);
+			_game = game;
+			_game.Content.RootDirectory = "Content";
+			DefaultContent = new DefaultContent(_game.Content);
 
-			// this.Load<SoundEffect>("");
+			// Load<SoundEffect>("");
 		}
 
 		public Texture2D GenerateTexture(int width, int height, bool mipmap = true)
 		{
-			return new Texture2D(this.game.GraphicsDevice, width, height, mipmap, SurfaceFormat.Color);
+			return new Texture2D(_game.GraphicsDevice, width, height, mipmap, SurfaceFormat.Color);
 		}
 
-		public virtual T LoadXNA<T>(string assetName)
+		public virtual AudioSource LoadAudio(string audio)
 		{
-			Type t = typeof(T);
-
-			if (!this.audioEnabled && t == typeof(SoundEffect) || t == typeof(Song))
-				return default;
-
-			try
+			if (!_audioCache.TryGetValue(audio, out AudioSource source))
 			{
-				if (this.cache.TryGetValue(assetName, out object cachedAsset) && cachedAsset is T typedAsset)
-					return typedAsset;
+				source = new FileAudioSource(audio);
+				_audioCache[audio] = source;
+			}
 
-				T asset = this.game.Content.Load<T>(assetName);
-				this.cache[assetName] = asset;
-				return asset;
-			}
-			catch (NoAudioHardwareException)
-			{
-				this.audioEnabled = false;
-				return default;
-			}
+			return source;
 		}
 
 		public virtual SpriteFont LoadSpriteFont(string font, int size, params CharacterRange[] characters)
 		{
-			if (!this.fontCache.TryGetValue(font, out FontSystem fontSystem))
+			if (!_fontCache.TryGetValue(font, out FontSystem fontSystem))
 			{
 				fontSystem = new FontSystem();
 				fontSystem.AddFont(File.ReadAllBytes(font));
-				this.fontCache[font] = fontSystem;
+				_fontCache[font] = fontSystem;
 			}
 
 			return fontSystem.GetFont(size).ToXNASpriteFont(characters);
@@ -79,7 +62,7 @@ namespace Frozen
 
 		public virtual Texture2D LoadTexture(string texture, bool generateMipmaps = true)
 		{
-			if (this.textureCache.TryGetValue(texture, out Texture2D tx))
+			if (_textureCache.TryGetValue(texture, out Texture2D tx))
 				return tx;
 
 			Image<Rgba32> img = Image.Load<Rgba32>(texture);
@@ -92,40 +75,52 @@ namespace Frozen
 			if (generateMipmaps)
 				tx.CreateMipMaps();
 
-			this.textureCache[texture] = tx;
+			_textureCache[texture] = tx;
 			return tx;
 		}
 
-		public virtual AudioSource LoadAudio(string audio)
+		public virtual T LoadXNA<T>(string assetName)
 		{
-			if (!this.audioCache.TryGetValue(audio, out AudioSource source))
-			{
-				source = new FileAudioSource(audio);
-				this.audioCache[audio] = source;
-			}
+			Type t = typeof(T);
 
-			return source;
+			if (!_audioEnabled && t == typeof(SoundEffect) || t == typeof(Song))
+				return default;
+
+			try
+			{
+				if (_cache.TryGetValue(assetName, out object cachedAsset) && cachedAsset is T typedAsset)
+					return typedAsset;
+
+				T asset = _game.Content.Load<T>(assetName);
+				_cache[assetName] = asset;
+				return asset;
+			}
+			catch (NoAudioHardwareException)
+			{
+				_audioEnabled = false;
+				return default;
+			}
 		}
 
 		public virtual T LoadXNALocalized<T>(string assetName)
 		{
 			Type t = typeof(T);
 
-			if (!this.audioEnabled && t == typeof(SoundEffect) || t == typeof(Song))
+			if (!_audioEnabled && t == typeof(SoundEffect) || t == typeof(Song))
 				return default;
 
 			try
 			{
-				if (this.cache.TryGetValue(assetName, out object cachedAsset) && cachedAsset is T typedAsset)
+				if (_cache.TryGetValue(assetName, out object cachedAsset) && cachedAsset is T typedAsset)
 					return typedAsset;
 
-				T asset = this.game.Content.LoadLocalized<T>(assetName);
-				this.cache[assetName] = asset;
+				T asset = _game.Content.LoadLocalized<T>(assetName);
+				_cache[assetName] = asset;
 				return asset;
 			}
 			catch (NoAudioHardwareException)
 			{
-				this.audioEnabled = false;
+				_audioEnabled = false;
 				return default;
 			}
 		}

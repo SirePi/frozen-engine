@@ -13,9 +13,9 @@ namespace Frozen
 
 	public static class Vector3Extensions
 	{
-		public static Vector2 XY(this Vector3 vector)
+		private static float RoundFloat(float f)
 		{
-			return new Vector2(vector.X, vector.Y);
+			return f % 1 > .5f ? MathF.Ceiling(f) : MathF.Floor(f);
 		}
 
 		public static Vector3 RoundToPixel(this Vector3 vector)
@@ -26,9 +26,9 @@ namespace Frozen
 			return vector;
 		}
 
-		private static float RoundFloat(float f)
+		public static Vector2 XY(this Vector3 vector)
 		{
-			return f % 1 > .5f ? MathF.Ceiling(f) : MathF.Floor(f);
+			return new Vector2(vector.X, vector.Y);
 		}
 	}
 }

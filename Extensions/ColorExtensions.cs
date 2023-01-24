@@ -97,6 +97,11 @@ namespace Frozen
 			return new Color(R, G, B);
 		}
 
+		public static float[] ToFloatArray(this Color color)
+		{
+			return new float[] { color.R / 255f, color.G / 255f, color.B / 255f, color.A / 255f };
+		}
+
 		public static Color WithAlpha(this Color color, byte alpha)
 		{
 			Color result = color;
@@ -109,11 +114,6 @@ namespace Frozen
 			Color result = color;
 			result.A = (byte)(alpha * 255f);
 			return result;
-		}
-
-		public static float[] ToFloatArray(this Color color)
-		{
-			return new float[] { color.R / 255f, color.G / 255f, color.B / 255f, color.A / 255f };
 		}
 	}
 }

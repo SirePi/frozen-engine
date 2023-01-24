@@ -5,47 +5,45 @@ namespace Frozen.Input
 {
 	public class MouseManager
 	{
-		private MouseState lastFrameState;
+		private MouseState _currentFrameState;
+		private MouseState _lastFrameState;
+		public Point Delta => _currentFrameState.Position - _lastFrameState.Position;
 
-		private MouseState currentFrameState;
+		public int HorizontalScrollWheelDelta => _currentFrameState.HorizontalScrollWheelValue - _lastFrameState.HorizontalScrollWheelValue;
+
+		public Point Position => _currentFrameState.Position;
+
+		public int ScrollWheelDelta => _currentFrameState.ScrollWheelValue - _lastFrameState.ScrollWheelValue;
 
 		internal MouseManager()
 		{
-			this.currentFrameState = Mouse.GetState();
+			_currentFrameState = Mouse.GetState();
 		}
 
 		internal void Update()
 		{
-			this.lastFrameState = this.currentFrameState;
-			this.currentFrameState = Mouse.GetState();
-		}
-
-		public bool IsButtonUp(MouseButton key)
-		{
-			return key.GetButtonState(this.currentFrameState) == ButtonState.Released;
+			_lastFrameState = _currentFrameState;
+			_currentFrameState = Mouse.GetState();
 		}
 
 		public bool IsButtonDown(MouseButton key)
 		{
-			return key.GetButtonState(this.currentFrameState) == ButtonState.Pressed;
+			return key.GetButtonState(_currentFrameState) == ButtonState.Pressed;
 		}
 
 		public bool IsButtonHit(MouseButton key)
 		{
-			return key.GetButtonState(this.currentFrameState) == ButtonState.Pressed && key.GetButtonState(this.lastFrameState) == ButtonState.Released;
+			return key.GetButtonState(_currentFrameState) == ButtonState.Pressed && key.GetButtonState(_lastFrameState) == ButtonState.Released;
 		}
 
 		public bool IsButtonReleased(MouseButton key)
 		{
-			return key.GetButtonState(this.currentFrameState) == ButtonState.Released && key.GetButtonState(this.lastFrameState) == ButtonState.Pressed;
+			return key.GetButtonState(_currentFrameState) == ButtonState.Released && key.GetButtonState(_lastFrameState) == ButtonState.Pressed;
 		}
 
-		public Point Delta => this.currentFrameState.Position - this.lastFrameState.Position;
-
-		public Point Position => this.currentFrameState.Position;
-
-		public int HorizontalScrollWheelDelta => this.currentFrameState.HorizontalScrollWheelValue - this.lastFrameState.HorizontalScrollWheelValue;
-
-		public int ScrollWheelDelta => this.currentFrameState.ScrollWheelValue - this.lastFrameState.ScrollWheelValue;
+		public bool IsButtonUp(MouseButton key)
+		{
+			return key.GetButtonState(_currentFrameState) == ButtonState.Released;
+		}
 	}
 }

@@ -10,34 +10,34 @@ namespace Frozen.Audio
 {
 	public abstract class AudioSource
 	{
-		private readonly DerivedObjectsPool<AudioInstance> pool;
+		private readonly DerivedObjectsPool<AudioInstance> _pool;
 
 		protected AudioSource()
 		{
-			this.pool = new DerivedObjectsPool<AudioInstance>();
+			_pool = new DerivedObjectsPool<AudioInstance>();
 		}
-
-		internal abstract AudioProvider ToAudioProvider();
 
 		private void Instance_OnStateChanged(AudioInstance arg1, SoundState arg2)
 		{
 			if (arg2 == SoundState.Stopped)
-				this.pool.ReturnOne(arg1);
-		}
-
-		internal SfxInstance GetSoundEffectInstance()
-		{
-			SfxInstance instance = this.pool.GetOne(() => new SfxInstance(this.ToAudioProvider()));
-			instance.OnStateChanged += this.Instance_OnStateChanged;
-			return instance;
+				_pool.ReturnOne(arg1);
 		}
 
 		internal BgmInstance GetMusicInstance()
 		{
-			BgmInstance instance = this.pool.GetOne(() => new BgmInstance(this.ToAudioProvider()));
-			instance.OnStateChanged += this.Instance_OnStateChanged;
+			BgmInstance instance = _pool.GetOne(() => new BgmInstance(ToAudioProvider()));
+			instance.OnStateChanged += Instance_OnStateChanged;
 			return instance;
 		}
+
+		internal SfxInstance GetSoundEffectInstance()
+		{
+			SfxInstance instance = _pool.GetOne(() => new SfxInstance(ToAudioProvider()));
+			instance.OnStateChanged += Instance_OnStateChanged;
+			return instance;
+		}
+
+		internal abstract AudioProvider ToAudioProvider();
 
 		public static GeneratedAudioSource SineWave(int frequency = 400, float amplitude = .25f, int sampleRate = 48000)
 		{
@@ -52,9 +52,8 @@ namespace Frozen.Audio
 
 	public class FileAudioSource : AudioSource
 	{
-		private readonly byte[] source;
-
-		private readonly WaveFormat waveFormat;
+		private readonly byte[] _source;
+		private readonly WaveFormat _waveFormat;
 
 		internal FileAudioSource(string filename) : base()
 		{
@@ -88,15 +87,15 @@ namespace Frozen.Audio
 			if (wave.WaveFormat.Channels < 1 || wave.WaveFormat.Channels > 2)
 				throw new Exception("Invalid number of channels");
 
-			this.source = new byte[wave.Length];
-			wave.Read(this.source, 0, this.source.Length);
+			_source = new byte[wave.Length];
+			wave.Read(_source, 0, _source.Length);
 
-			this.waveFormat = wave.WaveFormat;
+			_waveFormat = wave.WaveFormat;
 		}
 
 		internal override AudioProvider ToAudioProvider()
 		{
-			return new FileAudioProvider(new RawSourceWaveStream(this.source, 0, this.source.Length, this.waveFormat));
+			return new FileAudioProvider(new RawSourceWaveStream(_source, 0, _source.Length, _waveFormat));
 		}
 	}
 
@@ -106,12 +105,12 @@ namespace Frozen.Audio
 
 		internal GeneratedAudioSource(WaveGenerator generator)
 		{
-			this.Generator = generator;
+			Generator = generator;
 		}
 
 		internal override AudioProvider ToAudioProvider()
 		{
-			return new GeneratedAudioProvider(this.Generator);
+			return new GeneratedAudioProvider(Generator);
 		}
 	}
 }

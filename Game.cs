@@ -6,18 +6,22 @@ namespace Frozen
 {
 	public abstract class Game : Microsoft.Xna.Framework.Game
 	{
+		private Scene _nextScene;
+		protected GraphicsDeviceManager _graphics;
+
 		protected abstract Scene StartingScene { get; }
 
 		internal Scene CurrentScene { get; private set; }
 
-		private Scene nextScene;
-
-		protected GraphicsDeviceManager graphics;
-
 		protected Game()
 		{
 			System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-			this.graphics = new GraphicsDeviceManager(this);
+			_graphics = new GraphicsDeviceManager(this);
+		}
+
+		protected override void Draw(GameTime gameTime)
+		{
+			Engine.Drawing.DrawScene(CurrentScene);
 		}
 
 		protected override void Initialize()
@@ -25,7 +29,7 @@ namespace Frozen
 			base.Initialize();
 			Engine.Initialize(this);
 
-			this.nextScene = this.StartingScene;
+			_nextScene = StartingScene;
 		}
 
 		protected override void Update(GameTime gameTime)
@@ -40,32 +44,27 @@ namespace Frozen
 			foreach (GamePadManager gamePad in Engine.GamePad.Values)
 				gamePad.Update();
 
-			if (this.nextScene != null)
+			if (_nextScene != null)
 			{
-				Scene current = this.CurrentScene;
+				Scene current = CurrentScene;
 
 				current?.BeforeSwitchingFrom();
-				this.nextScene.BeforeSwitchingTo();
+				_nextScene.BeforeSwitchingTo();
 
-				this.CurrentScene = this.nextScene;
+				CurrentScene = _nextScene;
 
 				current?.AfterSwitchingFrom();
-				this.nextScene.AfterSwitchingTo();
+				_nextScene.AfterSwitchingTo();
 
-				this.nextScene = null;
+				_nextScene = null;
 			}
 
-			this.CurrentScene.Update();
-		}
-
-		protected override void Draw(GameTime gameTime)
-		{
-			Engine.Drawing.DrawScene(this.CurrentScene);
+			CurrentScene.Update();
 		}
 
 		internal void ChangeScene(Scene nextScene)
 		{
-			this.nextScene = nextScene;
+			_nextScene = nextScene;
 		}
 	}
 }

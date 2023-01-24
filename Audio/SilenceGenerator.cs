@@ -5,22 +5,22 @@ namespace Frozen.Audio
 {
 	internal class SilenceGenerator : WaveProvider32
 	{
-		private static SilenceGenerator instance;
+		private static SilenceGenerator _instance;
 
 		public static SilenceGenerator Instance
 		{
 			get
 			{
-				if (instance == null)
-					instance = new SilenceGenerator();
+				if (_instance == null)
+					_instance = new SilenceGenerator();
 
-				return instance;
+				return _instance;
 			}
 		}
 
 		private SilenceGenerator()
 		{
-			this.SetWaveFormat(AudioSystem.SampleRate, 2);
+			SetWaveFormat(AudioSystem.SampleRate, 2);
 		}
 
 		public override int Read(float[] buffer, int offset, int sampleCount)

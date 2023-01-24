@@ -4,49 +4,45 @@ namespace Frozen.ECS.Components
 {
 	public class SpriteAnimator : Component
 	{
+		private string _currentAnimation;
+		private Frame _currentFrame;
+		private int _currentFrameIndex;
+		private Frame[] _frames;
+		private float _time;
+
 		[RequiredComponent]
 		public SpriteRenderer Renderer { get; protected set; }
 
-		private Frame[] frames;
-
-		private Frame currentFrame;
-
-		private int currentFrameIndex;
-
-		private float time;
-
-		private string currentAnimation;
-
-		public void SetAnimation(string animation)
+		private void UpdateFrame(int index)
 		{
-			if (this.currentAnimation == animation)
-				return;
-
-			this.currentAnimation = animation;
-			this.frames = this.Renderer.Material.SpriteSheet.Atlas.GetAnimationChain(this.currentAnimation);
-			this.UpdateFrame(0);
+			_currentFrameIndex = index;
+			_currentFrame = _frames[_currentFrameIndex];
+			Renderer.SpriteIndex = _currentFrame.SpriteIndex;
 		}
 
 		protected override void OnUpdate()
 		{
 			base.OnUpdate();
-			this.time += Time.FrameSeconds;
+			_time += Time.FrameSeconds;
 
-			if (this.currentFrame.Duration <= 0)
+			if (_currentFrame.Duration <= 0)
 				return;
 
-			while (this.time > this.currentFrame.Duration)
+			while (_time > _currentFrame.Duration)
 			{
-				this.time -= this.currentFrame.Duration;
-				this.UpdateFrame((this.currentFrameIndex + 1) % this.frames.Length);
+				_time -= _currentFrame.Duration;
+				UpdateFrame((_currentFrameIndex + 1) % _frames.Length);
 			}
 		}
 
-		private void UpdateFrame(int index)
+		public void SetAnimation(string animation)
 		{
-			this.currentFrameIndex = index;
-			this.currentFrame = this.frames[this.currentFrameIndex];
-			this.Renderer.SpriteIndex = this.currentFrame.SpriteIndex;
+			if (_currentAnimation == animation)
+				return;
+
+			_currentAnimation = animation;
+			_frames = Renderer.Material.SpriteSheet.Atlas.GetAnimationChain(_currentAnimation);
+			UpdateFrame(0);
 		}
 	}
 }

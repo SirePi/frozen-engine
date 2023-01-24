@@ -2,6 +2,17 @@
 
 namespace Frozen.Input
 {
+	public enum DPad
+	{
+		Up,
+
+		Down,
+
+		Left,
+
+		Right
+	}
+
 	public enum GamePadButton : byte
 	{
 		A,
@@ -47,17 +58,6 @@ namespace Frozen.Input
 				default: return ButtonState.Released;
 			}
 		}
-	}
-
-	public enum DPad
-	{
-		Up,
-
-		Down,
-
-		Left,
-
-		Right
 	}
 
 	internal static class GamePadDPadExtension

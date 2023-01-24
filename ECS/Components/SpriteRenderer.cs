@@ -8,74 +8,71 @@ namespace Frozen.ECS.Components
 {
 	public class SpriteRenderer : Renderer
 	{
-		private readonly VertexPositionColorTexture[] vertices = new VertexPositionColorTexture[4];
+		private readonly VertexPositionColorTexture[] _vertices = new VertexPositionColorTexture[4];
+		private Material _material;
+		private int _spriteIndex;
 
-		private Material material;
+		public override Rectangle Bounds => Rect;
 
-		private int spriteIndex;
+		public Color ColorTint { get; set; } = Color.White;
 
 		public Material Material
 		{
-			get => this.material;
+			get => _material;
 			set
 			{
-				if (this.material != value)
+				if (_material != value)
 				{
-					this.material = value;
-					this.UpdateRect();
+					_material = value;
+					UpdateRect();
 				}
 			}
 		}
 
 		public Rectangle Rect { get; set; } = Rectangle.Empty;
-
-		public Color ColorTint { get; set; } = Color.White;
+		public override long RendererSortedHash => _material.DefaultSortingHash(Transform.Position.Z);
 
 		public int SpriteIndex
 		{
-			get => this.spriteIndex;
+			get => _spriteIndex;
 			set
 			{
-				if (this.spriteIndex != value)
+				if (_spriteIndex != value)
 				{
-					this.spriteIndex = value;
-					this.UpdateRect();
+					_spriteIndex = value;
+					UpdateRect();
 				}
 			}
 		}
 
-		public override long RendererSortedHash => this.material.DefaultSortingHash(this.Transform.Position.Z);
-
-		public override Rectangle Bounds => this.Rect;
-
 		private void UpdateRect()
 		{
-			Rectangle rect = this.material.SpriteSheet[this.spriteIndex];
-			this.Rect = rect.Transform2D(-rect.Size.ToVector2() * .5f);
+			Rectangle rect = _material.SpriteSheet[_spriteIndex];
+			Rect = rect.Transform2D(-rect.Size.ToVector2() * .5f);
 		}
 
 		public override void Draw(DrawingSystem drawing)
 		{
-			drawing.DrawTexturedTriangles(this.Material, this.vertices, Renderer.QUAD_INDICES);
+			drawing.DrawTexturedTriangles(Material, _vertices, Renderer.QUAD_INDICES);
 		}
 
 		public override void UpdateRenderer()
 		{
-			Matrix matrix = this.Transform.FullTransformMatrix;
-			UVRect uv = this.material.SpriteSheet.Atlas[this.spriteIndex];
+			Matrix matrix = Transform.FullTransformMatrix;
+			UVRect uv = _material.SpriteSheet.Atlas[_spriteIndex];
 
-			this.vertices[0].Color = this.ColorTint;
-			this.vertices[0].Position = Vector3.Transform(new Vector3(this.Rect.Left, this.Rect.Top, 0), matrix);
-			this.vertices[0].TextureCoordinate = uv.TopLeft;
-			this.vertices[1].Color = this.ColorTint;
-			this.vertices[1].Position = Vector3.Transform(new Vector3(this.Rect.Right, this.Rect.Top, 0), matrix);
-			this.vertices[1].TextureCoordinate = uv.TopRight;
-			this.vertices[2].Color = this.ColorTint;
-			this.vertices[2].Position = Vector3.Transform(new Vector3(this.Rect.Left, this.Rect.Bottom, 0), matrix);
-			this.vertices[2].TextureCoordinate = uv.BottomLeft;
-			this.vertices[3].Color = this.ColorTint;
-			this.vertices[3].Position = Vector3.Transform(new Vector3(this.Rect.Right, this.Rect.Bottom, 0), matrix);
-			this.vertices[3].TextureCoordinate = uv.BottomRight;
+			_vertices[0].Color = ColorTint;
+			_vertices[0].Position = Vector3.Transform(new Vector3(Rect.Left, Rect.Top, 0), matrix);
+			_vertices[0].TextureCoordinate = uv.TopLeft;
+			_vertices[1].Color = ColorTint;
+			_vertices[1].Position = Vector3.Transform(new Vector3(Rect.Right, Rect.Top, 0), matrix);
+			_vertices[1].TextureCoordinate = uv.TopRight;
+			_vertices[2].Color = ColorTint;
+			_vertices[2].Position = Vector3.Transform(new Vector3(Rect.Left, Rect.Bottom, 0), matrix);
+			_vertices[2].TextureCoordinate = uv.BottomLeft;
+			_vertices[3].Color = ColorTint;
+			_vertices[3].Position = Vector3.Transform(new Vector3(Rect.Right, Rect.Bottom, 0), matrix);
+			_vertices[3].TextureCoordinate = uv.BottomRight;
 		}
 	}
 }

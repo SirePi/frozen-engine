@@ -5,19 +5,19 @@ namespace Frozen.Utilities
 {
 	public sealed class Pool<T> where T : class
 	{
-		private readonly Func<T> factory;
+		private readonly Func<T> _factory;
 
-		private readonly Queue<T> pool = new Queue<T>();
+		private readonly Queue<T> _pool = new Queue<T>();
 
 		public Pool(Func<T> factory)
 		{
-			this.factory = factory;
+			_factory = factory;
 		}
 
 		public T GetOne()
 		{
-			if (!this.pool.TryDequeue(out T result))
-				result = this.factory();
+			if (!_pool.TryDequeue(out T result))
+				result = _factory();
 
 			if (result is IPoolable poolable)
 				poolable.OnPickup();
@@ -27,12 +27,13 @@ namespace Frozen.Utilities
 
 		public void ReturnOne(T obj)
 		{
-			if (obj == null) return;
+			if (obj == null)
+				return;
 
 			if (obj is IPoolable poolable)
 				poolable.OnReturn();
 
-			this.pool.Enqueue(obj);
+			_pool.Enqueue(obj);
 		}
 	}
 }

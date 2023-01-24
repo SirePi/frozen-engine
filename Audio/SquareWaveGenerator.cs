@@ -10,14 +10,14 @@ namespace Frozen.Audio
 
 		public override int Read(float[] buffer, int offset, int sampleCount)
 		{
-			int sampleRate = this.WaveFormat.SampleRate;
+			int sampleRate = WaveFormat.SampleRate;
 			for (int n = 0; n < sampleCount; n++)
 			{
-				buffer[n + offset] = this.Amplitude * MathF.Sign(MathF.Sin(FrozenMath.TWO_PI * this.sample * this.Frequency / sampleRate));
+				buffer[n + offset] = Amplitude * MathF.Sign(MathF.Sin(FrozenMath.TWO_PI * _sample * Frequency / sampleRate));
 
-				this.sample++;
-				if (this.sample >= sampleRate)
-					this.sample = 0;
+				_sample++;
+				if (_sample >= sampleRate)
+					_sample = 0;
 			}
 			return sampleCount;
 		}

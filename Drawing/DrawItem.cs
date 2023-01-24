@@ -7,114 +7,106 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Frozen.Drawing
 {
-	public abstract class DrawItem
+	internal class CameraBoundItem : DrawItem
 	{
-		public abstract void Draw(GraphicsDevice device, Camera camera);
-
-		public abstract void Clean();
-	}
-
-	public abstract class PrimitiveItem : DrawItem
-	{
-		protected ExpandingArray<VertexPositionColorTexture> vertices;
-
-		protected ExpandingArray<int> indices;
-
-		public abstract Material Material { get; protected set; }
-
-		protected abstract Func<int, bool> ValidateVertices { get; }
-
-		protected abstract int VerticesPerPrimitive { get; }
-
-		public PrimitiveType PrimitiveType { get; private set; }
-
-		protected PrimitiveItem(PrimitiveType pType)
-		{
-			this.PrimitiveType = pType;
-			this.vertices = new ExpandingArray<VertexPositionColorTexture>();
-			this.indices = new ExpandingArray<int>();
-		}
+		private Func<Camera, IEnumerable<PrimitiveItem>> _drawingFunc;
 
 		public override void Clean()
-		{
-			this.vertices.Clear();
-			this.indices.Clear();
-		}
-
-		public void AppendVertices(VertexPositionColorTexture[] vertices, int[] indices)
-		{
-			if (!this.ValidateVertices(indices.Length))
-				throw new ArgumentException("Not enough vertices");
-
-			// Offsetting indices to match the inserted vertices
-			this.indices.AddRange(indices.Select(i => i + this.vertices.Count).ToArray());
-			this.vertices.AddRange(vertices);
-		}
+		{ }
 
 		public override void Draw(GraphicsDevice device, Camera camera)
 		{
-			int primitivesCount = this.indices.Count / this.VerticesPerPrimitive;
-
-			if (primitivesCount > 0)
-			{
-				device.BlendState = this.Material.BlendState;
-				this.Material.SetShaderParameters(camera.View, camera.Projection);
-
-				foreach (EffectPass pass in this.Material.Effect.CurrentTechnique.Passes)
-				{
-					pass.Apply();
-					device.DrawUserIndexedPrimitives(this.PrimitiveType, this.vertices.Data, 0, this.vertices.Data.Length, this.indices.Data, 0, primitivesCount);
-				}
-			}
+			foreach (PrimitiveItem sd in _drawingFunc(camera))
+				sd.Draw(device, camera);
 		}
+
+		public void Reset(Func<Camera, IEnumerable<PrimitiveItem>> drawingFunc)
+		{
+			_drawingFunc = drawingFunc;
+		}
+	}
+
+	internal class LinesList : PrimitiveItem
+	{
+		protected override Func<int, bool> ValidateVertices => FrozenMath.IsMultipleOf2;
+		protected override int VerticesPerPrimitive => 2;
+		public override Material Material { get; protected set; } = Material.FlatColor;
+
+		public LinesList() : base(PrimitiveType.LineList)
+		{ }
 	}
 
 	internal class TriangleList : PrimitiveItem
 	{
-		public override Material Material { get; protected set; }
-
 		protected override Func<int, bool> ValidateVertices => FrozenMath.IsMultipleOf3;
-
 		protected override int VerticesPerPrimitive => 3;
+		public override Material Material { get; protected set; }
 
 		public TriangleList() : base(PrimitiveType.TriangleList)
 		{ }
 
 		public void Reset(Material material)
 		{
-			this.Material = material;
-			this.Clean();
+			Material = material;
+			Clean();
 		}
 	}
 
-	internal class LinesList : PrimitiveItem
+	public abstract class DrawItem
 	{
-		public override Material Material { get; protected set; } = Material.FlatColor;
+		public abstract void Clean();
 
-		protected override Func<int, bool> ValidateVertices => FrozenMath.IsMultipleOf2;
-
-		protected override int VerticesPerPrimitive => 2;
-
-		public LinesList() : base(PrimitiveType.LineList)
-		{ }
+		public abstract void Draw(GraphicsDevice device, Camera camera);
 	}
 
-	internal class CameraBoundItem : DrawItem
+	public abstract class PrimitiveItem : DrawItem
 	{
-		private Func<Camera, IEnumerable<PrimitiveItem>> drawingFunc;
+		protected ExpandingArray<int> _indexes;
+		protected ExpandingArray<VertexPositionColorTexture> _vertices;
 
-		public override void Draw(GraphicsDevice device, Camera camera)
+		protected abstract Func<int, bool> ValidateVertices { get; }
+		protected abstract int VerticesPerPrimitive { get; }
+		public abstract Material Material { get; protected set; }
+		public PrimitiveType PrimitiveType { get; private set; }
+
+		protected PrimitiveItem(PrimitiveType pType)
 		{
-			foreach (PrimitiveItem sd in this.drawingFunc(camera))
-				sd.Draw(device, camera);
+			PrimitiveType = pType;
+			_vertices = new ExpandingArray<VertexPositionColorTexture>();
+			_indexes = new ExpandingArray<int>();
+		}
+
+		public void AppendVertices(VertexPositionColorTexture[] vertices, int[] indexes)
+		{
+			if (!ValidateVertices(indexes.Length))
+				throw new ArgumentException("Not enough vertices");
+
+			// Offsetting indexes to match the inserted vertices
+			_indexes.AddRange(indexes.Select(i => i + _vertices.Count).ToArray());
+			_vertices.AddRange(vertices);
 		}
 
 		public override void Clean()
-		{ }
-
-		public void Reset(Func<Camera, IEnumerable<PrimitiveItem>> drawingFunc)
 		{
-			this.drawingFunc = drawingFunc;
+			_vertices.Clear();
+			_indexes.Clear();
+		}
+
+		public override void Draw(GraphicsDevice device, Camera camera)
+		{
+			int primitivesCount = _indexes.Count / VerticesPerPrimitive;
+
+			if (primitivesCount > 0)
+			{
+				device.BlendState = Material.BlendState;
+				Material.SetShaderParameters(camera.View, camera.Projection);
+
+				foreach (EffectPass pass in Material.Effect.CurrentTechnique.Passes)
+				{
+					pass.Apply();
+					device.DrawUserIndexedPrimitives(PrimitiveType, _vertices.Data, 0, _vertices.Data.Length, _indexes.Data, 0, primitivesCount);
+				}
+			}
 		}
 	}
 }
