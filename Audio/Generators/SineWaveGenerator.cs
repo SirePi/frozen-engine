@@ -1,10 +1,11 @@
 ﻿using System;
+using Frozen.ECS.Systems;
 
 namespace Frozen.Audio
 {
-	internal class SineWaveGenerator : WaveGenerator
+	public class SineWaveGenerator : WaveGenerator
 	{
-		public SineWaveGenerator(int frequency, float amplitude, int sampleRate)
+		public SineWaveGenerator(int frequency, float amplitude = 1, int sampleRate = AudioSystem.SampleRate)
 			: base(frequency, amplitude, sampleRate)
 		{ }
 

@@ -24,13 +24,13 @@ namespace Frozen.Audio
 
 	internal class GeneratedAudioProvider : AudioProvider
 	{
-		internal WaveGenerator Source { get; private set; }
+		internal AudioGenerator Source { get; private set; }
 
 		public override bool IsActive => true;
 
 		public override TimeSpan TimeLeft => TimeSpan.Zero;
 
-		public GeneratedAudioProvider(WaveGenerator source) : base(source, source.WaveFormat)
+		public GeneratedAudioProvider(AudioGenerator source) : base(source, source.WaveFormat)
 		{
 			Source = source;
 		}

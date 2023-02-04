@@ -38,16 +38,6 @@ namespace Frozen.Audio
 		}
 
 		internal abstract AudioProvider ToAudioProvider();
-
-		public static GeneratedAudioSource SineWave(int frequency = 400, float amplitude = .25f, int sampleRate = 48000)
-		{
-			return new GeneratedAudioSource(new SineWaveGenerator(frequency, amplitude, sampleRate));
-		}
-
-		public static GeneratedAudioSource SquareWave(int frequency = 400, float amplitude = .25f, int sampleRate = 48000)
-		{
-			return new GeneratedAudioSource(new SquareWaveGenerator(frequency, amplitude, sampleRate));
-		}
 	}
 
 	public class FileAudioSource : AudioSource
@@ -101,9 +91,9 @@ namespace Frozen.Audio
 
 	public class GeneratedAudioSource : AudioSource
 	{
-		public WaveGenerator Generator { get; private set; }
+		public AudioGenerator Generator { get; private set; }
 
-		internal GeneratedAudioSource(WaveGenerator generator)
+		internal GeneratedAudioSource(AudioGenerator generator)
 		{
 			Generator = generator;
 		}

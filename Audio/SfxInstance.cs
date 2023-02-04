@@ -85,7 +85,7 @@ namespace Frozen.Audio
 			}
 		}
 
-		public void Apply3D(SoundEmitter emitter, SoundListener listener, ThreeDSoundChange change = ThreeDSoundChange.Default)
+		public SfxInstance Apply3D(SoundEmitter emitter, SoundListener listener, ThreeDSoundChange change = ThreeDSoundChange.Default)
 		{
 			_emitter = emitter;
 			_listener = listener;
@@ -94,6 +94,8 @@ namespace Frozen.Audio
 			_updateVolume = change.HasFlag(ThreeDSoundChange.Volume);
 
 			Update();
+
+			return this;
 		}
 	}
 }

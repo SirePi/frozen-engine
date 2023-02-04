@@ -42,7 +42,7 @@ namespace Frozen.ECS
 					_parent = value;
 					_parent?._children.Add(this);
 
-					this.OnParentChanged(this);
+					OnParentChanged?.Invoke(this);
 				}
 			}
 		}

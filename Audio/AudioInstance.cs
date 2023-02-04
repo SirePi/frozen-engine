@@ -1,4 +1,5 @@
 ﻿using System;
+using Frozen.Utilities;
 using Microsoft.Xna.Framework.Audio;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
@@ -6,9 +7,10 @@ using static Frozen.DelegatesAndEvents;
 
 namespace Frozen.Audio
 {
-	public abstract class AudioInstance : ISampleProvider
+	public abstract class AudioInstance : IPoolable, ISampleProvider
 	{
 		private readonly VolumeSampleProvider _volume;
+		private ISampleProvider _output;
 		private SoundState _state;
 		protected readonly AudioProvider _source;
 
@@ -38,11 +40,19 @@ namespace Frozen.Audio
 			_state = SoundState.Stopped;
 			_source = provider;
 			_volume = new VolumeSampleProvider(SetupPipeline());
+			_output = _volume;
 		}
 
 		protected abstract ISampleProvider SetupPipeline();
 
 		internal abstract void Update();
+
+		public AudioInstance ApplyEffect(AudioEffect effect)
+		{
+			effect.ApplyTo(_volume);
+			_output = effect;
+			return this;
+		}
 
 		public void Pause()
 		{
@@ -61,8 +71,8 @@ namespace Frozen.Audio
 			switch (State)
 			{
 				case SoundState.Playing:
-					int read = _volume.Read(buffer, offset, count);
-					if (!_source.IsActive)
+					int read = _output.Read(buffer, offset, count);
+					if (read < count)
 						Stop();
 
 					return read;
@@ -85,5 +95,13 @@ namespace Frozen.Audio
 		{
 			State = SoundState.Stopped;
 		}
+
+		public void OnPickup()
+		{
+			_output = _volume;
+		}
+
+		public void OnReturn()
+		{ }
 	}
 }

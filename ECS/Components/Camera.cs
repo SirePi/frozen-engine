@@ -74,8 +74,8 @@ namespace Frozen.ECS.Components
 
 		protected Camera(CameraType type, CameraViewportSize size)
 		{
-			type = type;
-			size = size;
+			_type = type;
+			_size = size;
 			_nearPlane = 1;
 			_farPlane = 10000f;
 			_dirtyProjection = true;

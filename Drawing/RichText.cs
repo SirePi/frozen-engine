@@ -8,19 +8,23 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Frozen.Drawing
 {
-	public class RichTextPart
+	internal class RichTextParagraph
+	{
+		public string RawText { get; set; }
+		public List<RichTextPart> Parts { get; private set; } = new List<RichTextPart>();
+	}
+
+	internal class RichTextPart
 	{
 		public SpriteFont Font { get; set; }
 		public Color Color { get; set; }
 		public Color Background { get; set; }
 		public string Text { get; set; }
-		public float Width { get; set; }
-
 		/*
-		public void EmitVertices(Matrix transformMatrix, out VertexPositionColorTexture[] vertices, out int[] indexes)
+		public void EmitVertices(Vector3 source, out VertexPositionColorTexture[] vertices, out int[] indexes, Alignment alignment = Alignment.Top, float? maxWidth = null)
 		{
 
-			Vector2 textArea = _font.MeasureString(string.Join(Environment.NewLine, rows.Select(t => t.Text)));
+			Vector2 textArea = Font.MeasureString(string.Join(Environment.NewLine, rows.Select(t => t.Text)));
 			Vector2 start = -textArea * .5f;
 			float startX = start.X;
 
@@ -86,13 +90,13 @@ namespace Frozen.Drawing
 	{
 		private static readonly Regex ControlRegex = new Regex(@"^\[(?<type>t|c|b)=(?<value>.+)\]");
 		private static readonly string[] LineSeparators = new[]
-{
+		{
 			"\n\r",
 			"\n",
 		};
 
 		private string _rawText;
-		private List<List<RichTextPart>> rows;
+		private List<RichTextParagraph> _paragraphs;
 		public string RawText
 		{
 			get
@@ -104,7 +108,7 @@ namespace Frozen.Drawing
 				if (_rawText != value)
 				{
 					_rawText = value;
-					UpdateParts();
+					UpdateParagraphs();
 				}
 			}
 		}
@@ -115,28 +119,35 @@ namespace Frozen.Drawing
 
 		public RichText(string text)
 		{
-			rows = new List<List<RichTextPart>>();
+			_paragraphs = new List<RichTextParagraph>();
 			RawText = text;
 		}
 
-		private void UpdateParts()
+		private void UpdateParagraphs()
 		{
 			if (string.IsNullOrWhiteSpace(_rawText))
-				rows = null;
+				_paragraphs = null;
 			else
 			{
 				string[] rawRows = _rawText.Split(LineSeparators, StringSplitOptions.RemoveEmptyEntries);
-				rows.Clear();
 
 				Color color = Color;
 				Color background = Background;
 				SpriteFont font = Font;
 				RichTextPart currentPart = null;
+				int i = 0;
 
-				for(int i = 0; i < rawRows.Length; i++)
+				for(i = 0; i < rawRows.Length; i++)
 				{
 					string row = rawRows[i];
-					rows.Add(new List<RichTextPart>());
+
+					if (_paragraphs.Count > i)
+					{
+						if (_paragraphs[i].RawText == row)
+							continue; // row is the same, can skip
+					}
+					else
+						_paragraphs.Add(new RichTextParagraph { RawText = row });
 
 					while(row.Length > 0)
 					{
@@ -145,7 +156,7 @@ namespace Frozen.Drawing
 						{
 							if(currentPart != null)
 							{
-								rows[rows.Count - 1].Add(currentPart);
+								_paragraphs[_paragraphs.Count - 1].Parts.Add(currentPart);
 								currentPart = null;
 							}
 
@@ -185,13 +196,15 @@ namespace Frozen.Drawing
 
 					if (currentPart != null)
 					{
-						rows[rows.Count - 1].Add(currentPart);
+						_paragraphs[_paragraphs.Count - 1].Parts.Add(currentPart);
 						currentPart = null;
 					}
 				}
+
+				while (_paragraphs.Count > i)
+					_paragraphs.Remove(_paragraphs[_paragraphs.Count - 1]);
 			}
 		}
-
 		/*
 		public void EmitVertices(Matrix transformMatrix, out VertexPositionColorTexture[] vertices, out int[] indexes)
 		{

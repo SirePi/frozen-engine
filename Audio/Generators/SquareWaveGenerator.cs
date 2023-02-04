@@ -1,10 +1,11 @@
 ﻿using System;
+using Frozen.ECS.Systems;
 
 namespace Frozen.Audio
 {
-	internal class TriangleWaveGenerator : WaveGenerator
+	public class SquareWaveGenerator : WaveGenerator
 	{
-		public TriangleWaveGenerator(int frequency, float amplitude, int sampleRate)
+		public SquareWaveGenerator(int frequency, float amplitude = 1, int sampleRate = AudioSystem.SampleRate)
 			: base(frequency, amplitude, sampleRate)
 		{ }
 
@@ -14,6 +15,7 @@ namespace Frozen.Audio
 			for (int n = 0; n < sampleCount; n++)
 			{
 				buffer[n + offset] = Amplitude * MathF.Sign(MathF.Sin(FrozenMath.TWO_PI * _sample * Frequency / sampleRate));
+
 				_sample++;
 				if (_sample >= sampleRate)
 					_sample = 0;
