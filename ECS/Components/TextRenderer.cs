@@ -42,7 +42,7 @@ namespace Frozen.ECS.Components
 		private float _spaceWidth;
 		private string _text;
 
-		private VertexPositionColorTexture[] vertices;
+		private VertexPositionColorTexture[] _vertices;
 		public override Rectangle Bounds => Rect;
 		public Color ColorTint { get; set; } = Color.White;
 
@@ -113,7 +113,7 @@ namespace Frozen.ECS.Components
 			if (string.IsNullOrWhiteSpace(_text))
 				return;
 
-			drawing.DrawTexturedTriangles(_material, vertices, _indexes);
+			drawing.DrawTexturedTriangles(_material, _vertices, _indexes);
 		}
 
 		public override void UpdateRenderer()
@@ -163,7 +163,7 @@ namespace Frozen.ECS.Components
 				Vector2 start = -textArea * .5f;
 				float startX = start.X;
 
-				vertices = new VertexPositionColorTexture[_text.Length * 4];
+				_vertices = new VertexPositionColorTexture[_text.Length * 4];
 				_indexes = new int[_text.Length * 6];
 
 				int o = 0;
@@ -184,22 +184,22 @@ namespace Frozen.ECS.Components
 						float x = start.X + glyph.Glyph.Cropping.X;
 						float y = start.Y + glyph.Glyph.Cropping.Y;
 
-						vertices[vOffset + 0].Color = ColorTint;
-						vertices[vOffset + 0].Position = Vector3.Transform(new Vector3(x, y, 0), matrix);
-						vertices[vOffset + 0].TextureCoordinate.X = glyph.UVLeft;
-						vertices[vOffset + 0].TextureCoordinate.Y = glyph.UVTop;
-						vertices[vOffset + 1].Color = ColorTint;
-						vertices[vOffset + 1].Position = Vector3.Transform(new Vector3(x + glyph.Glyph.BoundsInTexture.Width, y, 0), matrix);
-						vertices[vOffset + 1].TextureCoordinate.X = glyph.UVRight;
-						vertices[vOffset + 1].TextureCoordinate.Y = glyph.UVTop;
-						vertices[vOffset + 2].Color = ColorTint;
-						vertices[vOffset + 2].Position = Vector3.Transform(new Vector3(x, y + glyph.Glyph.BoundsInTexture.Height, 0), matrix);
-						vertices[vOffset + 2].TextureCoordinate.X = glyph.UVLeft;
-						vertices[vOffset + 2].TextureCoordinate.Y = glyph.UVBottom;
-						vertices[vOffset + 3].Color = ColorTint;
-						vertices[vOffset + 3].Position = Vector3.Transform(new Vector3(x + glyph.Glyph.BoundsInTexture.Width, y + glyph.Glyph.BoundsInTexture.Height, 0), matrix);
-						vertices[vOffset + 3].TextureCoordinate.X = glyph.UVRight;
-						vertices[vOffset + 3].TextureCoordinate.Y = glyph.UVBottom;
+						_vertices[vOffset + 0].Color = ColorTint;
+						_vertices[vOffset + 0].Position = Vector3.Transform(new Vector3(x, y, 0), matrix);
+						_vertices[vOffset + 0].TextureCoordinate.X = glyph.UVLeft;
+						_vertices[vOffset + 0].TextureCoordinate.Y = glyph.UVTop;
+						_vertices[vOffset + 1].Color = ColorTint;
+						_vertices[vOffset + 1].Position = Vector3.Transform(new Vector3(x + glyph.Glyph.BoundsInTexture.Width, y, 0), matrix);
+						_vertices[vOffset + 1].TextureCoordinate.X = glyph.UVRight;
+						_vertices[vOffset + 1].TextureCoordinate.Y = glyph.UVTop;
+						_vertices[vOffset + 2].Color = ColorTint;
+						_vertices[vOffset + 2].Position = Vector3.Transform(new Vector3(x, y + glyph.Glyph.BoundsInTexture.Height, 0), matrix);
+						_vertices[vOffset + 2].TextureCoordinate.X = glyph.UVLeft;
+						_vertices[vOffset + 2].TextureCoordinate.Y = glyph.UVBottom;
+						_vertices[vOffset + 3].Color = ColorTint;
+						_vertices[vOffset + 3].Position = Vector3.Transform(new Vector3(x + glyph.Glyph.BoundsInTexture.Width, y + glyph.Glyph.BoundsInTexture.Height, 0), matrix);
+						_vertices[vOffset + 3].TextureCoordinate.X = glyph.UVRight;
+						_vertices[vOffset + 3].TextureCoordinate.Y = glyph.UVBottom;
 
 						iOffset = o * 6;
 						_indexes[iOffset + 0] = Renderer.QUAD_INDICES[0] + vOffset;

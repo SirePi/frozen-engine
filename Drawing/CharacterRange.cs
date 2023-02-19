@@ -11,6 +11,8 @@
 		public static readonly CharacterRange LatinExtendedA = new CharacterRange((char)0x0100, (char)0x017F);
 		public static readonly CharacterRange LatinExtendedB = new CharacterRange((char)0x0180, (char)0x024F);
 
+		public static readonly CharacterRange[] Default = new CharacterRange[] { BasicLatin, Latin1Supplement };
+
 		public char End { get; private set; }
 		public char Start { get; private set; }
 

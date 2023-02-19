@@ -48,6 +48,11 @@ namespace Frozen
 			return source;
 		}
 
+		public virtual SpriteFont LoadSpriteFont(string font, int size)
+		{
+			return LoadSpriteFont(font, size, CharacterRange.Default);
+		}
+
 		public virtual SpriteFont LoadSpriteFont(string font, int size, params CharacterRange[] characters)
 		{
 			if (!_fontCache.TryGetValue(font, out FontSystem fontSystem))
