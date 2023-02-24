@@ -17,7 +17,8 @@ namespace Frozen
 		private Dictionary<string, AudioSource> _audioCache = new Dictionary<string, AudioSource>();
 		private bool _audioEnabled = true;
 		private Dictionary<string, object> _cache = new Dictionary<string, object>();
-		private Dictionary<string, FontSystem> _fontCache = new Dictionary<string, FontSystem>();
+		private Dictionary<string, FontSystem> _rawFontCache = new Dictionary<string, FontSystem>();
+		private Dictionary<string, Dictionary<int, Font>> _fontCache = new Dictionary<string, Dictionary<int, Font>>();
 		private Game _game;
 		private Dictionary<string, Texture2D> _textureCache = new Dictionary<string, Texture2D>();
 
@@ -55,11 +56,11 @@ namespace Frozen
 
 		public virtual SpriteFontBase LoadSpriteFont(string font, int size, params CharacterRange[] characters)
 		{
-			if (!_fontCache.TryGetValue(font, out FontSystem fontSystem))
+			if (!_rawFontCache.TryGetValue(font, out FontSystem fontSystem))
 			{
 				fontSystem = new FontSystem();
 				fontSystem.AddFont(File.ReadAllBytes(font));
-				_fontCache[font] = fontSystem;
+				_rawFontCache[font] = fontSystem;
 			}
 
 			return fontSystem.GetFont(size);
