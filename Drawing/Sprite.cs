@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -26,6 +27,20 @@ namespace Frozen.Drawing
 		{
 			Texture = texture;
 			Atlas = Atlas.FromGrid(rows, columns);
+		}
+
+		public Sprite(Texture2D texture, params Rectangle[] sprites)
+		{
+			Texture = texture;
+
+			Vector2 uv = Vector2.One / Texture.Bounds.Size.ToVector2();
+
+			Atlas = Atlas.FromRects(sprites.Select(rect =>
+			{
+				Vector2 location = rect.Location.ToVector2() * uv;
+				Vector2 size = rect.Size.ToVector2() * uv;
+				return new UVRect(location, size);
+			}));
 		}
 
 		public Rectangle this[int spriteIndex]

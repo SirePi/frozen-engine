@@ -1,4 +1,5 @@
 ﻿using System;
+using FontStashSharp.RichText;
 
 namespace Frozen
 {
@@ -22,5 +23,18 @@ namespace Frozen
 		BottomLeft = Bottom | Left,
 
 		BottomRight = Bottom | Right
+	}
+
+	internal static class AlignmentExtensions
+	{
+		public static TextHorizontalAlignment ToFontStashSharpAlignment(this Alignment value)
+		{
+			if (value.HasFlag(Alignment.Left))
+				return TextHorizontalAlignment.Left;
+			else if (value.HasFlag(Alignment.Right))
+				return TextHorizontalAlignment.Right;
+			else
+				return TextHorizontalAlignment.Center;
+		}
 	}
 }

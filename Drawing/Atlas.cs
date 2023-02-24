@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Xna.Framework;
+using Myra.Utility;
 
 namespace Frozen.Drawing
 {
@@ -28,6 +30,15 @@ namespace Frozen.Drawing
 				for (int c = 0; c < columns; c++)
 					result._sprites.Add(new UVRect(x * c, y * r, x, y));
 
+			return result;
+		}
+
+		public static Atlas FromRects(IEnumerable<UVRect> rects)
+		{
+			if (rects == null || !rects.Any())
+				throw new ArgumentException(nameof(rects));
+			Atlas result = new Atlas();
+			result._sprites.AddRange(rects);
 			return result;
 		}
 

@@ -17,6 +17,9 @@ namespace Frozen
 
 		public float Y { get; set; }
 
+		public UVRect(Vector2 location, Vector2 size) : this(location.X, location.Y, size.X, size.Y)
+		{ }
+
 		public UVRect(float x, float y, float width, float height)
 		{
 			X = x;

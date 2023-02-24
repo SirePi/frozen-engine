@@ -9,7 +9,8 @@ namespace Frozen.ECS.Systems
 {
 	public class DrawingSystem
 	{
-		private readonly SpriteBatch _batch;
+		internal SpriteBatch Batch { get; private set; }
+
 		private readonly GraphicsDevice _device;
 		private readonly List<DrawItem> _drawables = new List<DrawItem>();
 
@@ -21,7 +22,7 @@ namespace Frozen.ECS.Systems
 			_device.BlendState = BlendState.AlphaBlend;
 			_device.RasterizerState = new RasterizerState { CullMode = CullMode.CullCounterClockwiseFace, FillMode = FillMode.Solid };
 
-			_batch = new SpriteBatch(_device);
+			Batch = new SpriteBatch(_device);
 		}
 
 		private void ClearDrawables()
@@ -82,7 +83,7 @@ namespace Frozen.ECS.Systems
 
 			_device.SetRenderTarget(null);
 
-			_batch.Begin();
+			Batch.Begin();
 			foreach (Camera camera in scene.GetCameras())
 			{
 				Vector2 location = Vector2.Zero;
@@ -96,9 +97,9 @@ namespace Frozen.ECS.Systems
 				if (camera.Alignment.HasFlag(Alignment.Right))
 					location.X = _device.Viewport.Width - camera.RenderTarget.Width - camera.Margin.X;
 
-				_batch.Draw(camera.RenderTarget, location, Color.White);
+				Batch.Draw(camera.RenderTarget, location, Color.White);
 			}
-			_batch.End();
+			Batch.End();
 
 			foreach (UI ui in scene.GetActiveComponents<UI>())
 				ui.Draw();
@@ -153,9 +154,10 @@ namespace Frozen.ECS.Systems
 			}
 		}
 
-		public void DrawString(Vector3 position, SpriteFont font, RichText text)
+		public void DrawRichText(Vector3 position, RichText text)
 		{
-
+			text.Update(Batch);
+			
 		}
 
 		public void DrawTexturedTriangles(Material material, VertexPositionColorTexture[] vertices, int[] indices)
