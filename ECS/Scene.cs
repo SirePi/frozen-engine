@@ -13,7 +13,6 @@ namespace Frozen.ECS
 		private readonly CoroutineManager _coroutineManager = new CoroutineManager();
 		private readonly EntityManager _entityManager = new EntityManager();
 		private readonly HashSet<Renderer> _renderers = new HashSet<Renderer>();
-		private readonly HashSet<UI> _uis = new HashSet<UI>();
 		public static Scene Current => Engine.Game.CurrentScene;
 
 		public int EntitiesCount => _entityManager.GetEntities().Count();
@@ -39,7 +38,6 @@ namespace Frozen.ECS
 			switch (component)
 			{
 				case Renderer r: _renderers.Add(r); break;
-				case UI ui: _uis.Add(ui); break;
 			}
 		}
 
@@ -48,7 +46,6 @@ namespace Frozen.ECS
 			switch (component)
 			{
 				case Renderer r: _renderers.Remove(r); break;
-				case UI ui: _uis.Remove(ui); break;
 			}
 		}
 

@@ -154,12 +154,6 @@ namespace Frozen.ECS.Systems
 			}
 		}
 
-		public void DrawRichText(Vector3 position, RichText text)
-		{
-			text.Update(Batch);
-			
-		}
-
 		public void DrawTexturedTriangles(Material material, VertexPositionColorTexture[] vertices, int[] indices)
 		{
 			if (_drawablesUsed > 0 && _drawables[_drawablesUsed - 1] is TriangleList tl && tl.Material == material)

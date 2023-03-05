@@ -1,7 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
+using SkiaSharp;
 
 namespace Frozen
 {
@@ -12,22 +10,21 @@ namespace Frozen
 			int w = texture.Width;
 			int h = texture.Height;
 
-			Rgba32[] data = new Rgba32[w * h];
+			SKColor[] data = new SKColor[w * h];
 			texture.GetData(0, texture.Bounds, data, 0, data.Length);
 
-			Image<Rgba32> source = Image.LoadPixelData(data, w, h);
+			using SKBitmap bmp = new SKBitmap(w, h);
+			bmp.Pixels = data;
 
 			for (int i = 1; i < texture.LevelCount; i++)
 			{
 				w /= 2;
 				h /= 2;
 
-				Image<Rgba32> mipmap = source.Clone();
-				mipmap.Mutate(x => x.Resize(w, h));
-				Rgba32[] mmData = new Rgba32[w * h];
+				using SKBitmap mipmap = new SKBitmap(w, h);
 
-				mipmap.CopyPixelDataTo(mmData);
-				texture.SetData(i, new Microsoft.Xna.Framework.Rectangle(0, 0, w, h), mmData, 0, w * h);
+				bmp.ScalePixels(mipmap, SKFilterQuality.High);
+				texture.SetData(i, new Microsoft.Xna.Framework.Rectangle(0, 0, w, h), mipmap.Pixels, 0, w * h);
 			}
 		}
 

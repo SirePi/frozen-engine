@@ -19,7 +19,7 @@ namespace Frozen.ECS.Components
 		private float _nearPlane;
 		private float _windowAspectRatio;
 
-		public Alignment Alignment { get; set; } = Alignment.None;
+		internal Alignment Alignment { get; set; } = Alignment.Center;
 
 		public Color ClearColor { get; set; } = Color.Black;
 
@@ -141,7 +141,7 @@ namespace Frozen.ECS.Components
 			base.OnUpdate();
 		}
 
-		public static Camera CreateCamera(CameraType type, CameraViewportSize size, Alignment alignment, Point? margin = null)
+		internal static Camera CreateCamera(CameraType type, CameraViewportSize size, Alignment alignment, Point? margin = null)
 		{
 			return new Camera(type, size)
 			{
@@ -150,14 +150,14 @@ namespace Frozen.ECS.Components
 			};
 		}
 
-		public static Camera CreateCamera(CameraType type, Vector2 size, bool isAbsoluteSize, Alignment alignment, Point? margin = null)
+		internal static Camera CreateCamera(CameraType type, Vector2 size, bool isAbsoluteSize, Alignment alignment, Point? margin = null)
 		{
 			return CreateCamera(type, new CameraViewportSize(size, isAbsoluteSize), alignment, margin);
 		}
 
 		public static Camera CreateFullScreen(CameraType type)
 		{
-			return CreateCamera(type, Vector2.One, false, Alignment.None);
+			return CreateCamera(type, Vector2.One, false, Alignment.Center);
 		}
 
 		public static IEnumerable<Camera> CreateSplitScreen(CameraType type, SplitScreen split)

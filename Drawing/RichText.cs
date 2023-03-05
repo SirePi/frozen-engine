@@ -98,30 +98,31 @@ namespace Frozen.Drawing
 			return (int)MathF.Pow(2, MathF.Ceiling(MathF.Log(minSize, 2)));
 		}
 
-		public void Update(SpriteBatch batch)
+		public bool UpdateIfNeeded(SpriteBatch batch)
 		{
-			if (_dirty)
+			if (!_dirty)
+				return false;
+
+			int textureWidth = CalculateTextureSize(_rtl.Size.X);
+			int textureHeigth = CalculateTextureSize(_rtl.Size.Y);
+
+			if (_renderTarget.Width < textureWidth || _renderTarget.Height < textureHeigth)
 			{
-				int textureWidth = CalculateTextureSize(_rtl.Size.X);
-				int textureHeigth = CalculateTextureSize(_rtl.Size.Y);
-
-				if (_renderTarget.Width < textureWidth || _renderTarget.Height < textureHeigth)
-				{ 
-					_renderTarget = new RenderTarget2D(Engine.Game.GraphicsDevice, textureWidth, textureHeigth);
-					Material.SpriteSheet = new Sprite(_renderTarget);
-				}
-
-				UVRect = new UVRect(Vector2.Zero, _rtl.Size.ToVector2() / _renderTarget.Bounds.Size.ToVector2());
-
-				Engine.Game.GraphicsDevice.SetRenderTarget(_renderTarget);
-				batch.Begin(SpriteSortMode.Immediate);
-				batch.GraphicsDevice.Clear(Color.Transparent);
-				_rtl.Draw(batch, Vector2.Zero, Color.White, horizontalAlignment: _alignment.ToFontStashSharpAlignment());
-				batch.End();
-				Engine.Game.GraphicsDevice.SetRenderTarget(null);
-
-				_dirty = false;
+				_renderTarget = new RenderTarget2D(Engine.Game.GraphicsDevice, textureWidth, textureHeigth);
+				Material.SpriteSheet = new Sprite(_renderTarget);
 			}
+
+			UVRect = new UVRect(Vector2.Zero, _rtl.Size.ToVector2() / _renderTarget.Bounds.Size.ToVector2());
+
+			Engine.Game.GraphicsDevice.SetRenderTarget(_renderTarget);
+			batch.Begin(SpriteSortMode.Immediate);
+			batch.GraphicsDevice.Clear(Color.Transparent);
+			_rtl.Draw(batch, _alignment.ToFontStashSharpOrigin(_rtl.Size), Color.White, horizontalAlignment: _alignment.ToFontStashSharpAlignment());
+			batch.End();
+			Engine.Game.GraphicsDevice.SetRenderTarget(null);
+
+			_dirty = false;
+			return true;
 		}
 	}
 }

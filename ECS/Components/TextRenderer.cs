@@ -21,8 +21,23 @@ namespace Frozen.ECS.Components
 
 		public override void Draw(DrawingSystem drawing)
 		{
-			Text.Update(drawing.Batch);
-			Rect = new Rectangle(Point.Zero, Text.Size);
+			bool updated = Text.UpdateIfNeeded(drawing.Batch);
+
+			if (updated)
+			{
+				switch (Text.Alignment)
+				{
+					case Alignment.TopLeft: Rect = new Rectangle(0 , 0, Text.Size.X, Text.Size.Y); break;
+					case Alignment.Top: Rect = new Rectangle(-Text.Size.X / 2, 0, Text.Size.X, Text.Size.Y); break;
+					case Alignment.TopRight: Rect = new Rectangle(-Text.Size.X, 0, Text.Size.X, Text.Size.Y); break;
+					case Alignment.Left: Rect = new Rectangle(0, -Text.Size.Y / 2, Text.Size.X, Text.Size.Y); break;
+					case Alignment.Center: Rect = new Rectangle(-Text.Size.X / 2, -Text.Size.Y / 2, Text.Size.X, Text.Size.Y); break;
+					case Alignment.Right: Rect = new Rectangle(-Text.Size.X, -Text.Size.Y / 2, Text.Size.X, Text.Size.Y); break;
+					case Alignment.BottomLeft: Rect = new Rectangle(0, -Text.Size.Y, Text.Size.X, Text.Size.Y); break;
+					case Alignment.Bottom: Rect = new Rectangle(-Text.Size.X / 2, -Text.Size.Y, Text.Size.X, Text.Size.Y); break;
+					case Alignment.BottomRight: Rect = new Rectangle(-Text.Size.X, -Text.Size.Y, Text.Size.X, Text.Size.Y); break;
+				}
+			}
 
 			Matrix matrix = Transform.FullTransformMatrix;
 			UVRect uv = Text.UVRect;

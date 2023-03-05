@@ -7,8 +7,7 @@ using Frozen.Drawing;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
+using SkiaSharp;
 
 namespace Frozen
 {
@@ -71,12 +70,12 @@ namespace Frozen
 			if (_textureCache.TryGetValue(texture, out Texture2D tx))
 				return tx;
 
-			Image<Rgba32> img = Image.Load<Rgba32>(texture);
-			byte[] data = new byte[img.Width * img.Height * img.PixelType.BitsPerPixel / 8];
-			img.CopyPixelDataTo(data);
+			byte[] src = File.ReadAllBytes(texture);
 
-			tx = new Texture2D(Engine.Game.GraphicsDevice, img.Width, img.Height, generateMipmaps, SurfaceFormat.Color);
-			tx.SetData(data);
+			using SKBitmap bmp = SKBitmap.Decode(src);
+
+			tx = new Texture2D(Engine.Game.GraphicsDevice, bmp.Width, bmp.Height, generateMipmaps, SurfaceFormat.Color);
+			tx.SetData(bmp.Pixels);
 
 			if (generateMipmaps)
 				tx.CreateMipMaps();
