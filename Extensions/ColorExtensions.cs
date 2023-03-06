@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 
 namespace Frozen
@@ -141,6 +142,20 @@ namespace Frozen
 		{
 			Color result = color;
 			result.A = (byte)(alpha * 255f);
+			return result;
+		}
+
+		public static Color[] ToXNA(this SkiaSharp.SKColor[] pixels)
+		{
+			Color[] result = new Color[pixels.Length];
+			Parallel.For(0, pixels.Length, i =>
+			{
+				result[i].R = pixels[i].Red;
+				result[i].G = pixels[i].Green;
+				result[i].B = pixels[i].Blue;
+				result[i].A = pixels[i].Alpha;
+			});
+
 			return result;
 		}
 	}

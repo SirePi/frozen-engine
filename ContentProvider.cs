@@ -16,9 +16,9 @@ namespace Frozen
 		private Dictionary<string, AudioSource> _audioCache = new Dictionary<string, AudioSource>();
 		private bool _audioEnabled = true;
 		private Dictionary<string, object> _cache = new Dictionary<string, object>();
-		private Dictionary<string, FontSystem> _rawFontCache = new Dictionary<string, FontSystem>();
-		private Dictionary<string, Dictionary<int, Font>> _fontCache = new Dictionary<string, Dictionary<int, Font>>();
+		private Dictionary<string, FontSystem> _fontCache = new Dictionary<string, FontSystem>();
 		private Game _game;
+		private Dictionary<string, SkiaSharp.Extended.Svg.SKSvg> _svgCache = new Dictionary<string, SkiaSharp.Extended.Svg.SKSvg>();
 		private Dictionary<string, Texture2D> _textureCache = new Dictionary<string, Texture2D>();
 
 		internal DefaultContent DefaultContent { get; private set; }
@@ -28,8 +28,6 @@ namespace Frozen
 			_game = game;
 			_game.Content.RootDirectory = "Content";
 			DefaultContent = new DefaultContent(_game.Content);
-
-			// Load<SoundEffect>("");
 		}
 
 		public Texture2D GenerateTexture(int width, int height, bool mipmap = true)
@@ -37,7 +35,7 @@ namespace Frozen
 			return new Texture2D(_game.GraphicsDevice, width, height, mipmap, SurfaceFormat.Color);
 		}
 
-		public virtual AudioSource LoadAudio(string audio)
+		public AudioSource LoadAudio(string audio)
 		{
 			if (!_audioCache.TryGetValue(audio, out AudioSource source))
 			{
@@ -48,43 +46,80 @@ namespace Frozen
 			return source;
 		}
 
-		public virtual SpriteFontBase LoadSpriteFont(string font, int size)
+		public SpriteFontBase LoadSpriteFont(string font, int size)
 		{
 			return LoadSpriteFont(font, size, CharacterRange.Default);
 		}
 
-		public virtual SpriteFontBase LoadSpriteFont(string font, int size, params CharacterRange[] characters)
+		public SpriteFontBase LoadSpriteFont(string font, int size, params CharacterRange[] characters)
 		{
-			if (!_rawFontCache.TryGetValue(font, out FontSystem fontSystem))
+			if (!_fontCache.TryGetValue(font, out FontSystem fontSystem))
 			{
 				fontSystem = new FontSystem();
 				fontSystem.AddFont(File.ReadAllBytes(font));
-				_rawFontCache[font] = fontSystem;
+				_fontCache[font] = fontSystem;
 			}
 
 			return fontSystem.GetFont(size);
 		}
 
-		public virtual Texture2D LoadTexture(string texture, bool generateMipmaps = true)
+		public Texture2D LoadTexture(string texture, bool generateMipmaps = true)
 		{
 			if (_textureCache.TryGetValue(texture, out Texture2D tx))
 				return tx;
 
 			byte[] src = File.ReadAllBytes(texture);
-
 			using SKBitmap bmp = SKBitmap.Decode(src);
 
-			tx = new Texture2D(Engine.Game.GraphicsDevice, bmp.Width, bmp.Height, generateMipmaps, SurfaceFormat.Color);
-			tx.SetData(bmp.Pixels);
-
-			if (generateMipmaps)
-				tx.CreateMipMaps();
+			tx = SKBitmapToTexture2D(bmp, generateMipmaps);
 
 			_textureCache[texture] = tx;
 			return tx;
 		}
 
-		public virtual T LoadXNA<T>(string assetName)
+		public Texture2D LoadSvg(string svg, int width, int? height = null, bool generateMipmaps = true)
+		{
+			if (!_svgCache.TryGetValue(svg, out SkiaSharp.Extended.Svg.SKSvg sksvg))
+			{
+				sksvg = new SkiaSharp.Extended.Svg.SKSvg();
+				sksvg.Load(svg);
+				_svgCache[svg] = sksvg;
+			}
+
+			if(height == null)
+				height = (int)MathF.Ceiling(width * sksvg.Picture.CullRect.Height / sksvg.Picture.CullRect.Width);
+
+			string textureId = $"{svg}:{width}x{height}";
+
+			if (_textureCache.TryGetValue(textureId, out Texture2D tx))
+				return tx;
+
+			SKMatrix scale = SKMatrix.CreateScale(width / sksvg.Picture.CullRect.Width, height.Value / sksvg.Picture.CullRect.Height);
+			using SKBitmap bmp = new SKBitmap(new SKImageInfo(width, height.Value, SKColorType.Rgba8888));
+			using SKCanvas canvas = new SKCanvas(bmp);
+
+			canvas.Clear(SKColors.Transparent);
+			canvas.DrawPicture(sksvg.Picture, ref scale);
+			canvas.Flush();
+
+			tx = SKBitmapToTexture2D(bmp, generateMipmaps);
+
+			_textureCache[textureId] = tx;
+			return tx;
+		}
+
+		private Texture2D SKBitmapToTexture2D(SKBitmap bitmap, bool generateMipmaps)
+		{
+			Texture2D texture = new Texture2D(Engine.Game.GraphicsDevice, bitmap.Width, bitmap.Height, generateMipmaps, SurfaceFormat.Color);
+			texture.SetData(bitmap.Pixels.ToXNA());
+
+			if (generateMipmaps)
+				texture.CreateMipMaps();
+
+			return texture;
+		}
+
+		public T LoadXNA<T>(string assetName)
 		{
 			Type t = typeof(T);
 
@@ -107,7 +142,7 @@ namespace Frozen
 			}
 		}
 
-		public virtual T LoadXNALocalized<T>(string assetName)
+		public T LoadXNALocalized<T>(string assetName)
 		{
 			Type t = typeof(T);
 
