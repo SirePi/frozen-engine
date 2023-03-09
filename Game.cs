@@ -35,6 +35,8 @@ namespace Frozen
 		protected override void Update(GameTime gameTime)
 		{
 			base.Update(gameTime);
+
+			Environment.Update(gameTime);
 			Time.Update(gameTime);
 
 			// Engine.Audio.Update();

@@ -17,7 +17,6 @@ namespace Frozen.ECS.Components
 		private bool _dirtyProjection;
 		private float _farPlane;
 		private float _nearPlane;
-		private float _windowAspectRatio;
 
 		internal Alignment Alignment { get; set; } = Alignment.Center;
 
@@ -112,28 +111,25 @@ namespace Frozen.ECS.Components
 
 		private void UpdateViewport()
 		{
-			GraphicsDevice device = Engine.Game.GraphicsDevice;
-			int width = (int)_size.Size.X;
-			int height = (int)_size.Size.Y;
+			Point desiredSize = GetDesiredSize();
 
-			if (!_size.IsAbsoluteSize)
-			{
-				width = (int)(device.Viewport.Width * _size.Size.X);
-				height = (int)(device.Viewport.Height * _size.Size.Y);
-			}
+			Viewport = new Viewport(0, 0, desiredSize.X, desiredSize.Y);
+			RenderTarget = new RenderTarget2D(Engine.Game.GraphicsDevice, desiredSize.X, desiredSize.Y, true, SurfaceFormat.Color, DepthFormat.Depth24Stencil8, 0, RenderTargetUsage.DiscardContents);
+		}
 
-			Viewport = new Viewport(0, 0, width, height);
-			RenderTarget = new RenderTarget2D(device, width, height, true, SurfaceFormat.Color, DepthFormat.Depth24Stencil8, 0, RenderTargetUsage.DiscardContents);
+		private Point GetDesiredSize()
+		{
+			if (_size.IsAbsoluteSize)
+				return _size.Size.ToPoint();
+			else
+				return (Engine.Game.GraphicsDevice.Viewport.Bounds.Size.ToVector2() * _size.Size).ToPoint();
 		}
 
 		protected override void OnUpdate()
 		{
-			GraphicsDevice device = Engine.Game.GraphicsDevice;
-			if (_windowAspectRatio != device.Viewport.AspectRatio && !_size.IsAbsoluteSize)
+			if (Environment.WindowResized && GetDesiredSize() != Viewport.Bounds.Size)
 			{
 				UpdateViewport();
-
-				_windowAspectRatio = device.Viewport.AspectRatio;
 				_dirtyProjection = true;
 			}
 

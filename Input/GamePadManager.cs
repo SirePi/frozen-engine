@@ -61,5 +61,20 @@ namespace Frozen.Input
 		{
 			return key.GetDPadState(_currentFrameState) == ButtonState.Released;
 		}
+
+		public void SetVibration(float motor)
+		{
+			SetVibration(motor, motor, 0, 0);
+		}
+
+		public void SetVibration(float leftMotor, float rightMotor)
+		{
+			SetVibration(leftMotor, rightMotor, 0, 0);
+		}
+
+		public void SetVibration(float leftMotor, float rightMotor, float leftTrigger, float rightTrigger)
+		{
+			GamePad.SetVibration(_player, leftMotor, rightMotor, leftTrigger, rightTrigger);
+		}
 	}
 }
