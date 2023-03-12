@@ -15,7 +15,9 @@ namespace Frozen.Audio
 		private readonly float _gain;
 
 		private int _delayInSamples;
+		private float[] _samplesBuffer;
 		private float[] _delayBuffer;
+		private int _samplesBufferIndex;
 		private int _delayBufferIndex;
 		private int _samplesSinceEnoughEnergy;
 
@@ -41,6 +43,11 @@ namespace Frozen.Audio
 
 			for (int i = 0; i < count; i++)
 			{
+				if (i < samplesRead)
+					_samplesBuffer[_samplesBufferIndex] = buffer[i + offset];
+				else
+					_samplesBuffer[_samplesBufferIndex] = 0;
+
 				int delaySamples = (int)(_depth * MathF.Sin(_rate * i));
 				int delayIndex = _delayBufferIndex + _delayInSamples - delaySamples;
 				while (delayIndex >= _delayInSamples)

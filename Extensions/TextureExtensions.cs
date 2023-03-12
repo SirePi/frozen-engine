@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using System;
+using Microsoft.Xna.Framework.Graphics;
 using SkiaSharp;
 
 namespace Frozen
@@ -7,24 +8,24 @@ namespace Frozen
 	{
 		public static void CreateMipMaps(this Texture2D texture)
 		{
-			int w = texture.Width;
-			int h = texture.Height;
+			float w = texture.Width;
+			float h = texture.Height;
 
-			SKColor[] data = new SKColor[w * h];
+			SKColor[] data = new SKColor[texture.Width * texture.Height];
 			texture.GetData(0, texture.Bounds, data, 0, data.Length);
 
-			using SKBitmap bmp = new SKBitmap(w, h);
+			using SKBitmap bmp = new SKBitmap(texture.Width, texture.Height);
 			bmp.Pixels = data;
 
 			for (int i = 1; i < texture.LevelCount; i++)
 			{
-				w /= 2;
-				h /= 2;
+				w = MathF.Ceiling(w / 2);
+				h = MathF.Ceiling(h / 2);
 
-				using SKBitmap mipmap = new SKBitmap(w, h);
+				using SKBitmap mipmap = new SKBitmap((int)w, (int)h);
 
 				bmp.ScalePixels(mipmap, SKFilterQuality.High);
-				texture.SetData(i, new Microsoft.Xna.Framework.Rectangle(0, 0, w, h), mipmap.Pixels, 0, w * h);
+				texture.SetData(i, new Microsoft.Xna.Framework.Rectangle(0, 0, mipmap.Width, mipmap.Height), mipmap.Pixels, 0, mipmap.Pixels.Length);
 			}
 		}
 

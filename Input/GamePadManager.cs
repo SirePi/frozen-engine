@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
 namespace Frozen.Input
@@ -10,6 +11,8 @@ namespace Frozen.Input
 		private GamePadState _currentFrameState;
 		private GamePadState _lastFrameState;
 
+		private TimeSpan? _endVibration;
+
 		internal GamePadManager(PlayerIndex player)
 		{
 			_player = player;
@@ -20,6 +23,12 @@ namespace Frozen.Input
 		{
 			_lastFrameState = _currentFrameState;
 			_currentFrameState = GamePad.GetState(_player, GamePadDeadZone.Circular);
+
+			if (_endVibration.HasValue && Time.ScaledGameTime > _endVibration.Value)
+			{
+				SetVibration(0);
+				_endVibration = null;
+			}
 		}
 
 		public bool IsButtonDown(GamePadButton key)
@@ -74,6 +83,22 @@ namespace Frozen.Input
 
 		public void SetVibration(float leftMotor, float rightMotor, float leftTrigger, float rightTrigger)
 		{
+			GamePad.SetVibration(_player, leftMotor, rightMotor, leftTrigger, rightTrigger);
+		}
+
+		public void PulseVibration(TimeSpan time, float motor)
+		{
+			PulseVibration(time, motor, motor, 0, 0);
+		}
+
+		public void PulseVibration(TimeSpan time, float leftMotor, float rightMotor)
+		{
+			PulseVibration(time, leftMotor, rightMotor, 0, 0);
+		}
+
+		public void PulseVibration(TimeSpan time, float leftMotor, float rightMotor, float leftTrigger, float rightTrigger)
+		{
+			_endVibration = Time.ScaledGameTime + time;
 			GamePad.SetVibration(_player, leftMotor, rightMotor, leftTrigger, rightTrigger);
 		}
 	}
