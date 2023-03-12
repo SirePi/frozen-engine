@@ -98,10 +98,10 @@ namespace Frozen.Drawing
 
 			if (primitivesCount > 0)
 			{
-				device.BlendState = Material.BlendState;
-				Material.SetShaderParameters(camera.View, camera.Projection);
-
-				foreach (EffectPass pass in Material.Effect.CurrentTechnique.Passes)
+				Material.Begin(device);
+				Material.SetDefaultEffectParameters(camera.View, camera.Projection);
+				
+				foreach (EffectPass pass in Material.CurrentTechniquePasses(device))
 				{
 					pass.Apply();
 					device.DrawUserIndexedPrimitives(PrimitiveType, _vertices.Data, 0, _vertices.Data.Length, _indexes.Data, 0, primitivesCount);
