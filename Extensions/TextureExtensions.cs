@@ -8,8 +8,8 @@ namespace Frozen
 	{
 		public static void CreateMipMaps(this Texture2D texture)
 		{
-			float w = texture.Width;
-			float h = texture.Height;
+			int w = texture.Width;
+			int h = texture.Height;
 
 			SKColor[] data = new SKColor[texture.Width * texture.Height];
 			texture.GetData(0, texture.Bounds, data, 0, data.Length);
@@ -19,10 +19,10 @@ namespace Frozen
 
 			for (int i = 1; i < texture.LevelCount; i++)
 			{
-				w = MathF.Ceiling(w / 2);
-				h = MathF.Ceiling(h / 2);
+				w = Math.Max(w >> 1, 1);
+				h = Math.Max(h >> 1, 1);
 
-				using SKBitmap mipmap = new SKBitmap((int)w, (int)h);
+				using SKBitmap mipmap = new SKBitmap(w, h);
 
 				bmp.ScalePixels(mipmap, SKFilterQuality.High);
 				texture.SetData(i, new Microsoft.Xna.Framework.Rectangle(0, 0, mipmap.Width, mipmap.Height), mipmap.Pixels, 0, mipmap.Pixels.Length);

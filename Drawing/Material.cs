@@ -22,7 +22,7 @@ namespace Frozen.Drawing
 				if (spriteSheet != value)
 				{
 					spriteSheet = value;
-					EffectParameters["Texture"].SetValue(spriteSheet.Texture);
+					EffectParameters["Texture"]?.SetValue(spriteSheet.Texture);
 				}
 			}
 		}

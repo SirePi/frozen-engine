@@ -75,7 +75,7 @@ namespace Frozen.ECS.Systems
 				_device.BlendState = BlendState.AlphaBlend;
 				_device.DepthStencilState = DepthStencilState.Default;
 				_device.SamplerStates[0] = SamplerState.AnisotropicWrap;
-				_device.RasterizerState = new RasterizerState { CullMode = CullMode.CullCounterClockwiseFace, FillMode = FillMode.Solid };
+				_device.RasterizerState = new RasterizerState { CullMode = CullMode.CullCounterClockwiseFace, FillMode = FillMode.Solid, MultiSampleAntiAlias = true };
 
 				for (int i = 0; i < _drawablesUsed; i++)
 					_drawables[i].Draw(_device, camera);
